@@ -72,13 +72,12 @@ let activeBlock = {
     size: 3
 };
 
-function collidesWithGrid(grid, activeBlock, x, y, rotation){
+function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
     for (let j = 0; j < activeBlock.size; j++) {
-        for (let i = 0; i <  activeBlock.size; i++) {
-            if(blocks[activeBlock.type].shape[(activeBlock.rotation + rotation)%4][j][i] && ((activeBlock.x + x + i) < 0 || (activeBlock.x + x + i) > 9 || (activeBlock.y + y + j > 19))){
-                return true;
-            }
-            if(blocks[activeBlock.type].shape[(activeBlock.rotation + rotation)%4][j][i] && grid[activeBlock.y + y + j][activeBlock.x + x + i]){
+        for (let i = 0; i < activeBlock.size; i++) {
+            var x = activeBlock.x + new_x + i;
+            var y = activeBlock.y + new_y + j;
+            if (blocks[activeBlock.type].shape[(activeBlock.rotation + new_rotation) % 4][j][i] && ((x < 0) || (x > 9) || (y > 19) || grid[y][x])) {
                 return true;
             }
         }
@@ -164,22 +163,22 @@ window.onload = (event) => {
     document.addEventListener('keydown', function (event) {
         switch (event.key) {
             case 'a':
-                if(!collidesWithGrid(grid,activeBlock, -1, 0, 0)){
+                if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
                     activeBlock.x -= 1;
                 }
                 break;
             case 'd':
-                if(!collidesWithGrid(grid,activeBlock, 1, 0, 0)){
+                if (!collidesWithGrid(grid, activeBlock, 1, 0, 0)) {
                     activeBlock.x += 1;
                 }
                 break;
             case 's':
-                if(!collidesWithGrid(grid,activeBlock, 0, 1, 0)){
+                if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
                     activeBlock.y += 1;
                 }
                 break;
             case 'w':
-                if(!collidesWithGrid(grid,activeBlock, 0, 0, 1)){
+                if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
                 break;

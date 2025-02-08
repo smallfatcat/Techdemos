@@ -1,6 +1,7 @@
 const blocks = [
     {
         blockType: 'I',
+        size: 4,
         shape: [
             [
                 [0, 0, 0, 0],
@@ -29,16 +30,8 @@ const blocks = [
         ]
     },
     {
-        blockType: 'O',
-        shape: [
-            [0, 1, 1, 0],
-            [0, 1, 1, 0],
-            [0, 0, 0, 0],
-            [0, 0, 0, 0]
-        ]
-    },
-    {
         blockType: 'J',
+        size: 3,
         shape: [
             [
                 [1, 0, 0],
@@ -61,20 +54,216 @@ const blocks = [
                 [1, 1, 0]
             ]
         ]
+    },
+    {
+        blockType: 'L',
+        size: 3,
+        shape: [
+            [
+                [0, 0, 1],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            [
+                [0, 1, 0],
+                [0, 1, 0],
+                [0, 1, 1]
+            ],
+            [
+                [0, 0, 0],
+                [1, 1, 1],
+                [1, 0, 0]
+            ],
+            [
+                [1, 1, 0],
+                [0, 1, 0],
+                [0, 1, 0]
+            ]
+        ]
+    },
+    {
+        blockType: 'O',
+        size: 4,
+        shape: [
+            [
+                [0, 1, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ]
+        ]
+    },
+    {
+        blockType: 'S',
+        size: 3,
+        shape: [
+            [
+                [0, 1, 1],
+                [1, 1, 0],
+                [0, 0, 0]
+            ],
+            [
+                [0, 1, 0],
+                [0, 1, 1],
+                [0, 0, 1]
+            ],
+            [
+                [0, 0, 0],
+                [0, 1, 1],
+                [1, 1, 0]
+            ],
+            [
+                [1, 0, 0],
+                [1, 1, 0],
+                [0, 1, 0]
+            ]
+        ]
+    },
+    {
+        blockType: 'T',
+        size: 3,
+        shape: [
+            [
+                [0, 1, 0],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            [
+                [0, 1, 0],
+                [0, 1, 1],
+                [0, 1, 0]
+            ],
+            [
+                [0, 0, 0],
+                [1, 1, 1],
+                [0, 1, 0]
+            ],
+            [
+                [0, 1, 0],
+                [1, 1, 0],
+                [0, 1, 0]
+            ]
+        ]
+    },
+    {
+        blockType: 'Z',
+        size: 3,
+        shape: [
+            [
+                [1, 1, 0],
+                [0, 1, 1],
+                [0, 0, 0]
+            ],
+            [
+                [0, 0, 1],
+                [0, 1, 1],
+                [0, 1, 0]
+            ],
+            [
+                [0, 0, 0],
+                [1, 1, 0],
+                [0, 1, 1]
+            ],
+            [
+                [1, 0, 0],
+                [1, 1, 0],
+                [0, 1, 0]
+            ]
+        ]
     }
 ];
+let grid = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+];
+const blockColors = ["⬛","🟦", "🟧", "🟫", "🟨", "🟩", "🟪", "🟥"]
+let activeBlock = {};
+spawnBlock();
+dropTickStart = Date.now();
 
-let activeBlock = {
-    x: 3,
-    y: 0,
-    type: 2,
-    rotation: 0,
-    size: 3
-};
+function checkLines() {
+    for (let row = 0; row < 20; row++) {
+        lineCleared = true;
+        for (let col = 0; col < 10; col++) {
+            if (grid[row][col] == 0) {
+                lineCleared = false;
+            }
+        }
+        if(lineCleared){
+            grid.splice(row,1);
+            grid.unshift([0,0,0,0,0,0,0,0,0,0]);
+        }
+    }
+}
+
+function spawnBlock() {
+    checkLines();
+    var newType = getRandomInt(0, 7);
+    activeBlock = {
+        x: 3,
+        y: 0,
+        type: newType,
+        rotation: 0,
+    }
+}
+
+function freezeBlock(grid) {
+    for (let i = 0; i < blocks[activeBlock.type].size; i++) {
+        for (let j = 0; j < blocks[activeBlock.type].size; j++) {
+            var x = activeBlock.x + i;
+            var y = activeBlock.y + j;
+            if (blocks[activeBlock.type].shape[activeBlock.rotation][j][i]) {
+                grid[y][x] = activeBlock.type + 1;
+            }
+        }
+    }
+}
+
+function getRandomInt(min, max) {
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
+}
 
 function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
-    for (let j = 0; j < activeBlock.size; j++) {
-        for (let i = 0; i < activeBlock.size; i++) {
+    for (let j = 0; j < blocks[activeBlock.type].size; j++) {
+        for (let i = 0; i < blocks[activeBlock.type].size; i++) {
             var x = activeBlock.x + new_x + i;
             var y = activeBlock.y + new_y + j;
             if (blocks[activeBlock.type].shape[(activeBlock.rotation + new_rotation) % 4][j][i] && ((x < 0) || (x > 9) || (y > 19) || grid[y][x])) {
@@ -85,79 +274,52 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
     return false;
 }
 
+function hasValidMoves(grid, activeBlock) {
+    if (!collidesWithGrid(grid, activeBlock, 1, 0, 0) || !collidesWithGrid(grid, activeBlock, -1, 0, 0) || !collidesWithGrid(grid, activeBlock, 0, 1, 0) || !collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
+        return true;
+    }
+    return false;
+}
+
 function drawGrid(grid, activeBlock) {
     gridElement = '';
     for (let row = 0; row < 20; row++) {
-        rowText = '';
+        var rowText = '';
         for (let col = 0; col < 10; col++) {
             let j = col - activeBlock.x;
             let i = row - activeBlock.y;
-            if (i >= 0 && i < activeBlock.size && j >= 0 && j < activeBlock.size) {
+            if (i >= 0 && i < blocks[activeBlock.type].size && j >= 0 && j < blocks[activeBlock.type].size) {
                 if (blocks[activeBlock.type].shape[activeBlock.rotation][i][j]) {
-                    rowText += "🟦";
+                    rowText += blockColors[activeBlock.type+1];
                     continue;
                 }
             }
-
-
-            switch (grid[row][col]) {
-                case 1:
-                    rowText += "🟦";
-                    break;
-                case 2:
-                    rowText += "🟧";
-                    break;
-                case 3:
-                    rowText += "🟫";
-                    break;
-                case 4:
-                    rowText += "🟨";
-                    break;
-                case 5:
-                    rowText += "🟩";
-                    break;
-                case 6:
-                    rowText += "🟪";
-                    break;
-                case 7:
-                    rowText += "🟥";
-                    break;
-                default:
-                    rowText += "⬛";
-                    break;
-            }
+            rowText += blockColors[grid[row][col]];
         }
         gridElement += rowText + '<br>';
     }
     document.getElementById("griddiv").innerHTML = gridElement;
 }
 
-window.onload = (event) => {
-
-    let grid = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 3, 3, 3, 0, 0, 0, 0],
-        [0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
-        [0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
-        [0, 0, 0, 0, 5, 5, 0, 0, 0, 0],
-        [0, 0, 0, 5, 5, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 6, 0, 0, 0, 0, 0],
-        [0, 0, 0, 6, 6, 6, 0, 0, 0, 0],
-        [0, 0, 0, 7, 7, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 7, 7, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 5, 0, 3, 4, 4, 2],
-        [0, 0, 0, 0, 5, 5, 3, 4, 4, 2],
-        [0, 0, 0, 7, 7, 5, 3, 3, 2, 2],
-        [0, 0, 0, 6, 7, 7, 1, 1, 1, 1],
-    ];
-
+function animate() {
+    if (Date.now() - dropTickStart > 2000) {
+        console.log(dropTickStart)
+        dropTickStart = Date.now();
+        if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
+            freezeBlock(grid);
+            spawnBlock();
+        }
+        else {
+            activeBlock.y += 1;
+        }
+    }
     drawGrid(grid, activeBlock);
+    requestAnimationFrame(animate);
+}
+
+window.onload = (event) => {
+    drawGrid(grid, activeBlock);
+    requestAnimationFrame(animate);
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {
@@ -175,6 +337,11 @@ window.onload = (event) => {
             case 's':
                 if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
                     activeBlock.y += 1;
+                    dropTickStart = Date.now();
+                }
+                else {
+                    freezeBlock(grid);
+                    spawnBlock();
                 }
                 break;
             case 'w':
@@ -182,7 +349,15 @@ window.onload = (event) => {
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
                 break;
+            case 'q':
+                freezeBlock(grid);
+                spawnBlock();
+                break;
         }
+        // if (!hasValidMoves(grid, activeBlock)) {
+        //     freezeBlock(grid);
+        //     spawnBlock();
+        // }
         drawGrid(grid, activeBlock)
     });
 };

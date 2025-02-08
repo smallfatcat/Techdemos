@@ -72,6 +72,20 @@ let activeBlock = {
     size: 3
 };
 
+function collidesWithGrid(grid, activeBlock, x, y, rotation){
+    for (let j = 0; j < activeBlock.size; j++) {
+        for (let i = 0; i <  activeBlock.size; i++) {
+            if(blocks[activeBlock.type].shape[(activeBlock.rotation + rotation)%4][j][i] && ((activeBlock.x + x + i) < 0 || (activeBlock.x + x + i) > 9 || (activeBlock.y + y + j > 19))){
+                return true;
+            }
+            if(blocks[activeBlock.type].shape[(activeBlock.rotation + rotation)%4][j][i] && grid[activeBlock.y + y + j][activeBlock.x + x + i]){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 function drawGrid(grid, activeBlock) {
     gridElement = '';
     for (let row = 0; row < 20; row++) {
@@ -140,8 +154,8 @@ window.onload = (event) => {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 5, 0, 3, 4, 4, 2],
         [0, 0, 0, 0, 5, 5, 3, 4, 4, 2],
-        [0, 0, 6, 7, 7, 5, 3, 3, 2, 2],
-        [0, 6, 6, 6, 7, 7, 1, 1, 1, 1],
+        [0, 0, 0, 7, 7, 5, 3, 3, 2, 2],
+        [0, 0, 0, 6, 7, 7, 1, 1, 1, 1],
     ];
 
     drawGrid(grid, activeBlock);
@@ -150,25 +164,26 @@ window.onload = (event) => {
     document.addEventListener('keydown', function (event) {
         switch (event.key) {
             case 'a':
-                console.log("left")
-                activeBlock.x -= 1;
-                drawGrid(grid, activeBlock)
+                if(!collidesWithGrid(grid,activeBlock, -1, 0, 0)){
+                    activeBlock.x -= 1;
+                }
                 break;
             case 'd':
-                console.log("right")
-                activeBlock.x += 1;
-                drawGrid(grid, activeBlock)
+                if(!collidesWithGrid(grid,activeBlock, 1, 0, 0)){
+                    activeBlock.x += 1;
+                }
                 break;
             case 's':
-                console.log("down")
-                activeBlock.y += 1;
-                drawGrid(grid, activeBlock)
+                if(!collidesWithGrid(grid,activeBlock, 0, 1, 0)){
+                    activeBlock.y += 1;
+                }
                 break;
             case 'w':
-                console.log("down")
-                activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                drawGrid(grid, activeBlock)
+                if(!collidesWithGrid(grid,activeBlock, 0, 0, 1)){
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
                 break;
         }
+        drawGrid(grid, activeBlock)
     });
 };

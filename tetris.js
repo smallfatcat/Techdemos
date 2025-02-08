@@ -36,14 +36,57 @@ const blocks = [
             [0, 0, 0, 0],
             [0, 0, 0, 0]
         ]
+    },
+    {
+        blockType: 'J',
+        shape: [
+            [
+                [1, 0, 0],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            [
+                [0, 1, 1],
+                [0, 1, 0],
+                [0, 1, 0]
+            ],
+            [
+                [0, 0, 0],
+                [1, 1, 1],
+                [0, 0, 1]
+            ],
+            [
+                [0, 1, 0],
+                [0, 1, 0],
+                [1, 1, 0]
+            ]
+        ]
     }
 ];
+
+let activeBlock = {
+    x: 3,
+    y: 0,
+    type: 2,
+    rotation: 0,
+    size: 3
+};
 
 function drawGrid(grid, activeBlock) {
     gridElement = '';
     for (let row = 0; row < 20; row++) {
         rowText = '';
         for (let col = 0; col < 10; col++) {
+            let j = col - activeBlock.x;
+            let i = row - activeBlock.y;
+            if (i >= 0 && i < activeBlock.size && j >= 0 && j < activeBlock.size) {
+                if (blocks[activeBlock.type].shape[activeBlock.rotation][i][j]) {
+                    rowText += "🟦";
+                    continue;
+                }
+            }
+
+
             switch (grid[row][col]) {
                 case 1:
                     rowText += "🟦";
@@ -77,12 +120,12 @@ function drawGrid(grid, activeBlock) {
 }
 
 window.onload = (event) => {
-    
+
     let grid = [
-        [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
-        [0, 0, 0, 2, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 2, 2, 2, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 3, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 3, 3, 3, 0, 0, 0, 0],
         [0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
         [0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
@@ -101,33 +144,31 @@ window.onload = (event) => {
         [0, 6, 6, 6, 7, 7, 1, 1, 1, 1],
     ];
 
-    let activeBlock = {
-        x: 3,
-        y: 0,
-        type: "I",
-        rotation: 0
-    };
-
     drawGrid(grid, activeBlock);
-
-
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {
         switch (event.key) {
-            case 'ArrowLeft':
+            case 'a':
                 console.log("left")
-                // moveTetrominoLeft();
+                activeBlock.x -= 1;
+                drawGrid(grid, activeBlock)
                 break;
-            case 'ArrowRight':
+            case 'd':
                 console.log("right")
-                // moveTetrominoRight();
+                activeBlock.x += 1;
+                drawGrid(grid, activeBlock)
                 break;
-            case 'ArrowDown':
+            case 's':
                 console.log("down")
-                // moveTetrominoDown();
+                activeBlock.y += 1;
+                drawGrid(grid, activeBlock)
                 break;
-            // Add more key presses for rotation (e.g., 'ArrowUp')
+            case 'w':
+                console.log("down")
+                activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                drawGrid(grid, activeBlock)
+                break;
         }
     });
 };

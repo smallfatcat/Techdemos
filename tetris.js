@@ -221,6 +221,7 @@ let nextBlock = {
     rotation: 0,
 }
 let gameOver = false;
+let score  = 0;
 spawnBlock();
 let dropTickStart = Date.now();
 
@@ -233,6 +234,7 @@ function checkLines() {
             }
         }
         if (lineCleared) {
+            score += 1;
             grid.splice(row, 1);
             grid.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         }
@@ -329,11 +331,12 @@ function drawGrid(grid, activeBlock) {
     }
     document.getElementById("griddiv").innerHTML = gridElement;
     document.getElementById("nextdiv").innerHTML = nextElement;
+    document.getElementById("scorediv").innerHTML = "Score: " + score;
 }
 
 function animate() {
     if (Date.now() - dropTickStart > 2000) {
-        console.log(dropTickStart)
+        // console.log(dropTickStart)
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
             freezeBlock(grid);
@@ -353,7 +356,7 @@ window.onload = (event) => {
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {
-        switch (event.key) {
+        switch (event.key.toLowerCase()) {
             case 'a':
                 if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
                     activeBlock.x -= 1;

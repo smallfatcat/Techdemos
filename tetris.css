@@ -1,13 +1,38 @@
 body {
     background-color: rgb(50, 50, 50);
     color: rgb(159, 170, 180);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 #ui-container{
     display: flex;
     justify-content: space-around;
 }
+#score-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 150px;
+}
 
 #nextdiv {
-    width: 200px;
+    /* line-height: 20px;
+    letter-spacing: -2px; */
+    width: 100px;
+}
+#scorediv {
+    /* text-align: center; */
+    height: 50px;
+}
+/* #griddiv {
+    line-height: 20px;
+    letter-spacing: -2px;
+}
+#examples {
+    line-height: 20px;
+    letter-spacing: -2px;
+} */
+.compact{
+    line-height: 20px;
+    letter-spacing: -2px;
 }

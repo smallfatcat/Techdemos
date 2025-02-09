@@ -8,13 +8,6 @@ body {
     justify-content: space-around;
 }
 
-#examples {
-    /* position: absolute;
-    right: 0px;
-    top: 0px; */
-}
-#griddiv {
-    /* position: absolute;
-    left: 0px;
-    top: 0px; */
+#nextdiv {
+    width: 200px;
 }

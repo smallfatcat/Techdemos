@@ -212,10 +212,17 @@ let grid = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
-const blockColors = ["⬛","🟦", "🟧", "🟫", "🟨", "🟩", "🟪", "🟥"]
+const blockColors = ["⬛", "🟦", "🟧", "🟫", "🟨", "🟩", "🟪", "🟥"]
 let activeBlock = {};
+let nextBlock = {
+    x: 3,
+    y: 0,
+    type: getRandomInt(0, 7),
+    rotation: 0,
+}
+let gameOver = false;
 spawnBlock();
-dropTickStart = Date.now();
+let dropTickStart = Date.now();
 
 function checkLines() {
     for (let row = 0; row < 20; row++) {
@@ -225,21 +232,29 @@ function checkLines() {
                 lineCleared = false;
             }
         }
-        if(lineCleared){
-            grid.splice(row,1);
-            grid.unshift([0,0,0,0,0,0,0,0,0,0]);
+        if (lineCleared) {
+            grid.splice(row, 1);
+            grid.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         }
     }
 }
 
 function spawnBlock() {
-    checkLines();
-    var newType = getRandomInt(0, 7);
-    activeBlock = {
-        x: 3,
-        y: 0,
-        type: newType,
-        rotation: 0,
+    if (!gameOver) {
+        checkLines();
+        if (collidesWithGrid(grid, nextBlock, 0, 0, 0)) {
+            console.log("Game Ended");
+            gameOver = true;
+        }
+        else {
+            activeBlock = {
+                x: 3,
+                y: 0,
+                type: nextBlock.type,
+                rotation: 0,
+            }
+            nextBlock.type = getRandomInt(0, 7);
+        }
     }
 }
 
@@ -290,7 +305,7 @@ function drawGrid(grid, activeBlock) {
             let i = row - activeBlock.y;
             if (i >= 0 && i < blocks[activeBlock.type].size && j >= 0 && j < blocks[activeBlock.type].size) {
                 if (blocks[activeBlock.type].shape[activeBlock.rotation][i][j]) {
-                    rowText += blockColors[activeBlock.type+1];
+                    rowText += blockColors[activeBlock.type + 1];
                     continue;
                 }
             }
@@ -298,7 +313,22 @@ function drawGrid(grid, activeBlock) {
         }
         gridElement += rowText + '<br>';
     }
+    nextElement = '';
+    var size = blocks[nextBlock.type].size;
+    for (let x = 0; x < size; x++) {
+        var rowText = '';
+        for (let y = 0; y < size; y++) {
+            if(blocks[nextBlock.type].shape[nextBlock.rotation][x][y]){
+                rowText += blockColors[nextBlock.type+1];
+            }
+            else{
+                rowText += blockColors[0];
+            }
+        }
+        nextElement += rowText + '<br>';;
+    }
     document.getElementById("griddiv").innerHTML = gridElement;
+    document.getElementById("nextdiv").innerHTML = nextElement;
 }
 
 function animate() {
@@ -348,10 +378,6 @@ window.onload = (event) => {
                 if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
-                break;
-            case 'q':
-                freezeBlock(grid);
-                spawnBlock();
                 break;
         }
         // if (!hasValidMoves(grid, activeBlock)) {

@@ -220,6 +220,7 @@ let nextBlock = {
     type: getRandomInt(0, 7),
     rotation: 0,
 }
+let tickTime = 1000;
 let gameOver = false;
 let score  = 0;
 spawnBlock();
@@ -335,7 +336,7 @@ function drawGrid(grid, activeBlock) {
 }
 
 function animate() {
-    if (Date.now() - dropTickStart > 2000) {
+    if (Date.now() - dropTickStart > tickTime) {
         // console.log(dropTickStart)
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
@@ -381,6 +382,43 @@ window.onload = (event) => {
                 if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
+                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 1)){
+                    activeBlock.x -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;         
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 1)){
+                    activeBlock.x += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;         
+                }
+                
+                break;
+            case 'e':
+                if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 1)){
+                    activeBlock.x -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;         
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 1)){
+                    activeBlock.x += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;         
+                }
+                
+                break;
+            case 'q':
+                if (!collidesWithGrid(grid, activeBlock, 0, 0, 3)) {
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 3)){
+                    activeBlock.x -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;         
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 3)){
+                    activeBlock.x += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;        
+                }
+                
                 break;
         }
         // if (!hasValidMoves(grid, activeBlock)) {

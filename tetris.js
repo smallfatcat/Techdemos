@@ -183,9 +183,9 @@ const blocks = [
                 [0, 1, 1]
             ],
             [
-                [1, 0, 0],
+                [0, 1, 0],
                 [1, 1, 0],
-                [0, 1, 0]
+                [1, 0, 0]
             ]
         ]
     }
@@ -210,13 +210,18 @@ let grid = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ];
 const blockColors = ["⬛", "🟦", "🟧", "🟫", "🟨", "🟩", "🟪", "🟥"]
+const height = grid.length;
 let activeBlock = {};
 let nextBlock = {
     x: 3,
-    y: 0,
+    y: 2,
     type: getRandomInt(0, 7),
     rotation: 0,
 }
@@ -231,7 +236,7 @@ let dropTickStart = Date.now();
 
 function checkLines() {
     var clearedCount = 0;
-    for (let row = 0; row < 20; row++) {
+    for (let row = 0; row < grid.length; row++) {
         lineCleared = true;
         for (let col = 0; col < 10; col++) {
             if (grid[row][col] == 0) {
@@ -266,7 +271,7 @@ function checkLines() {
             break;
     }
     level = Math.floor(lines / 5) + 1;
-    speed = Math.floor(((0.8-((level - 1) * 0.007))**(level-1)) * 1000);
+    speed = Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
 }
 
 function spawnBlock() {
@@ -279,7 +284,7 @@ function spawnBlock() {
         else {
             activeBlock = {
                 x: 3,
-                y: 0,
+                y: 2,
                 type: nextBlock.type,
                 rotation: 0,
             }
@@ -311,7 +316,7 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
         for (let i = 0; i < blocks[activeBlock.type].size; i++) {
             var x = activeBlock.x + new_x + i;
             var y = activeBlock.y + new_y + j;
-            if (blocks[activeBlock.type].shape[(activeBlock.rotation + new_rotation) % 4][j][i] && ((x < 0) || (x > 9) || (y > 19) || grid[y][x])) {
+            if (blocks[activeBlock.type].shape[(activeBlock.rotation + new_rotation) % 4][j][i] && ((x < 0) || (x > 9) || (y > height - 1) || grid[y][x])) {
                 return true;
             }
         }
@@ -328,7 +333,7 @@ function hasValidMoves(grid, activeBlock) {
 
 function drawGrid(grid, activeBlock) {
     gridElement = '';
-    for (let row = 0; row < 20; row++) {
+    for (let row = 4; row < grid.length; row++) {
         var rowText = '';
         for (let col = 0; col < 10; col++) {
             let j = col - activeBlock.x;
@@ -405,44 +410,131 @@ window.onload = (event) => {
                     spawnBlock();
                 }
                 break;
+            // rotate right: none, down, left, left/down, right, right/down, up, left/up, right/up
             case 'w':
-                if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
+                if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {        // none
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 1)) {
+                else if (!collidesWithGrid(grid, activeBlock, 0, 1, 1)) {  // down
+                    activeBlock.y -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 1)) {   // left
                     activeBlock.x -= 1;
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 1)) {
+                else if (!collidesWithGrid(grid, activeBlock, -1, 1, 1)) {   // left/down
+                    activeBlock.x -= 1;
+                    activeBlock.y += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 1)) {   // right
                     activeBlock.x += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 1, 1)) {   // right/down
+                    activeBlock.x += 1;
+                    activeBlock.y += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 0, -1, 1)) {   // up
+                    activeBlock.y -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, -1, -1, 1)) {   // left/up
+                    activeBlock.x -= 1;
+                    activeBlock.y -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, -1, 1)) {   // right/up
+                    activeBlock.x += 1;
+                    activeBlock.y -= 1;
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
 
                 break;
+            // rotate right: none, down, left, left/down, right, right/down, up, left/up, right/up
             case 'e':
-                if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
+                if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {        // none
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 1)) {
+                else if (!collidesWithGrid(grid, activeBlock, 0, 1, 1)) {  // down
+                    activeBlock.y -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 1)) {   // left
                     activeBlock.x -= 1;
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 1)) {
+                else if (!collidesWithGrid(grid, activeBlock, -1, 1, 1)) {   // left/down
+                    activeBlock.x -= 1;
+                    activeBlock.y += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 1)) {   // right
                     activeBlock.x += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 1, 1)) {   // right/down
+                    activeBlock.x += 1;
+                    activeBlock.y += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 0, -1, 1)) {   // up
+                    activeBlock.y -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, -1, -1, 1)) {   // left/up
+                    activeBlock.x -= 1;
+                    activeBlock.y -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, -1, 1)) {   // right/up
+                    activeBlock.x += 1;
+                    activeBlock.y -= 1;
                     activeBlock.rotation = (activeBlock.rotation + 1) % 4;
                 }
 
                 break;
+            // rotate left:  none, down, right, right/down, left, left/down, up, right/up, left/up 
             case 'q':
-                if (!collidesWithGrid(grid, activeBlock, 0, 0, 3)) {
+                if (!collidesWithGrid(grid, activeBlock, 0, 0, 3)) {        // none
                     activeBlock.rotation = (activeBlock.rotation + 3) % 4;
                 }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 3)) {
+                else if (!collidesWithGrid(grid, activeBlock, 0, 1, 3)) {   // down
+                    activeBlock.y += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 3)) {   // right
+                    activeBlock.x += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, 1, 3)) {   // right/down
+                    activeBlock.x += 1;
+                    activeBlock.y += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 3)) {   // left
                     activeBlock.x -= 1;
                     activeBlock.rotation = (activeBlock.rotation + 3) % 4;
                 }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 3)) {
+                else if (!collidesWithGrid(grid, activeBlock, -1, 1, 3)) {   // left/down
+                    activeBlock.x -= 1;
+                    activeBlock.y += 1;
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 0, -1, 3)) {   // up
+                    activeBlock.y -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, 1, -1, 3)) {   // right/up
                     activeBlock.x += 1;
+                    activeBlock.y -= 1;
+                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
+                }
+                else if (!collidesWithGrid(grid, activeBlock, -1, -1, 3)) {   // left/up
+                    activeBlock.x -= 1;
+                    activeBlock.y -= 1;
                     activeBlock.rotation = (activeBlock.rotation + 3) % 4;
                 }
 

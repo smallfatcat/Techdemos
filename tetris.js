@@ -545,23 +545,23 @@ window.onload = (event) => {
 
 function rotateLeft() {
     if (activeBlock.type == 0) {
-        srs(rotIleft[activeBlock.rotation]);
+        rotateUsingSRS(rotIleft[activeBlock.rotation]);
     }
     else if (activeBlock.type != 3) {
-        srs(rotJLTSZleft[activeBlock.rotation]);
+        rotateUsingSRS(rotJLTSZleft[activeBlock.rotation]);
     }
 }
 
 function rotateRight() {
     if (activeBlock.type == 0) {
-        srs(rotIright[activeBlock.rotation]);
+        rotateUsingSRS(rotIright[activeBlock.rotation]);
     }
     else if (activeBlock.type != 3) {
-        srs(rotJLTSZright[activeBlock.rotation]);
+        rotateUsingSRS(rotJLTSZright[activeBlock.rotation]);
     }
 }
 
-function srs(srsArray) {
+function rotateUsingSRS(srsArray) {
     for (let i = 0; i < srsArray.length; i++) {
         if (skipCheck(srsArray[i][0], srsArray[i][1], srsArray[i][2])) {
             break;

@@ -319,6 +319,7 @@ let activeBlock = {};
 let nextBlock = {};
 let grid = [];
 let lastGrid = [];
+let lastActiveBlock = {};
 let gameOver = false;
 let score = 0;
 let lines = 0;
@@ -329,6 +330,7 @@ let dropTickStart = Date.now();
 let startTime = Date.now();
 let history = [];
 let historyNext = [];
+let historyActiveBlock = [];
 
 let replayMode = false;
 
@@ -336,6 +338,8 @@ let replayMode = false;
 
 function init() {
     history = [];
+    historyNext = [];
+    historyActiveBlock = [];
     grid = [];
     for (let i = 0; i < gridHeight; i++) {
         grid.push(blankRow.slice())
@@ -348,6 +352,8 @@ function init() {
         type: getRandomInt(0, 7),
         rotation: 0,
     }
+    lastActiveBlock = getActiveBlockCopy(nextBlock);
+
     gameOver = false;
     score = 0;
     lines = 0;
@@ -409,8 +415,9 @@ function spawnBlock() {
                 x: 3,
                 y: 2,
                 type: nextBlock.type,
-                rotation: 0,
+                rotation: 0
             }
+
             nextBlock.type = getRandomInt(0, 7);
         }
     }
@@ -500,14 +507,27 @@ function animate() {
     }
 
     if (gridChanged(grid, lastGrid)) {
-        console.log(grid);
+        // console.log(grid);
         history.push(getGridCopy(grid));
     }
+    if (activeBlockChanged(activeBlock, lastActiveBlock)) {
+        console.log(activeBlock);
+        historyActiveBlock.push(getActiveBlockCopy(activeBlock));
+    }
+    lastActiveBlock = getActiveBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);
     drawGrid(grid, activeBlock);
     if (!gameOver) {
         requestAnimationFrame(animate);
     }
+}
+
+function activeBlockChanged(activeBlock, lastActiveBlock) {
+    if (activeBlock.x != lastActiveBlock.x || activeBlock.y != lastActiveBlock.y
+        || activeBlock.rotation != lastActiveBlock.rotation || activeBlock.type != lastActiveBlock.type) {
+        return true;
+    }
+    return false;
 }
 
 function gridChanged(grid, lastGrid) {
@@ -524,6 +544,16 @@ function gridChanged(grid, lastGrid) {
         }
     }
     return changedGrid;
+}
+
+function getActiveBlockCopy(activeBlockOriginal) {
+    let activeBlockCopy = {
+        x: activeBlockOriginal.x,
+        y: activeBlockOriginal.y,
+        type: activeBlockOriginal.type,
+        rotation: activeBlockOriginal.rotation
+    }
+    return activeBlockCopy
 }
 
 function getGridCopy(originalGrid) {

@@ -6,7 +6,10 @@ body {
 }
 
 input {
-    width: 20px;
+    background-color: rgb(50, 50, 50);
+    color: rgb(159, 170, 180);
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    width: 40px;
 }
 
 #ui-container{
@@ -21,7 +24,7 @@ input {
 }
 
 #inputdiv {
-    width: 20px;
+    width: auto;
 }
 #nextdiv {
     width: 100px;

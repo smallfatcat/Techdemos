@@ -330,12 +330,16 @@ let history = [];
 let historyNext = [];
 
 let replayMode = false;
+let historyNextIndex = 0;
 
 
 
 function init() {
-    history = [];
-    historyNext = [];
+    historyNextIndex = 0;
+    if (!replayMode) {
+        history = [];
+        historyNext = [];
+    }
     grid = [];
     for (let i = 0; i < gridHeight; i++) {
         grid.push(blankRow.slice())
@@ -425,11 +429,52 @@ function lockBlock(grid) {
     }
 }
 
+function playback() {
+    replayMode = true;
+    // var historyItem = history.shift();
+    // var key = historyItem[0]
+    // var timestamp = historyItem[1];
+    init();
+    drawGrid(grid, activeBlock);
+    requestAnimationFrame(animate);
+    for (const historyItem of history) {
+        setTimeout(playbackKeys, historyItem[1], historyItem[0]);
+    }
+}
+
+function playbackKeys(key){
+    switch (key) {
+        case "a":
+            left();
+            break;
+        case "d":
+            right();
+            break;
+        case "s":
+            down();
+            break;
+        case "e":
+            rotateRight();
+            break;
+        case "q":
+            rotateLeft();
+            break;
+
+    }
+}
+
 function getRandomInt(min, max) {
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
     var res = Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
-    historyNext.push(res);
+
+    if (replayMode) {
+        res = historyNext[historyNextIndex];
+        historyNextIndex += 1;
+    }
+    else {
+        historyNext.push(res);
+    }
 
     return res; // The maximum is exclusive and the minimum is inclusive
 }
@@ -484,6 +529,7 @@ function drawGrid(grid, activeBlock) {
 }
 
 function animate() {
+    // console.log("animate entry")
     if (Date.now() - dropTickStart > speed) {
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
@@ -496,7 +542,9 @@ function animate() {
         }
     }
     drawGrid(grid, activeBlock);
-    requestAnimationFrame(animate);
+    if(!gameOver){
+        requestAnimationFrame(animate);
+    }
 }
 
 window.onload = (event) => {
@@ -531,32 +579,39 @@ window.onload = (event) => {
 };
 
 function down() {
-    history.push(["s", Date.now() - startTime]);
+    if (!replayMode) {
+        history.push(["s", Date.now() - startTime]);
+    }
     if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
         activeBlock.y += 1;
         dropTickStart = Date.now();
     }
     else {
         lockBlock(grid);
-        // history.push(['r', Date.now() - startTime, nextBlock.type])
         spawnBlock();
     }
 }
 function left() {
-    history.push(["a", Date.now() - startTime]);
+    if (!replayMode) {
+        history.push(["a", Date.now() - startTime]);
+    }
     if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
         activeBlock.x -= 1;
     }
 }
 function right() {
-    history.push(["d", Date.now() - startTime]);
+    if (!replayMode) {
+        history.push(["d", Date.now() - startTime]);
+    }
     if (!collidesWithGrid(grid, activeBlock, 1, 0, 0)) {
         activeBlock.x += 1;
     }
 }
 
 function rotateLeft() {
-    history.push(["q", Date.now() - startTime]);
+    if (!replayMode) {
+        history.push(["q", Date.now() - startTime]);
+    }
     if (activeBlock.type == 0) {
         rotateUsingSRS(rotIleft[activeBlock.rotation]);
     }
@@ -566,7 +621,9 @@ function rotateLeft() {
 }
 
 function rotateRight() {
-    history.push(["e", Date.now() - startTime]);
+    if (!replayMode) {
+        history.push(["e", Date.now() - startTime]);
+    }
     if (activeBlock.type == 0) {
         rotateUsingSRS(rotIright[activeBlock.rotation]);
     }

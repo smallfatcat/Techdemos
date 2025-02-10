@@ -254,6 +254,66 @@ const rotJLTSZleft = [
         [-1, -2, 3]
     ]
 ];
+const rotIright = [
+    [
+        [0, 0, 1],
+        [-2, 0, 1],
+        [1, 0, 1],
+        [-2, 1, 1],
+        [1, -2, 1]
+    ],
+    [
+        [0, 0, 1],
+        [-1, 0, 1],
+        [2, 0, 1],
+        [-1, -2, 1],
+        [2, 1, 1]
+    ],
+    [
+        [0, 0, 1],
+        [2, 0, 1],
+        [-1, 0, 1],
+        [2, -1, 1],
+        [-1, 2, 1]
+    ],
+    [
+        [0, 0, 1],
+        [1, 0, 1],
+        [-2, 0, 1],
+        [1, 2, 1],
+        [-2, -1, 1]
+    ]
+];
+const rotIleft = [
+    [
+        [0, 0, 3],
+        [-1, 0, 3],
+        [2, 0, 3],
+        [-1, -2, 3],
+        [2, 1, 3]
+    ],
+    [
+        [0, 0, 3],
+        [2, 0, 3],
+        [-1, 0, 3],
+        [2, -1, 3],
+        [-1, 2, 3]
+    ],
+    [
+        [0, 0, 3],
+        [1, 0, 3],
+        [-2, 0, 3],
+        [1, 2, 3],
+        [-2, -1, 3]
+    ],
+    [
+        [0, 0, 3],
+        [-2, 0, 3],
+        [1, 0, 3],
+        [-2, 1, 3],
+        [1, -2, 3]
+    ]
+];
 
 let activeBlock = {};
 let nextBlock = {};
@@ -266,7 +326,7 @@ let level = startLevel;
 let speed = 800;
 let dropTickStart = Date.now();
 
-init();
+
 
 function init() {
     grid = [];
@@ -283,7 +343,7 @@ function init() {
     gameOver = false;
     score = 0;
     lines = 0;
-    startLevel = 1;
+    startLevel = Number(document.getElementById("startlevel").value);
     level = startLevel;
     speed = 800;
     spawnBlock();
@@ -422,7 +482,6 @@ function drawGrid(grid, activeBlock) {
 
 function animate() {
     if (Date.now() - dropTickStart > speed) {
-        // console.log(dropTickStart)
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
             lockBlock(grid);
@@ -437,6 +496,7 @@ function animate() {
 }
 
 window.onload = (event) => {
+    init();
     drawGrid(grid, activeBlock);
     requestAnimationFrame(animate);
 
@@ -479,20 +539,26 @@ window.onload = (event) => {
                 rotateLeft();
                 break;
         }
-        // if (!hasValidMoves(grid, activeBlock)) {
-        //     freezeBlock(grid);
-        //     spawnBlock();
-        // }
         drawGrid(grid, activeBlock)
     });
 };
 
 function rotateLeft() {
-    srs(rotJLTSZleft[activeBlock.rotation]);
+    if (activeBlock.type == 0) {
+        srs(rotIleft[activeBlock.rotation]);
+    }
+    else if (activeBlock.type != 3) {
+        srs(rotJLTSZleft[activeBlock.rotation]);
+    }
 }
 
 function rotateRight() {
-    srs(rotJLTSZright[activeBlock.rotation]);
+    if (activeBlock.type == 0) {
+        srs(rotIright[activeBlock.rotation]);
+    }
+    else if (activeBlock.type != 3) {
+        srs(rotJLTSZright[activeBlock.rotation]);
+    }
 }
 
 function srs(srsArray) {

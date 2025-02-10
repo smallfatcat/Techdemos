@@ -357,6 +357,8 @@ function init() {
     spawnBlock();
     dropTickStart = Date.now();
     startTime = Date.now();
+    drawGrid(grid, activeBlock);
+    requestAnimationFrame(animate);
 }
 
 function checkLines() {
@@ -538,8 +540,8 @@ function getGridCopy(originalGrid) {
 
 window.onload = (event) => {
     init();
-    drawGrid(grid, activeBlock);
-    requestAnimationFrame(animate);
+    // drawGrid(grid, activeBlock);
+    // requestAnimationFrame(animate);
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {

@@ -191,29 +191,104 @@ const blocks = [
     }
 ];
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-let grid = [];
-for (let i = 0; i < 24; i++) {
-    grid.push(blankRow.slice())
-}
 const blockColors = ["⬛", "🟦", "🟧", "🟫", "🟨", "🟩", "🟪", "🟥"]
-const height = grid.length;
-let activeBlock = {};
-let nextBlock = {
-    x: 3,
-    y: 2,
-    type: getRandomInt(0, 7),
-    rotation: 0,
-}
+const gridHeight = 24;
 const startDisplay = 0;
-let tickTime = 1000;
+const rotJLTSZright = [
+    [
+        [0, 0, 1],
+        [-1, 0, 1],
+        [-1, -1, 1],
+        [0, 2, 1],
+        [-1, 2, 1]
+    ],
+    [
+        [0, 0, 1],
+        [1, 0, 1],
+        [1, 1, 1],
+        [0, -2, 1],
+        [1, -2, 1]
+    ],
+    [
+        [0, 0, 1],
+        [1, 0, 1],
+        [1, -1, 1],
+        [0, 2, 1],
+        [1, 2, 1]
+    ],
+    [
+        [0, 0, 1],
+        [-1, 0, 1],
+        [-1, 1, 1],
+        [0, -2, 1],
+        [-1, -2, 1]
+    ]
+];
+const rotJLTSZleft = [
+    [
+        [0, 0, 3],
+        [1, 0, 3],
+        [1, -1, 3],
+        [0, 2, 3],
+        [1, 2, 3]
+    ],
+    [
+        [0, 0, 3],
+        [1, 0, 3],
+        [1, 1, 3],
+        [0, -2, 3],
+        [1, -2, 3]
+    ],
+    [
+        [0, 0, 3],
+        [-1, 0, 3],
+        [-1, -1, 3],
+        [0, 2, 3],
+        [-1, 2, 3]
+    ],
+    [
+        [0, 0, 3],
+        [-1, 0, 3],
+        [-1, 1, 3],
+        [0, -2, 3],
+        [-1, -2, 3]
+    ]
+];
+
+let activeBlock = {};
+let nextBlock = {};
+let grid = [];
 let gameOver = false;
 let score = 0;
 let lines = 0;
-let startLevel = 5;
+let startLevel = 1;
 let level = startLevel;
 let speed = 800;
-spawnBlock();
 let dropTickStart = Date.now();
+
+init();
+
+function init() {
+    grid = [];
+    for (let i = 0; i < gridHeight; i++) {
+        grid.push(blankRow.slice())
+    }
+    activeBlock = {};
+    nextBlock = {
+        x: 3,
+        y: 2,
+        type: getRandomInt(0, 7),
+        rotation: 0,
+    }
+    gameOver = false;
+    score = 0;
+    lines = 0;
+    startLevel = 1;
+    level = startLevel;
+    speed = 800;
+    spawnBlock();
+    dropTickStart = Date.now();
+}
 
 function checkLines() {
     var clearedCount = 0;
@@ -233,24 +308,21 @@ function checkLines() {
     switch (clearedCount) {
         case 1:
             score += 100 * level;
-            lines += 1;
             break;
         case 2:
             score += 300 * level;
-            lines += 2;
             break;
         case 3:
             score += 500 * level;
-            lines += 3;
             break;
         case 4:
             score += 800 * level;
-            lines += 4;
             break;
 
         default:
             break;
     }
+    lines += clearedCount;
     level = Math.floor(lines / 5) + startLevel;
     speed = Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
 }
@@ -297,7 +369,7 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
         for (let i = 0; i < blocks[activeBlock.type].size; i++) {
             var x = activeBlock.x + new_x + i;
             var y = activeBlock.y + new_y + j;
-            if (blocks[activeBlock.type].shape[(activeBlock.rotation + new_rotation) % 4][j][i] && ((x < 0) || (x > 9) || (y > height - 1) || grid[y][x])) {
+            if (blocks[activeBlock.type].shape[(activeBlock.rotation + new_rotation) % 4][j][i] && ((x < 0) || (x > 9) || (y > gridHeight - 1) || grid[y][x])) {
                 return true;
             }
         }
@@ -416,44 +488,16 @@ window.onload = (event) => {
 };
 
 function rotateLeft() {
-    // rotate left:  basic rotation, down, right, right/down, left, left/down, up, right/up, left/up 
-    // rotate left: {{0,0,},{0,-1,},{1,0,},{1,-1,},{-1,0,},{-1,-1,},{0,1,},{1,1,},{-1,1,},}
-    // SRS system
-    srsLeft = [
-        [0, 0, 3],  // basic rotation
-        [0, 1, 3],  // down
-        [1, 0, 3],  // right
-        [1, 1, 3],  // right/down
-        [-1, 0, 3], // left
-        [-1, 1, 3], // left/down
-        [0, -1, 3], // up
-        [1, -1, 3], // right/up
-        [-1, -1, 3] // left/up
-    ];
-    for (let i = 0; i < srsLeft.length; i++) {
-        if (skipCheck(srsLeft[i][0], srsLeft[i][1], srsLeft[i][2])) {
-            break;
-        }
-    }
+    srs(rotJLTSZleft[activeBlock.rotation]);
 }
 
 function rotateRight() {
-    // rotate right: {{0,0,},{0,-1,},{-1,0,},{-1,-1,},{1,0,},{1,-1,},{0,1,},{-1,1,},{1,1,},}
-    // rotate right: basic rotation, down, left, left/down, right, right/down, up, left/up, right/up
-    // SRS system
-    srsRight = [
-        [0, 0, 1],  // basic rotation
-        [0, 1, 1],  // down
-        [-1, 0, 1], // left
-        [-1, 1, 1], // left/down
-        [1, 0, 1],  // right
-        [1, 1, 1],  // right/down
-        [0, -1, 1], // up
-        [-1, -1, 1] // left/up
-        [1, -1, 1], // right/up
-    ];
-    for (let i = 0; i < srsRight.length; i++) {
-        if (skipCheck(srsRight[i][0], srsRight[i][1], srsRight[i][2])) {
+    srs(rotJLTSZright[activeBlock.rotation]);
+}
+
+function srs(srsArray) {
+    for (let i = 0; i < srsArray.length; i++) {
+        if (skipCheck(srsArray[i][0], srsArray[i][1], srsArray[i][2])) {
             break;
         }
     }

@@ -12,7 +12,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 150px;
+    height: 300px;
 }
 
 #nextdiv {
@@ -21,6 +21,10 @@ body {
     width: 100px;
 }
 #scorediv {
+    /* text-align: center; */
+    height: 50px;
+}
+#controldiv {
     /* text-align: center; */
     height: 50px;
 }

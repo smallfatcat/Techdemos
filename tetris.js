@@ -437,12 +437,12 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
     return false;
 }
 
-function hasValidMoves(grid, activeBlock) {
-    if (!collidesWithGrid(grid, activeBlock, 1, 0, 0) || !collidesWithGrid(grid, activeBlock, -1, 0, 0) || !collidesWithGrid(grid, activeBlock, 0, 1, 0) || !collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
-        return true;
-    }
-    return false;
-}
+// function hasValidMoves(grid, activeBlock) {
+//     if (!collidesWithGrid(grid, activeBlock, 1, 0, 0) || !collidesWithGrid(grid, activeBlock, -1, 0, 0) || !collidesWithGrid(grid, activeBlock, 0, 1, 0) || !collidesWithGrid(grid, activeBlock, 0, 0, 1)) {
+//         return true;
+//     }
+//     return false;
+// }
 
 function drawGrid(grid, activeBlock) {
     gridElement = '';

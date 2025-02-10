@@ -229,7 +229,8 @@ let tickTime = 1000;
 let gameOver = false;
 let score = 0;
 let lines = 0;
-let level = 1;
+let startLevel = 5;
+let level = startLevel;
 let speed = 800;
 spawnBlock();
 let dropTickStart = Date.now();
@@ -270,7 +271,7 @@ function checkLines() {
         default:
             break;
     }
-    level = Math.floor(lines / 5) + 1;
+    level = Math.floor(lines / 5) + startLevel;
     speed = Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
 }
 
@@ -293,7 +294,7 @@ function spawnBlock() {
     }
 }
 
-function freezeBlock(grid) {
+function lockBlock(grid) {
     for (let i = 0; i < blocks[activeBlock.type].size; i++) {
         for (let j = 0; j < blocks[activeBlock.type].size; j++) {
             var x = activeBlock.x + i;
@@ -372,7 +373,7 @@ function animate() {
         // console.log(dropTickStart)
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
-            freezeBlock(grid);
+            lockBlock(grid);
             spawnBlock();
         }
         else {
@@ -406,7 +407,7 @@ window.onload = (event) => {
                     dropTickStart = Date.now();
                 }
                 else {
-                    freezeBlock(grid);
+                    lockBlock(grid);
                     spawnBlock();
                 }
                 break;

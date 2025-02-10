@@ -190,32 +190,11 @@ const blocks = [
         ]
     }
 ];
-let grid = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-];
+let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let grid = [];
+for (let i = 0; i < 24; i++) {
+    grid.push(blankRow.slice())
+}
 const blockColors = ["⬛", "🟦", "🟧", "🟫", "🟨", "🟩", "🟪", "🟥"]
 const height = grid.length;
 let activeBlock = {};
@@ -225,6 +204,7 @@ let nextBlock = {
     type: getRandomInt(0, 7),
     rotation: 0,
 }
+const startDisplay = 0;
 let tickTime = 1000;
 let gameOver = false;
 let score = 0;
@@ -247,7 +227,7 @@ function checkLines() {
         if (lineCleared) {
             clearedCount += 1;
             grid.splice(row, 1);
-            grid.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            grid.unshift(blankRow.slice());
         }
     }
     switch (clearedCount) {
@@ -334,7 +314,7 @@ function hasValidMoves(grid, activeBlock) {
 
 function drawGrid(grid, activeBlock) {
     gridElement = '';
-    for (let row = 4; row < grid.length; row++) {
+    for (let row = startDisplay; row < grid.length; row++) {
         var rowText = '';
         for (let col = 0; col < 10; col++) {
             let j = col - activeBlock.x;

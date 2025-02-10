@@ -28,6 +28,7 @@ input {
 }
 #nextdiv {
     width: 100px;
+    height: 100px;
 }
 #scorediv {
     height: 50px;

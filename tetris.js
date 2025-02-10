@@ -325,10 +325,17 @@ let startLevel = 1;
 let level = startLevel;
 let speed = 800;
 let dropTickStart = Date.now();
+let startTime = Date.now();
+let history = [];
+let historyNext = [];
+
+let replayMode = false;
 
 
 
 function init() {
+    history = [];
+    historyNext = [];
     grid = [];
     for (let i = 0; i < gridHeight; i++) {
         grid.push(blankRow.slice())
@@ -348,6 +355,7 @@ function init() {
     speed = 800;
     spawnBlock();
     dropTickStart = Date.now();
+    startTime = Date.now();
 }
 
 function checkLines() {
@@ -420,7 +428,10 @@ function lockBlock(grid) {
 function getRandomInt(min, max) {
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
-    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
+    var res = Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+    historyNext.push(res);
+
+    return res; // The maximum is exclusive and the minimum is inclusive
 }
 
 function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
@@ -477,6 +488,7 @@ function animate() {
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
             lockBlock(grid);
+            // history.push(['r', Date.now() - startTime, nextBlock.type])
             spawnBlock();
         }
         else {
@@ -496,37 +508,20 @@ window.onload = (event) => {
     document.addEventListener('keydown', function (event) {
         switch (event.key.toLowerCase()) {
             case 'a':
-                if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
-                    activeBlock.x -= 1;
-                }
+                left();
                 break;
             case 'd':
-                if (!collidesWithGrid(grid, activeBlock, 1, 0, 0)) {
-                    activeBlock.x += 1;
-                }
+                right();
                 break;
             case 's':
-                if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
-                    activeBlock.y += 1;
-                    dropTickStart = Date.now();
-                }
-                else {
-                    lockBlock(grid);
-                    spawnBlock();
-                }
+                down();
                 break;
-
-            // rotate right: none, down, left, left/down, right, right/down, up, left/up, right/up
             case 'w':
                 rotateRight();
                 break;
-
-            // rotate right: none, down, left, left/down, right, right/down, up, left/up, right/up
             case 'e':
                 rotateRight();
                 break;
-
-            // rotate left:  none, down, right, right/down, left, left/down, up, right/up, left/up 
             case 'q':
                 rotateLeft();
                 break;
@@ -535,7 +530,33 @@ window.onload = (event) => {
     });
 };
 
+function down() {
+    history.push(["s", Date.now() - startTime]);
+    if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
+        activeBlock.y += 1;
+        dropTickStart = Date.now();
+    }
+    else {
+        lockBlock(grid);
+        // history.push(['r', Date.now() - startTime, nextBlock.type])
+        spawnBlock();
+    }
+}
+function left() {
+    history.push(["a", Date.now() - startTime]);
+    if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
+        activeBlock.x -= 1;
+    }
+}
+function right() {
+    history.push(["d", Date.now() - startTime]);
+    if (!collidesWithGrid(grid, activeBlock, 1, 0, 0)) {
+        activeBlock.x += 1;
+    }
+}
+
 function rotateLeft() {
+    history.push(["q", Date.now() - startTime]);
     if (activeBlock.type == 0) {
         rotateUsingSRS(rotIleft[activeBlock.rotation]);
     }
@@ -545,6 +566,7 @@ function rotateLeft() {
 }
 
 function rotateRight() {
+    history.push(["e", Date.now() - startTime]);
     if (activeBlock.type == 0) {
         rotateUsingSRS(rotIright[activeBlock.rotation]);
     }

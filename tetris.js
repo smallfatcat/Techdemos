@@ -410,134 +410,20 @@ window.onload = (event) => {
                     spawnBlock();
                 }
                 break;
+
             // rotate right: none, down, left, left/down, right, right/down, up, left/up, right/up
             case 'w':
-                if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {        // none
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 0, 1, 1)) {  // down
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 1)) {   // left
-                    activeBlock.x -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 1, 1)) {   // left/down
-                    activeBlock.x -= 1;
-                    activeBlock.y += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 1)) {   // right
-                    activeBlock.x += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 1, 1)) {   // right/down
-                    activeBlock.x += 1;
-                    activeBlock.y += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 0, -1, 1)) {   // up
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, -1, 1)) {   // left/up
-                    activeBlock.x -= 1;
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, -1, 1)) {   // right/up
-                    activeBlock.x += 1;
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-
+                rotateRight();
                 break;
+
             // rotate right: none, down, left, left/down, right, right/down, up, left/up, right/up
             case 'e':
-                if (!collidesWithGrid(grid, activeBlock, 0, 0, 1)) {        // none
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 0, 1, 1)) {  // down
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 1)) {   // left
-                    activeBlock.x -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 1, 1)) {   // left/down
-                    activeBlock.x -= 1;
-                    activeBlock.y += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 1)) {   // right
-                    activeBlock.x += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 1, 1)) {   // right/down
-                    activeBlock.x += 1;
-                    activeBlock.y += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 0, -1, 1)) {   // up
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, -1, 1)) {   // left/up
-                    activeBlock.x -= 1;
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, -1, 1)) {   // right/up
-                    activeBlock.x += 1;
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 1) % 4;
-                }
-
+                rotateRight();
                 break;
+
             // rotate left:  none, down, right, right/down, left, left/down, up, right/up, left/up 
             case 'q':
-                if (!collidesWithGrid(grid, activeBlock, 0, 0, 3)) {        // none
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 0, 1, 3)) {   // down
-                    activeBlock.y += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 0, 3)) {   // right
-                    activeBlock.x += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, 1, 3)) {   // right/down
-                    activeBlock.x += 1;
-                    activeBlock.y += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 0, 3)) {   // left
-                    activeBlock.x -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, 1, 3)) {   // left/down
-                    activeBlock.x -= 1;
-                    activeBlock.y += 1;
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 0, -1, 3)) {   // up
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, 1, -1, 3)) {   // right/up
-                    activeBlock.x += 1;
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-                else if (!collidesWithGrid(grid, activeBlock, -1, -1, 3)) {   // left/up
-                    activeBlock.x -= 1;
-                    activeBlock.y -= 1;
-                    activeBlock.rotation = (activeBlock.rotation + 3) % 4;
-                }
-
+                rotateLeft();
                 break;
         }
         // if (!hasValidMoves(grid, activeBlock)) {
@@ -548,5 +434,56 @@ window.onload = (event) => {
     });
 };
 
-// rotate left: {{0,0,},{0,-1,},{1,0,},{1,-1,},{-1,0,},{-1,-1,},{0,1,},{1,1,},{-1,1,},}
-// rotate right: {{0,0,},{0,-1,},{-1,0,},{-1,-1,},{1,0,},{1,-1,},{0,1,},{-1,1,},{1,1,},}
+function rotateLeft() {
+    // rotate left:  basic rotation, down, right, right/down, left, left/down, up, right/up, left/up 
+    // rotate left: {{0,0,},{0,-1,},{1,0,},{1,-1,},{-1,0,},{-1,-1,},{0,1,},{1,1,},{-1,1,},}
+    // SRS system
+    srsLeft = [
+        [0, 0, 3],  // basic rotation
+        [0, 1, 3],  // down
+        [1, 0, 3],  // right
+        [1, 1, 3],  // right/down
+        [-1, 0, 3], // left
+        [-1, 1, 3], // left/down
+        [0, -1, 3], // up
+        [1, -1, 3], // right/up
+        [-1, -1, 3] // left/up
+    ];
+    for (let i = 0; i < srsLeft.length; i++) {
+        if (skipCheck(srsLeft[i][0], srsLeft[i][1], srsLeft[i][2])) {
+            break;
+        }
+    }
+}
+
+function rotateRight() {
+    // rotate right: {{0,0,},{0,-1,},{-1,0,},{-1,-1,},{1,0,},{1,-1,},{0,1,},{-1,1,},{1,1,},}
+    // rotate right: basic rotation, down, left, left/down, right, right/down, up, left/up, right/up
+    // SRS system
+    srsRight = [
+        [0, 0, 1],  // basic rotation
+        [0, 1, 1],  // down
+        [-1, 0, 1], // left
+        [-1, 1, 1], // left/down
+        [1, 0, 1],  // right
+        [1, 1, 1],  // right/down
+        [0, -1, 1], // up
+        [-1, -1, 1] // left/up
+        [1, -1, 1], // right/up
+    ];
+    for (let i = 0; i < srsRight.length; i++) {
+        if (skipCheck(srsRight[i][0], srsRight[i][1], srsRight[i][2])) {
+            break;
+        }
+    }
+}
+
+function skipCheck(x, y, r) {
+    if (!collidesWithGrid(grid, activeBlock, x, y, r)) {   // left/up
+        activeBlock.x += x;
+        activeBlock.y += y;
+        activeBlock.rotation = (activeBlock.rotation + r) % 4;
+        return true;
+    }
+    return false;
+}

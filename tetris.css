@@ -1,0 +1,38 @@
+body {
+    background-color: rgb(50, 50, 50);
+    color: rgb(159, 170, 180);
+    font-weight: bold;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+input {
+    width: 20px;
+}
+
+#ui-container{
+    display: flex;
+    justify-content: space-around;
+}
+#score-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 300px;
+}
+
+#inputdiv {
+    width: 20px;
+}
+#nextdiv {
+    width: 100px;
+}
+#scorediv {
+    height: 50px;
+}
+#controldiv {
+    height: 50px;
+}
+.compact{
+    line-height: 20px;
+    letter-spacing: -2px;
+}

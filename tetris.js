@@ -318,6 +318,7 @@ const rotIleft = [
 let activeBlock = {};
 let nextBlock = {};
 let grid = [];
+let lastGrid = [];
 let gameOver = false;
 let score = 0;
 let lines = 0;
@@ -330,20 +331,16 @@ let history = [];
 let historyNext = [];
 
 let replayMode = false;
-let historyNextIndex = 0;
 
 
 
 function init() {
-    historyNextIndex = 0;
-    if (!replayMode) {
-        history = [];
-        historyNext = [];
-    }
+    history = [];
     grid = [];
     for (let i = 0; i < gridHeight; i++) {
         grid.push(blankRow.slice())
     }
+    lastGrid = getGridCopy(grid);
     activeBlock = {};
     nextBlock = {
         x: 3,
@@ -429,52 +426,12 @@ function lockBlock(grid) {
     }
 }
 
-function playback() {
-    replayMode = true;
-    // var historyItem = history.shift();
-    // var key = historyItem[0]
-    // var timestamp = historyItem[1];
-    init();
-    drawGrid(grid, activeBlock);
-    requestAnimationFrame(animate);
-    for (const historyItem of history) {
-        setTimeout(playbackKeys, historyItem[1], historyItem[0]);
-    }
-}
-
-function playbackKeys(key){
-    switch (key) {
-        case "a":
-            left();
-            break;
-        case "d":
-            right();
-            break;
-        case "s":
-            down();
-            break;
-        case "e":
-            rotateRight();
-            break;
-        case "q":
-            rotateLeft();
-            break;
-
-    }
-}
-
 function getRandomInt(min, max) {
     const minCeiled = Math.ceil(min);
     const maxFloored = Math.floor(max);
     var res = Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 
-    if (replayMode) {
-        res = historyNext[historyNextIndex];
-        historyNextIndex += 1;
-    }
-    else {
-        historyNext.push(res);
-    }
+    historyNext.push(res);
 
     return res; // The maximum is exclusive and the minimum is inclusive
 }
@@ -529,22 +486,54 @@ function drawGrid(grid, activeBlock) {
 }
 
 function animate() {
-    // console.log("animate entry")
     if (Date.now() - dropTickStart > speed) {
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
             lockBlock(grid);
-            // history.push(['r', Date.now() - startTime, nextBlock.type])
             spawnBlock();
         }
         else {
             activeBlock.y += 1;
         }
     }
+
+    if (gridChanged(grid, lastGrid)) {
+        console.log(grid);
+        history.push(getGridCopy(grid));
+    }
+    lastGrid = getGridCopy(grid);
     drawGrid(grid, activeBlock);
-    if(!gameOver){
+    if (!gameOver) {
         requestAnimationFrame(animate);
     }
+}
+
+function gridChanged(grid, lastGrid) {
+    var changedGrid = false;
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid[0].length; j++) {
+            if (grid[i][j] != lastGrid[i][j]) {
+                changedGrid = true;
+                break;
+            }
+        }
+        if (changedGrid) {
+            break;
+        }
+    }
+    return changedGrid;
+}
+
+function getGridCopy(originalGrid) {
+    let copyOfGrid = [];
+    for (let i = 0; i < originalGrid.length; i++) {
+        row = []
+        for (let j = 0; j < originalGrid[0].length; j++) {
+            row.push(originalGrid[i][j]);
+        }
+        copyOfGrid.push(row);
+    }
+    return copyOfGrid;
 }
 
 window.onload = (event) => {
@@ -579,9 +568,6 @@ window.onload = (event) => {
 };
 
 function down() {
-    if (!replayMode) {
-        history.push(["s", Date.now() - startTime]);
-    }
     if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
         activeBlock.y += 1;
         dropTickStart = Date.now();
@@ -592,26 +578,17 @@ function down() {
     }
 }
 function left() {
-    if (!replayMode) {
-        history.push(["a", Date.now() - startTime]);
-    }
     if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
         activeBlock.x -= 1;
     }
 }
 function right() {
-    if (!replayMode) {
-        history.push(["d", Date.now() - startTime]);
-    }
     if (!collidesWithGrid(grid, activeBlock, 1, 0, 0)) {
         activeBlock.x += 1;
     }
 }
 
 function rotateLeft() {
-    if (!replayMode) {
-        history.push(["q", Date.now() - startTime]);
-    }
     if (activeBlock.type == 0) {
         rotateUsingSRS(rotIleft[activeBlock.rotation]);
     }
@@ -621,9 +598,6 @@ function rotateLeft() {
 }
 
 function rotateRight() {
-    if (!replayMode) {
-        history.push(["e", Date.now() - startTime]);
-    }
     if (activeBlock.type == 0) {
         rotateUsingSRS(rotIright[activeBlock.rotation]);
     }

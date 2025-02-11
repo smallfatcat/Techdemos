@@ -22,14 +22,15 @@ async def counter(websocket):
     try:
         # Register user
         USERS.add(websocket)
-        broadcast(USERS, users_event())
+        # broadcast(USERS, users_event())
         # print(websocket)
         # Send current state to user
-        await websocket.send(value_event())
+        # await websocket.send(value_event())
         # Manage state changes
         async for message in websocket:
             event = json.loads(message)
             print(event)
+            broadcast(USERS, json.dumps(event))
             # if event["action"] == "minus":
             #     VALUE -= 1
             #     broadcast(USERS, value_event())
@@ -42,7 +43,7 @@ async def counter(websocket):
         # Unregister user
         # print(websocket)
         USERS.remove(websocket)
-        broadcast(USERS, users_event())
+        # broadcast(USERS, users_event())
 
 async def main():
     async with serve(counter, "localhost", 6789):

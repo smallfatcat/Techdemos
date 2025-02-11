@@ -189,7 +189,7 @@ function renderGridElement(grid, activeBlock) {
 function renderBlockElement(blockType, blockRotation) {
     nextElement = '';
     var size = 3;
-    if (blockType== BLOCK_I || blockType == BLOCK_O) {
+    if (blockType == BLOCK_I || blockType == BLOCK_O) {
         size = 4;
     }
     for (let x = 0; x < size; x++) {
@@ -229,11 +229,11 @@ function animate() {
 
     if (gridChanged(grid, lastGrid)) {
         history.push([Date.now() - startTime, getGridCopy(grid)]);
-        websocket.send(JSON.stringify([Date.now() - startTime, getGridCopy(grid)]));
+        websocket.send(JSON.stringify({type: "g", t: Date.now() - startTime, d: getGridCopy(grid)}));
     }
     if (activeBlockChanged(activeBlock, lastActiveBlock)) {
         historyActiveBlock.push([Date.now() - startTime, getActiveBlockCopy(activeBlock)]);
-        websocket.send(JSON.stringify([Date.now() - startTime, getActiveBlockCopy(activeBlock)]));
+        websocket.send(JSON.stringify({type: "b", t: Date.now() - startTime, d: getActiveBlockCopy(activeBlock)}));
     }
     lastActiveBlock = getActiveBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);
@@ -244,10 +244,10 @@ function animate() {
 }
 
 function activeBlockChanged(activeBlock, lastActiveBlock) {
-    if (activeBlock.x != lastActiveBlock.x 
+    if (activeBlock.x != lastActiveBlock.x
         || activeBlock.y != lastActiveBlock.y
-        || activeBlock.rotation != lastActiveBlock.rotation 
-        || activeBlock.type != lastActiveBlock.type 
+        || activeBlock.rotation != lastActiveBlock.rotation
+        || activeBlock.type != lastActiveBlock.type
         || activeBlock.id != lastActiveBlock.id) {
         return true;
     }
@@ -382,27 +382,29 @@ window.onload = (event) => {
         drawGrid(grid, activeBlock)
     });
 
-  
+
     // document.querySelector(".minus").addEventListener("click", () => {
     //   websocket.send(JSON.stringify({ action: "minus" }));
     // });
-  
+
     // document.querySelector(".plus").addEventListener("click", () => {
     //   websocket.send(JSON.stringify({ action: "plus" }));
     // });
-  
+
     websocket.onmessage = ({ data }) => {
-      const event = JSON.parse(data);
-      switch (event.type) {
-        case "value":
-        //   document.querySelector(".value").textContent = event.value;
-          break;
-        case "users":
-        //   const users = `${event.count} user${event.count == 1 ? "" : "s"}`;
-        //   document.querySelector(".users").textContent = users;
-          break;
-        default:
-          console.error("unsupported event", event);
-      }
+        const event = JSON.parse(data);
+        switch (event.type) {
+            case "g":
+                console.log(event);
+                //   document.querySelector(".value").textContent = event.value;
+                break;
+            case "b":
+                console.log(event);
+                //   const users = `${event.count} user${event.count == 1 ? "" : "s"}`;
+                //   document.querySelector(".users").textContent = users;
+                break;
+            default:
+                console.error("unsupported event", event);
+        }
     };
 };

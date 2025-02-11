@@ -150,7 +150,7 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
 
 function drawGrid(grid, activeBlock) {
     document.getElementById("griddiv").innerHTML = renderGridElement(grid, activeBlock);
-    document.getElementById("nextdiv").innerHTML = renderBlockElement(blockCoords[nextBlock.type], 0);
+    document.getElementById("nextdiv").innerHTML = renderBlockElement(nextBlock.type, 0);
     document.getElementById("scorediv").innerHTML = "Score: " + score + "<br>" + "Level: " + level + "<br>" + "Lines: " + lines;
 }
 
@@ -182,13 +182,13 @@ function renderGridElement(grid, activeBlock) {
 function renderBlockElement(blockType, blockRotation) {
     nextElement = '';
     var size = 3;
-    if (nextBlock.type == BLOCK_I || nextBlock.type == BLOCK_O) {
+    if (blockType== BLOCK_I || blockType == BLOCK_O) {
         size = 4;
     }
     for (let x = 0; x < size; x++) {
         var rowText = '';
         for (let y = 0; y < size; y++) {
-            var coords = blockCoords[nextBlock.type][0];
+            var coords = blockCoords[blockType][blockRotation];
             var flag = false;
             for (let coord of coords) {
                 if (coord[0] == y && coord[1] == x) {
@@ -197,7 +197,7 @@ function renderBlockElement(blockType, blockRotation) {
                 }
             }
             if (flag) {
-                rowText += blockColors[nextBlock.type + 1];
+                rowText += blockColors[blockType + 1];
             }
             else {
                 rowText += blockColors[0];

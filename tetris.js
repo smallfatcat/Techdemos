@@ -43,6 +43,14 @@ const blockCoords = [
     ]
 ];
 
+const BLOCK_I = 0;
+const BLOCK_J = 1;
+const BLOCK_L = 2;
+const BLOCK_O = 3;
+const BLOCK_S = 4;
+const BLOCK_T = 5;
+const BLOCK_Z = 6;
+
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const blockColors = ["⬛", "🟦", "🟧", "🟨", "🟫", "🟩", "🟪", "🟥"]
 const gridHeight = 24;
@@ -341,7 +349,7 @@ function renderGridElement(grid, activeBlock) {
 function renderBlockElement(blockType, blockRotation){
     nextElement = '';
     var size = 3;
-    if (nextBlock.type == 0 || nextBlock.type == 3) {
+    if (nextBlock.type == BLOCK_I || nextBlock.type == BLOCK_O) {
         size = 4;
     }
     for (let x = 0; x < size; x++) {
@@ -492,19 +500,19 @@ function right() {
 }
 
 function rotateLeft() {
-    if (activeBlock.type == 0) {
+    if (activeBlock.type == BLOCK_I) {
         rotateUsingSRS(rotIleft[activeBlock.rotation]);
     }
-    else if (activeBlock.type != 3) {
+    else if (activeBlock.type != BLOCK_O) {
         rotateUsingSRS(rotJLTSZleft[activeBlock.rotation]);
     }
 }
 
 function rotateRight() {
-    if (activeBlock.type == 0) {
+    if (activeBlock.type == BLOCK_I) {
         rotateUsingSRS(rotIright[activeBlock.rotation]);
     }
-    else if (activeBlock.type != 3) {
+    else if (activeBlock.type != BLOCK_O) {
         rotateUsingSRS(rotJLTSZright[activeBlock.rotation]);
     }
 }

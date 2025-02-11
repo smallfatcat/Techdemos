@@ -190,6 +190,51 @@ const blocks = [
         ]
     }
 ];
+const blockCoords = [
+    [
+        [[0, 1], [1, 1], [2, 1], [3, 1]],
+        [[2, 0], [2, 1], [2, 2], [2, 3]],
+        [[0, 2], [1, 2], [2, 2], [3, 2]],
+        [[1, 0], [1, 1], [1, 2], [1, 3]]
+    ],
+    [
+        [[0, 0], [0, 1], [1, 1], [2, 1]],
+        [[1, 0], [2, 0], [1, 1], [1, 2]],
+        [[0, 1], [1, 1], [2, 1], [2, 2]],
+        [[1, 0], [1, 1], [0, 2], [1, 2]]
+    ],
+    [
+        [[2, 0], [0, 1], [1, 1], [2, 1]],
+        [[1, 0], [1, 1], [1, 2], [2, 2]],
+        [[0, 1], [1, 1], [2, 1], [0, 2]],
+        [[0, 0], [1, 0], [1, 1], [1, 2]]
+    ],
+    [
+        [[1, 0], [2, 0], [1, 1], [2, 1]],
+        [[1, 0], [2, 0], [1, 1], [2, 1]],
+        [[1, 0], [2, 0], [1, 1], [2, 1]],
+        [[1, 0], [2, 0], [1, 1], [2, 1]]
+    ],
+    [
+        [[1, 0], [2, 0], [0, 1], [1, 1]],
+        [[1, 0], [1, 1], [2, 1], [2, 2]],
+        [[1, 1], [2, 1], [0, 2], [1, 2]],
+        [[0, 0], [0, 1], [1, 1], [1, 2]]
+    ],
+    [
+        [[1, 0], [0, 1], [1, 1], [2, 1]],
+        [[1, 0], [1, 1], [2, 1], [1, 2]],
+        [[0, 1], [1, 1], [2, 1], [1, 2]],
+        [[1, 0], [0, 1], [1, 1], [1, 2]]
+    ],
+    [
+        [[0, 0], [1, 0], [1, 1], [2, 1]],
+        [[2, 0], [1, 1], [2, 1], [1, 2]],
+        [[0, 1], [1, 1], [1, 2], [2, 2]],
+        [[1, 0], [0, 1], [1, 1], [0, 2]]
+    ]
+];
+
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const blockColors = ["⬛", "🟦", "🟧", "🟨", "🟫", "🟩", "🟪", "🟥"]
 const gridHeight = 24;
@@ -423,15 +468,23 @@ function spawnBlock() {
     }
 }
 
+// function lockBlock(grid) {
+//     for (let i = 0; i < blocks[activeBlock.type].size; i++) {
+//         for (let j = 0; j < blocks[activeBlock.type].size; j++) {
+//             var x = activeBlock.x + i;
+//             var y = activeBlock.y + j;
+//             if (blocks[activeBlock.type].shape[activeBlock.rotation][j][i]) {
+//                 grid[y][x] = activeBlock.type + 1;
+//             }
+//         }
+//     }
+// }
 function lockBlock(grid) {
-    for (let i = 0; i < blocks[activeBlock.type].size; i++) {
-        for (let j = 0; j < blocks[activeBlock.type].size; j++) {
-            var x = activeBlock.x + i;
-            var y = activeBlock.y + j;
-            if (blocks[activeBlock.type].shape[activeBlock.rotation][j][i]) {
-                grid[y][x] = activeBlock.type + 1;
-            }
-        }
+    var coords = blockCoords[activeBlock.type][activeBlock.rotation];
+    for (var coord of coords) {
+        var col = activeBlock.x + coord[0];
+        var row = activeBlock.y + coord[1];
+        grid[row][col] = activeBlock.type + 1;
     }
 }
 
@@ -446,13 +499,12 @@ function getRandomInt(min, max) {
 }
 
 function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
-    for (let j = 0; j < blocks[activeBlock.type].size; j++) {
-        for (let i = 0; i < blocks[activeBlock.type].size; i++) {
-            var x = activeBlock.x + new_x + i;
-            var y = activeBlock.y + new_y + j;
-            if (blocks[activeBlock.type].shape[(activeBlock.rotation + new_rotation) % 4][j][i] && ((x < 0) || (x > 9) || (y > gridHeight - 1) || grid[y][x])) {
-                return true;
-            }
+    var coords = blockCoords[activeBlock.type][(activeBlock.rotation + new_rotation)%4];
+    for (var coord of coords) {
+        var col = activeBlock.x + new_x + coord[0];
+        var row = activeBlock.y + new_y + coord[1];
+        if((col < 0 || col > 9) || (row > gridHeight - 1) || grid[row][col]){
+            return true;
         }
     }
     return false;
@@ -655,3 +707,27 @@ function skipCheck(x, y, r) {
     }
     return false;
 }
+
+function convertShape(blocks) {
+    let newblocks = []
+    for (b in blocks) {
+        let newrots = [];
+        for (rot in blocks[b].shape) {
+            let newbricks = []
+            for (row in blocks[b].shape[rot]) {
+                //console.log("row",row);
+                for (col in blocks[b].shape[rot][row]) {
+                    //console.log("col",col);
+                    if (blocks[b].shape[rot][row][col]) {
+                        // console.log(rot, row, col, blocks[b].shape[rot][row][col]);
+                        newbricks.push([col, row]);
+                    }
+                }
+            }
+            newrots.push(newbricks)
+        }
+        newblocks.push(newrots)
+    }
+    return newblocks;
+}
+

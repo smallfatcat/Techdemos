@@ -1,13 +1,7 @@
 const websocket = new WebSocket("ws://localhost:6789/");
 const CLIENT_ID = Math.floor(Math.random() * 1000000);
 
-const BLOCK_I = 0;
-const BLOCK_J = 1;
-const BLOCK_L = 2;
-const BLOCK_O = 3;
-const BLOCK_S = 4;
-const BLOCK_T = 5;
-const BLOCK_Z = 6;
+const loggingOn = false;
 
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const blockColors = ["⬛", "🟦", "🟧", "🟨", "🟫", "🟩", "🟪", "🟥"]
@@ -19,6 +13,7 @@ let nextBlock = {};
 let grid = [];
 let lastGrid = [];
 let lastActiveBlock = {};
+let lastNextBlock = {};
 let gameOver = false;
 let score = 0;
 let lines = 0;
@@ -52,7 +47,7 @@ function init() {
         rotation: 0,
         id: nextBlockID,
     }
-    lastActiveBlock = getActiveBlockCopy(nextBlock);
+    lastActiveBlock = getBlockCopy(nextBlock);
 
     gameOver = false;
     score = 0;
@@ -122,6 +117,7 @@ function spawnBlock() {
 
             nextBlock.type = getRandomInt(0, 7);
             nextBlock.id = nextBlockID;
+
         }
     }
 }
@@ -231,13 +227,13 @@ function animate() {
 
     if (gridChanged(grid, lastGrid)) {
         history.push([Date.now() - startTime, getGridCopy(grid)]);
-        websocket.send(JSON.stringify({cid: CLIENT_ID, type: "g", t: Date.now() - startTime, d: getGridCopy(grid)}));
+        websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "g", t: Date.now() - startTime, d: getGridCopy(grid) }));
     }
-    if (activeBlockChanged(activeBlock, lastActiveBlock)) {
-        historyActiveBlock.push([Date.now() - startTime, getActiveBlockCopy(activeBlock)]);
-        websocket.send(JSON.stringify({cid: CLIENT_ID, type: "b", t: Date.now() - startTime, d: getActiveBlockCopy(activeBlock)}));
+    if (blockChanged(activeBlock, lastActiveBlock)) {
+        historyActiveBlock.push([Date.now() - startTime, getBlockCopy(activeBlock)]);
+        websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "b", t: Date.now() - startTime, d: getBlockCopy(activeBlock), n: nextBlock.type }));
     }
-    lastActiveBlock = getActiveBlockCopy(activeBlock);
+    lastActiveBlock = getBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);
     drawGrid(grid, activeBlock);
     if (!gameOver) {
@@ -245,12 +241,12 @@ function animate() {
     }
 }
 
-function activeBlockChanged(activeBlock, lastActiveBlock) {
-    if (activeBlock.x != lastActiveBlock.x
-        || activeBlock.y != lastActiveBlock.y
-        || activeBlock.rotation != lastActiveBlock.rotation
-        || activeBlock.type != lastActiveBlock.type
-        || activeBlock.id != lastActiveBlock.id) {
+function blockChanged(block, lastblock) {
+    if (block.x != lastblock.x
+        || block.y != lastblock.y
+        || block.rotation != lastblock.rotation
+        || block.type != lastblock.type
+        || block.id != lastblock.id) {
         return true;
     }
     return false;
@@ -272,15 +268,15 @@ function gridChanged(grid, lastGrid) {
     return changedGrid;
 }
 
-function getActiveBlockCopy(activeBlockOriginal) {
-    let activeBlockCopy = {
-        x: activeBlockOriginal.x,
-        y: activeBlockOriginal.y,
-        type: activeBlockOriginal.type,
-        rotation: activeBlockOriginal.rotation,
-        id: activeBlockOriginal.id,
+function getBlockCopy(blockOriginal) {
+    let blockCopy = {
+        x: blockOriginal.x,
+        y: blockOriginal.y,
+        type: blockOriginal.type,
+        rotation: blockOriginal.rotation,
+        id: blockOriginal.id,
     }
-    return activeBlockCopy
+    return blockCopy
 }
 
 function getGridCopy(originalGrid) {
@@ -356,8 +352,6 @@ function skipCheck(x, y, r) {
 
 window.onload = (event) => {
     init();
-    // drawGrid(grid, activeBlock);
-    // requestAnimationFrame(animate);
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {
@@ -388,23 +382,35 @@ window.onload = (event) => {
         const event = JSON.parse(data);
         switch (event.type) {
             case "g":
-                console.log(event);
+                if (loggingOn) {
+                    console.log(event);
+                }
                 break;
             case "b":
-                console.log(event);
+                if (loggingOn) {
+                    console.log(event);
+                }
                 break;
             case "r":
-                console.log(event);
+                if (loggingOn) {
+                    console.log(event);
+                }
                 break;
             case "open":
-                console.log(event);
-                websocket.send(JSON.stringify({cid: CLIENT_ID, type: "r", t: 0}));
+                if (loggingOn) {
+                    console.log(event);
+                }
+                websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "r", t: 0 }));
                 break;
             default:
-                console.error("unsupported event", event);
+                if (loggingOn) {
+                    console.error("unsupported event", event);
+                }
         }
     };
     websocket.onerror = ({ data }) => {
-        console.log(data);
+        if (loggingOn) {
+            console.log(data);
+        }
     };
 };

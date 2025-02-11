@@ -37,8 +37,37 @@ function animate() {
 
 function drawGrid(grid, activeBlock) {
     document.getElementById("griddiv").innerHTML = renderGridElement(grid, activeBlock);
-    // document.getElementById("nextdiv").innerHTML = renderBlockElement(nextBlock.type, 0);
+    document.getElementById("nextdiv").innerHTML = renderBlockElement(nextBlock.type, nextBlock.rotation);
     // document.getElementById("scorediv").innerHTML = "Score: " + score + "<br>" + "Level: " + level + "<br>" + "Lines: " + lines;
+}
+
+function renderBlockElement(blockType, blockRotation) {
+    nextElement = '';
+    var size = 3;
+    if (blockType == BLOCK_I || blockType == BLOCK_O) {
+        size = 4;
+    }
+    for (let x = 0; x < size; x++) {
+        var rowText = '';
+        for (let y = 0; y < size; y++) {
+            var coords = blockCoords[blockType][blockRotation];
+            var flag = false;
+            for (let coord of coords) {
+                if (coord[0] == y && coord[1] == x) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
+                rowText += blockColors[blockType + 1];
+            }
+            else {
+                rowText += blockColors[0];
+            }
+        }
+        nextElement += rowText + '<br>';;
+    }
+    return nextElement;
 }
 
 function renderGridElement(grid, activeBlock) {
@@ -78,6 +107,7 @@ window.onload = (event) => {
                 break;
             case "b":
                 activeBlock = event.d;
+                nextBlock.type = event.n;
                 console.log(event);
                 break;
             case "r":

@@ -308,7 +308,12 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
 }
 
 function drawGrid(grid, activeBlock) {
-    // draw grid    
+    document.getElementById("griddiv").innerHTML = renderGridElement(grid, activeBlock);
+    document.getElementById("nextdiv").innerHTML = renderBlockElement(blockCoords[nextBlock.type], 0);
+    document.getElementById("scorediv").innerHTML = "Score: " + score + "<br>" + "Level: " + level + "<br>" + "Lines: " + lines;
+}
+
+function renderGridElement(grid, activeBlock) {
     gridElement = '';
     for (let row = startDisplay; row < grid.length; row++) {
         var rowText = '';
@@ -330,11 +335,13 @@ function drawGrid(grid, activeBlock) {
         }
         gridElement += rowText + '<br>';
     }
+    return gridElement;
+}
 
-    // draw the next block
+function renderBlockElement(blockType, blockRotation){
     nextElement = '';
     var size = 3;
-    if (nextBlock.type == 0 || nextBlock.type == 3){
+    if (nextBlock.type == 0 || nextBlock.type == 3) {
         size = 4;
     }
     for (let x = 0; x < size; x++) {
@@ -357,9 +364,7 @@ function drawGrid(grid, activeBlock) {
         }
         nextElement += rowText + '<br>';;
     }
-    document.getElementById("griddiv").innerHTML = gridElement;
-    document.getElementById("nextdiv").innerHTML = nextElement;
-    document.getElementById("scorediv").innerHTML = "Score: " + score + "<br>" + "Level: " + level + "<br>" + "Lines: " + lines;
+    return nextElement;
 }
 
 function animate() {

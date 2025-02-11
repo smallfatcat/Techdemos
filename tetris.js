@@ -1,195 +1,3 @@
-const blocks = [
-    {
-        blockType: 'I',
-        size: 4,
-        shape: [
-            [
-                [0, 0, 0, 0],
-                [1, 1, 1, 1],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]
-            ],
-            [
-                [0, 0, 1, 0],
-                [0, 0, 1, 0],
-                [0, 0, 1, 0],
-                [0, 0, 1, 0]
-            ],
-            [
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-                [1, 1, 1, 1],
-                [0, 0, 0, 0]
-            ],
-            [
-                [0, 1, 0, 0],
-                [0, 1, 0, 0],
-                [0, 1, 0, 0],
-                [0, 1, 0, 0]
-            ]
-        ]
-    },
-    {
-        blockType: 'J',
-        size: 3,
-        shape: [
-            [
-                [1, 0, 0],
-                [1, 1, 1],
-                [0, 0, 0]
-            ],
-            [
-                [0, 1, 1],
-                [0, 1, 0],
-                [0, 1, 0]
-            ],
-            [
-                [0, 0, 0],
-                [1, 1, 1],
-                [0, 0, 1]
-            ],
-            [
-                [0, 1, 0],
-                [0, 1, 0],
-                [1, 1, 0]
-            ]
-        ]
-    },
-    {
-        blockType: 'L',
-        size: 3,
-        shape: [
-            [
-                [0, 0, 1],
-                [1, 1, 1],
-                [0, 0, 0]
-            ],
-            [
-                [0, 1, 0],
-                [0, 1, 0],
-                [0, 1, 1]
-            ],
-            [
-                [0, 0, 0],
-                [1, 1, 1],
-                [1, 0, 0]
-            ],
-            [
-                [1, 1, 0],
-                [0, 1, 0],
-                [0, 1, 0]
-            ]
-        ]
-    },
-    {
-        blockType: 'O',
-        size: 4,
-        shape: [
-            [
-                [0, 1, 1, 0],
-                [0, 1, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]
-            ],
-            [
-                [0, 1, 1, 0],
-                [0, 1, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]
-            ],
-            [
-                [0, 1, 1, 0],
-                [0, 1, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]
-            ],
-            [
-                [0, 1, 1, 0],
-                [0, 1, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]
-            ]
-        ]
-    },
-    {
-        blockType: 'S',
-        size: 3,
-        shape: [
-            [
-                [0, 1, 1],
-                [1, 1, 0],
-                [0, 0, 0]
-            ],
-            [
-                [0, 1, 0],
-                [0, 1, 1],
-                [0, 0, 1]
-            ],
-            [
-                [0, 0, 0],
-                [0, 1, 1],
-                [1, 1, 0]
-            ],
-            [
-                [1, 0, 0],
-                [1, 1, 0],
-                [0, 1, 0]
-            ]
-        ]
-    },
-    {
-        blockType: 'T',
-        size: 3,
-        shape: [
-            [
-                [0, 1, 0],
-                [1, 1, 1],
-                [0, 0, 0]
-            ],
-            [
-                [0, 1, 0],
-                [0, 1, 1],
-                [0, 1, 0]
-            ],
-            [
-                [0, 0, 0],
-                [1, 1, 1],
-                [0, 1, 0]
-            ],
-            [
-                [0, 1, 0],
-                [1, 1, 0],
-                [0, 1, 0]
-            ]
-        ]
-    },
-    {
-        blockType: 'Z',
-        size: 3,
-        shape: [
-            [
-                [1, 1, 0],
-                [0, 1, 1],
-                [0, 0, 0]
-            ],
-            [
-                [0, 0, 1],
-                [0, 1, 1],
-                [0, 1, 0]
-            ],
-            [
-                [0, 0, 0],
-                [1, 1, 0],
-                [0, 1, 1]
-            ],
-            [
-                [0, 1, 0],
-                [1, 1, 0],
-                [1, 0, 0]
-            ]
-        ]
-    }
-];
 const blockCoords = [
     [
         [[0, 1], [1, 1], [2, 1], [3, 1]],
@@ -468,17 +276,6 @@ function spawnBlock() {
     }
 }
 
-// function lockBlock(grid) {
-//     for (let i = 0; i < blocks[activeBlock.type].size; i++) {
-//         for (let j = 0; j < blocks[activeBlock.type].size; j++) {
-//             var x = activeBlock.x + i;
-//             var y = activeBlock.y + j;
-//             if (blocks[activeBlock.type].shape[activeBlock.rotation][j][i]) {
-//                 grid[y][x] = activeBlock.type + 1;
-//             }
-//         }
-//     }
-// }
 function lockBlock(grid) {
     var coords = blockCoords[activeBlock.type][activeBlock.rotation];
     for (var coord of coords) {
@@ -499,11 +296,11 @@ function getRandomInt(min, max) {
 }
 
 function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
-    var coords = blockCoords[activeBlock.type][(activeBlock.rotation + new_rotation)%4];
+    var coords = blockCoords[activeBlock.type][(activeBlock.rotation + new_rotation) % 4];
     for (var coord of coords) {
         var col = activeBlock.x + new_x + coord[0];
         var row = activeBlock.y + new_y + coord[1];
-        if((col < 0 || col > 9) || (row > gridHeight - 1) || grid[row][col]){
+        if ((col < 0 || col > 9) || (row > gridHeight - 1) || grid[row][col]) {
             return true;
         }
     }
@@ -511,28 +308,47 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
 }
 
 function drawGrid(grid, activeBlock) {
+    // draw grid    
     gridElement = '';
     for (let row = startDisplay; row < grid.length; row++) {
         var rowText = '';
         for (let col = 0; col < 10; col++) {
-            let j = col - activeBlock.x;
-            let i = row - activeBlock.y;
-            if (i >= 0 && i < blocks[activeBlock.type].size && j >= 0 && j < blocks[activeBlock.type].size) {
-                if (blocks[activeBlock.type].shape[activeBlock.rotation][i][j]) {
+            var coords = blockCoords[activeBlock.type][activeBlock.rotation]
+            var noActiveBlockAtThisCoord = true;
+            for (let coord of coords) {
+                var x = activeBlock.x + coord[0];
+                var y = activeBlock.y + coord[1];
+                if (row == y && col == x) {
                     rowText += blockColors[activeBlock.type + 1];
-                    continue;
+                    noActiveBlockAtThisCoord = false;
+                    break;
                 }
             }
-            rowText += blockColors[grid[row][col]];
+            if (noActiveBlockAtThisCoord) {
+                rowText += blockColors[grid[row][col]];
+            }
         }
         gridElement += rowText + '<br>';
     }
+
+    // draw the next block
     nextElement = '';
-    var size = blocks[nextBlock.type].size;
+    var size = 3;
+    if (nextBlock.type == 0 || nextBlock.type == 3){
+        size = 4;
+    }
     for (let x = 0; x < size; x++) {
         var rowText = '';
         for (let y = 0; y < size; y++) {
-            if (blocks[nextBlock.type].shape[nextBlock.rotation][x][y]) {
+            var coords = blockCoords[nextBlock.type][0];
+            var flag = false;
+            for (let coord of coords) {
+                if (coord[0] == y && coord[1] == x) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
                 rowText += blockColors[nextBlock.type + 1];
             }
             else {
@@ -559,11 +375,9 @@ function animate() {
     }
 
     if (gridChanged(grid, lastGrid)) {
-        // console.log(grid);
         history.push([Date.now() - startTime, getGridCopy(grid)]);
     }
     if (activeBlockChanged(activeBlock, lastActiveBlock)) {
-        // console.log(activeBlock);
         historyActiveBlock.push([Date.now() - startTime, getActiveBlockCopy(activeBlock)]);
     }
     lastActiveBlock = getActiveBlockCopy(activeBlock);
@@ -706,28 +520,5 @@ function skipCheck(x, y, r) {
         return true;
     }
     return false;
-}
-
-function convertShape(blocks) {
-    let newblocks = []
-    for (b in blocks) {
-        let newrots = [];
-        for (rot in blocks[b].shape) {
-            let newbricks = []
-            for (row in blocks[b].shape[rot]) {
-                //console.log("row",row);
-                for (col in blocks[b].shape[rot][row]) {
-                    //console.log("col",col);
-                    if (blocks[b].shape[rot][row][col]) {
-                        // console.log(rot, row, col, blocks[b].shape[rot][row][col]);
-                        newbricks.push([col, row]);
-                    }
-                }
-            }
-            newrots.push(newbricks)
-        }
-        newblocks.push(newrots)
-    }
-    return newblocks;
 }
 

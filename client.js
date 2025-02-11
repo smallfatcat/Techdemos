@@ -15,6 +15,8 @@ let nextBlock = {
     rotation: 0,
     id: 1,
 }
+let grids = {};
+let activeBlocks = {};
 let grid = [];
 
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -36,8 +38,15 @@ function animate() {
 }
 
 function drawGrid(grid, activeBlock) {
-    document.getElementById("griddiv").innerHTML = renderGridElement(grid, activeBlock);
-    document.getElementById("nextdiv").innerHTML = renderBlockElement(nextBlock.type, nextBlock.rotation);
+    document.getElementById("grid-container").innerHTML = "";
+    for (const cid of Object.keys(grids)) {
+        var griddiv = document.createElement("div");
+        griddiv.innerHTML = renderGridElement(grids[cid], activeBlocks[cid]);
+        griddiv.className = "compact";
+        griddiv.id = cid;
+        document.getElementById("grid-container").appendChild(griddiv);
+    }
+    // document.getElementById("nextdiv").innerHTML = renderBlockElement(nextBlock.type, 0);
     // document.getElementById("scorediv").innerHTML = "Score: " + score + "<br>" + "Level: " + level + "<br>" + "Lines: " + lines;
 }
 
@@ -102,11 +111,13 @@ window.onload = (event) => {
         const event = JSON.parse(data);
         switch (event.type) {
             case "g":
-                grid = event.d; 
+                grid = event.d;
+                grids[event.cid] = grid;
                 console.log(event);
                 break;
             case "b":
                 activeBlock = event.d;
+                activeBlocks[event.cid] = activeBlock;
                 nextBlock.type = event.n;
                 console.log(event);
                 break;

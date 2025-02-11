@@ -2,6 +2,8 @@ const websocket = new WebSocket("ws://localhost:6789/");
 const CLIENT_ID = Math.floor(Math.random() * 1000000);
 
 const loggingOn = false;
+const websocketEnabled = false;
+
 
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const blockColors = ["⬛", "🟦", "🟧", "🟨", "🟫", "🟩", "🟪", "🟥"]
@@ -227,11 +229,15 @@ function animate() {
 
     if (gridChanged(grid, lastGrid)) {
         history.push([Date.now() - startTime, getGridCopy(grid)]);
-        websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "g", t: Date.now() - startTime, d: getGridCopy(grid) }));
+        if (websocketEnabled) {
+            websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "g", t: Date.now() - startTime, d: getGridCopy(grid) }));
+        }
     }
     if (blockChanged(activeBlock, lastActiveBlock)) {
         historyActiveBlock.push([Date.now() - startTime, getBlockCopy(activeBlock)]);
-        websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "b", t: Date.now() - startTime, d: getBlockCopy(activeBlock), n: nextBlock.type }));
+        if (websocketEnabled) {
+            websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "b", t: Date.now() - startTime, d: getBlockCopy(activeBlock), n: nextBlock.type }));
+        }
     }
     lastActiveBlock = getBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);
@@ -400,7 +406,9 @@ window.onload = (event) => {
                 if (loggingOn) {
                     console.log(event);
                 }
-                websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "r", t: 0 }));
+                if (websocketEnabled) {
+                    websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "r", t: 0 }));
+                }
                 break;
             default:
                 if (loggingOn) {
@@ -408,9 +416,9 @@ window.onload = (event) => {
                 }
         }
     };
-    websocket.onerror = ({ data }) => {
-        if (loggingOn) {
-            console.log(data);
-        }
+    websocket.onerror = ({ error }) => {
+        // if (loggingOn) {
+            console.log(error);
+        // }
     };
 };

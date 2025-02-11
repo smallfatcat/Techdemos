@@ -1,3 +1,4 @@
+const websocket = new WebSocket("ws://localhost:6789/");
 const BLOCK_I = 0;
 const BLOCK_J = 1;
 const BLOCK_L = 2;
@@ -27,6 +28,7 @@ let startTime = Date.now();
 let history = [];
 let historyNext = [];
 let historyActiveBlock = [];
+let nextBlockID = 0;
 
 let replayMode = false;
 
@@ -40,11 +42,13 @@ function init() {
     }
     lastGrid = getGridCopy(grid);
     activeBlock = {};
+    nextBlockID = 0;
     nextBlock = {
         x: 3,
         y: 2,
         type: getRandomInt(0, 7),
         rotation: 0,
+        id: nextBlockID,
     }
     lastActiveBlock = getActiveBlockCopy(nextBlock);
 
@@ -99,6 +103,7 @@ function checkLines() {
 
 function spawnBlock() {
     if (!gameOver) {
+        nextBlockID += 1;
         checkLines();
         if (collidesWithGrid(grid, nextBlock, 0, 0, 0)) {
             console.log("Game Ended");
@@ -109,10 +114,12 @@ function spawnBlock() {
                 x: 3,
                 y: 2,
                 type: nextBlock.type,
-                rotation: 0
+                rotation: 0,
+                id: nextBlock.id,
             }
 
             nextBlock.type = getRandomInt(0, 7);
+            nextBlock.id = nextBlockID;
         }
     }
 }
@@ -222,9 +229,11 @@ function animate() {
 
     if (gridChanged(grid, lastGrid)) {
         history.push([Date.now() - startTime, getGridCopy(grid)]);
+        websocket.send(JSON.stringify([Date.now() - startTime, getGridCopy(grid)]));
     }
     if (activeBlockChanged(activeBlock, lastActiveBlock)) {
         historyActiveBlock.push([Date.now() - startTime, getActiveBlockCopy(activeBlock)]);
+        websocket.send(JSON.stringify([Date.now() - startTime, getActiveBlockCopy(activeBlock)]));
     }
     lastActiveBlock = getActiveBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);
@@ -235,8 +244,11 @@ function animate() {
 }
 
 function activeBlockChanged(activeBlock, lastActiveBlock) {
-    if (activeBlock.x != lastActiveBlock.x || activeBlock.y != lastActiveBlock.y
-        || activeBlock.rotation != lastActiveBlock.rotation || activeBlock.type != lastActiveBlock.type) {
+    if (activeBlock.x != lastActiveBlock.x 
+        || activeBlock.y != lastActiveBlock.y
+        || activeBlock.rotation != lastActiveBlock.rotation 
+        || activeBlock.type != lastActiveBlock.type 
+        || activeBlock.id != lastActiveBlock.id) {
         return true;
     }
     return false;
@@ -263,7 +275,8 @@ function getActiveBlockCopy(activeBlockOriginal) {
         x: activeBlockOriginal.x,
         y: activeBlockOriginal.y,
         type: activeBlockOriginal.type,
-        rotation: activeBlockOriginal.rotation
+        rotation: activeBlockOriginal.rotation,
+        id: activeBlockOriginal.id,
     }
     return activeBlockCopy
 }
@@ -280,37 +293,6 @@ function getGridCopy(originalGrid) {
     return copyOfGrid;
 }
 
-window.onload = (event) => {
-    init();
-    // drawGrid(grid, activeBlock);
-    // requestAnimationFrame(animate);
-
-    // Handle user input (add keypress events)
-    document.addEventListener('keydown', function (event) {
-        switch (event.key.toLowerCase()) {
-            case 'a':
-                left();
-                break;
-            case 'd':
-                right();
-                break;
-            case 's':
-                down();
-                break;
-            case 'w':
-                rotateRight();
-                break;
-            case 'e':
-                rotateRight();
-                break;
-            case 'q':
-                rotateLeft();
-                break;
-        }
-        drawGrid(grid, activeBlock)
-    });
-};
-
 function down() {
     if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
         activeBlock.y += 1;
@@ -321,11 +303,13 @@ function down() {
         spawnBlock();
     }
 }
+
 function left() {
     if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
         activeBlock.x -= 1;
     }
 }
+
 function right() {
     if (!collidesWithGrid(grid, activeBlock, 1, 0, 0)) {
         activeBlock.x += 1;
@@ -368,3 +352,57 @@ function skipCheck(x, y, r) {
     return false;
 }
 
+window.onload = (event) => {
+    init();
+    // drawGrid(grid, activeBlock);
+    // requestAnimationFrame(animate);
+
+    // Handle user input (add keypress events)
+    document.addEventListener('keydown', function (event) {
+        switch (event.key.toLowerCase()) {
+            case 'a':
+                left();
+                break;
+            case 'd':
+                right();
+                break;
+            case 's':
+                down();
+                break;
+            case 'w':
+                rotateRight();
+                break;
+            case 'e':
+                rotateRight();
+                break;
+            case 'q':
+                rotateLeft();
+                break;
+        }
+        drawGrid(grid, activeBlock)
+    });
+
+  
+    // document.querySelector(".minus").addEventListener("click", () => {
+    //   websocket.send(JSON.stringify({ action: "minus" }));
+    // });
+  
+    // document.querySelector(".plus").addEventListener("click", () => {
+    //   websocket.send(JSON.stringify({ action: "plus" }));
+    // });
+  
+    websocket.onmessage = ({ data }) => {
+      const event = JSON.parse(data);
+      switch (event.type) {
+        case "value":
+        //   document.querySelector(".value").textContent = event.value;
+          break;
+        case "users":
+        //   const users = `${event.count} user${event.count == 1 ? "" : "s"}`;
+        //   document.querySelector(".users").textContent = users;
+          break;
+        default:
+          console.error("unsupported event", event);
+      }
+    };
+};

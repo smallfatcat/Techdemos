@@ -508,11 +508,11 @@ function animate() {
 
     if (gridChanged(grid, lastGrid)) {
         // console.log(grid);
-        history.push(getGridCopy(grid));
+        history.push([Date.now() - startTime, getGridCopy(grid)]);
     }
     if (activeBlockChanged(activeBlock, lastActiveBlock)) {
-        console.log(activeBlock);
-        historyActiveBlock.push(getActiveBlockCopy(activeBlock));
+        // console.log(activeBlock);
+        historyActiveBlock.push([Date.now() - startTime, getActiveBlockCopy(activeBlock)]);
     }
     lastActiveBlock = getActiveBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);

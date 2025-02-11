@@ -17,7 +17,7 @@ def users_event():
 def value_event():
     return json.dumps({"type": "value", "value": VALUE})
 
-async def counter(websocket):
+async def server(websocket):
     global USERS, VALUE
     try:
         # Register user
@@ -25,7 +25,7 @@ async def counter(websocket):
         # broadcast(USERS, users_event())
         # print(websocket)
         # Send current state to user
-        # await websocket.send(value_event())
+        await websocket.send(json.dumps({"type": "open"}))
         # Manage state changes
         async for message in websocket:
             event = json.loads(message)
@@ -46,7 +46,7 @@ async def counter(websocket):
         # broadcast(USERS, users_event())
 
 async def main():
-    async with serve(counter, "localhost", 6789):
+    async with serve(server, "localhost", 6789):
         await asyncio.get_running_loop().create_future()  # run forever
 
 if __name__ == "__main__":

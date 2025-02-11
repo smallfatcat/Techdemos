@@ -1,4 +1,6 @@
 const websocket = new WebSocket("ws://localhost:6789/");
+const CLIENT_ID = Math.floor(Math.random() * 1000000);
+
 const BLOCK_I = 0;
 const BLOCK_J = 1;
 const BLOCK_L = 2;
@@ -229,11 +231,11 @@ function animate() {
 
     if (gridChanged(grid, lastGrid)) {
         history.push([Date.now() - startTime, getGridCopy(grid)]);
-        websocket.send(JSON.stringify({type: "g", t: Date.now() - startTime, d: getGridCopy(grid)}));
+        websocket.send(JSON.stringify({cid: CLIENT_ID, type: "g", t: Date.now() - startTime, d: getGridCopy(grid)}));
     }
     if (activeBlockChanged(activeBlock, lastActiveBlock)) {
         historyActiveBlock.push([Date.now() - startTime, getActiveBlockCopy(activeBlock)]);
-        websocket.send(JSON.stringify({type: "b", t: Date.now() - startTime, d: getActiveBlockCopy(activeBlock)}));
+        websocket.send(JSON.stringify({cid: CLIENT_ID, type: "b", t: Date.now() - startTime, d: getActiveBlockCopy(activeBlock)}));
     }
     lastActiveBlock = getActiveBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);
@@ -382,29 +384,27 @@ window.onload = (event) => {
         drawGrid(grid, activeBlock)
     });
 
-
-    // document.querySelector(".minus").addEventListener("click", () => {
-    //   websocket.send(JSON.stringify({ action: "minus" }));
-    // });
-
-    // document.querySelector(".plus").addEventListener("click", () => {
-    //   websocket.send(JSON.stringify({ action: "plus" }));
-    // });
-
     websocket.onmessage = ({ data }) => {
         const event = JSON.parse(data);
         switch (event.type) {
             case "g":
                 console.log(event);
-                //   document.querySelector(".value").textContent = event.value;
                 break;
             case "b":
                 console.log(event);
-                //   const users = `${event.count} user${event.count == 1 ? "" : "s"}`;
-                //   document.querySelector(".users").textContent = users;
+                break;
+            case "r":
+                console.log(event);
+                break;
+            case "open":
+                console.log(event);
+                websocket.send(JSON.stringify({cid: CLIENT_ID, type: "r", t: 0}));
                 break;
             default:
                 console.error("unsupported event", event);
         }
+    };
+    websocket.onerror = ({ data }) => {
+        console.log(data);
     };
 };

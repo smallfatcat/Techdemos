@@ -5,20 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tetris</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quantico">
     <link rel="stylesheet" href="tetris.css">
     <script src="data.js"></script>
     <script src="tetris.js"></script>
 </head>
 
 <body>
-    <div id="ui-container">
+    <div id="ui-container" class="fr">
+        <div id="nextdiv" class="compact"></div>
         <div id="griddiv" class="compact"></div>
         <div id="score-container">
             <div id="scorediv"></div>
-            <div id="inputdiv"><label for="startlevel">Start Level</label><input type="number" name= "startlevel" id="startlevel" value="5" max="19" min="1"></div>
+            <div id="inputdiv"><label for="startlevel">Start Level</label><br><input type="number" name= "startlevel" id="startlevel" value="5" max="19" min="1"></div>
             <div id="controldiv"><button onclick="init()">Reset</button></div>
             <div id="controldiv"><button onclick="playback()" hidden="true">Playback</button></div>
-            <div id="nextdiv" class="compact"></div>
         </div>
         <div id="examples" class="compact" hidden="true">
             I<br>

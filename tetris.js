@@ -2,12 +2,12 @@ const websocket = new WebSocket("ws://localhost:6789/");
 const CLIENT_ID = Math.floor(Math.random() * 1000000);
 
 const loggingOn = false;
-const websocketEnabled = false;
+const websocketEnabled = true;
 
 let keys = {};
 let keyTimer = {};
 let keyRepeatTime = {};
-let timeDelay1 = 250;
+let timeDelay1 = 400;
 let timeDelay2 = 33;
 
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];

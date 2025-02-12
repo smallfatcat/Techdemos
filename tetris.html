@@ -18,19 +18,19 @@
         <div id="score-container">
             <div id="scorediv"></div>
             <div id="inputdiv"><label for="startlevel">Start Level</label><br><input type="number" name="startlevel"
-                    id="startlevel" value="5" max="19" min="1"></div>
+                    id="startlevel" value="0" max="20" min="0"></div>
             <div id="controldiv"><button onclick="init()">Reset</button></div>
             <!-- <div id="controldiv"><button onclick="playback()" hidden="true">Playback</button></div> -->
         </div>
         <div class="grid9x9">
-            <div id="rl">Q</div>
-            <div id="mu">W</div>
-            <div id="rr">E</div>
-            <div id="ml">A</div>
+            <div id="rl" onclick="reassign('rl')">Q</div>
+            <div id="mu" onclick="reassign('mu')">W</div>
+            <div id="rr" onclick="reassign('rr')">E</div>
+            <div id="ml" onclick="reassign('ml')">A</div>
             <div> </div>
-            <div id="mr">D</div>
+            <div id="mr" onclick="reassign('mr')">D</div>
             <div> </div>
-            <div id="md">S</div>
+            <div id="md" onclick="reassign('md')">S</div>
             <div> </div>
         </div>
         <div id="examples" class="compact" hidden="true">

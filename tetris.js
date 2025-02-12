@@ -24,7 +24,7 @@ let lastNextBlock = {};
 let gameOver = false;
 let score = 0;
 let lines = 0;
-let startLevel = 1;
+let startLevel = 0;
 let level = startLevel;
 let speed = gravityArray[0];
 let dropTickStart = Date.now();
@@ -35,6 +35,23 @@ let historyActiveBlock = [];
 let nextBlockID = 0;
 
 let replayMode = false;
+let reassignMode = false;
+let reassignControl = '';
+
+let keymap = {
+    rl: 'q',
+    rr: 'e',
+    mu: 'w',
+    md: 's',
+    ml: 'a',
+    mr: 'd',
+}
+
+function reassign(elementID) {
+    document.getElementById(elementID).classList.add("highlight-yellow");
+    reassignControl = elementID;
+    reassignMode = true;
+}
 
 function init() {
     history = [];
@@ -452,22 +469,22 @@ function checkKeys() {
                 keyRepeatTime[key] = timeDelayARE;
             }
             switch (key) {
-                case 'a':
+                case keymap['ml']:
                     left();
                     break;
-                case 'd':
+                case keymap['mr']:
                     right();
                     break;
-                case 's':
+                case keymap['md']:
                     down();
                     break;
-                case 'w':
+                case keymap['mu']:
                     hardDrop();
                     break;
-                case 'e':
+                case keymap['rr']:
                     rotateRight();
                     break;
-                case 'q':
+                case keymap['rl']:
                     rotateLeft();
                     break;
             }
@@ -480,6 +497,13 @@ window.onload = (event) => {
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {
+        if(reassignMode){
+            keymap[reassignControl] = event.key.toLowerCase();
+            document.getElementById(reassignControl).classList.remove("highlight-yellow");
+            document.getElementById(reassignControl).innerHTML = event.key.toUpperCase();
+            reassignMode = false;
+        }
+        
         if (!keys[event.key.toLowerCase()]) {
             keys[event.key.toLowerCase()] = true;
             keyTimer[event.key.toLowerCase()] = Date.now();

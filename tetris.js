@@ -357,11 +357,11 @@ function hardDrop() {
     while (!locked) {
         if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
             activeBlock.y += 1;
-            dropTickStart = Date.now();
+            // dropTickStart = Date.now();
         }
         else {
-            lockBlock(grid);
-            spawnBlock();
+            // lockBlock(grid);
+            // spawnBlock();
             locked = true;
         }
     }

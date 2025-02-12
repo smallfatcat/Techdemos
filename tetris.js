@@ -4,6 +4,11 @@ const CLIENT_ID = Math.floor(Math.random() * 1000000);
 const loggingOn = false;
 const websocketEnabled = false;
 
+let keys = {};
+let keyTimer = {};
+let keyRepeatTime = {};
+let timeDelay1 = 250;
+let timeDelay2 = 33;
 
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const blockColors = ["⬛", "🟦", "🟧", "🟨", "🟫", "🟩", "🟪", "🟥"]
@@ -216,6 +221,7 @@ function renderBlockElement(blockType, blockRotation) {
 }
 
 function animate() {
+    checkKeys();
     if (Date.now() - dropTickStart > speed) {
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
@@ -356,31 +362,57 @@ function skipCheck(x, y, r) {
     return false;
 }
 
+
+function checkKeys() {
+    for (let key of Object.keys(keys)) {
+        if (keys[key] && Date.now() - keyTimer[key] > keyRepeatTime[key]) {
+            keyTimer[key] = Date.now();
+            if(keyRepeatTime[key] == 0){
+                keyRepeatTime[key] = timeDelay1;
+            }
+            else{
+                keyRepeatTime[key] = timeDelay2;
+            }
+            switch (key) {
+                case 'a':
+                    left();
+                    break;
+                case 'd':
+                    right();
+                    break;
+                case 's':
+                    down();
+                    break;
+                case 'w':
+                    rotateRight();
+                    break;
+                case 'e':
+                    rotateRight();
+                    break;
+                case 'q':
+                    rotateLeft();
+                    break;
+            }
+        }
+    }
+
+}
+
 window.onload = (event) => {
     init();
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {
-        switch (event.key.toLowerCase()) {
-            case 'a':
-                left();
-                break;
-            case 'd':
-                right();
-                break;
-            case 's':
-                down();
-                break;
-            case 'w':
-                rotateRight();
-                break;
-            case 'e':
-                rotateRight();
-                break;
-            case 'q':
-                rotateLeft();
-                break;
+        if (!keys[event.key.toLowerCase()]) {
+            keys[event.key.toLowerCase()] = true;
+            keyTimer[event.key.toLowerCase()] = Date.now();
+            keyRepeatTime[event.key.toLowerCase()] = 0;
         }
+        drawGrid(grid, activeBlock)
+    });
+
+    document.addEventListener('keyup', function (event) {
+        keys[event.key.toLowerCase()] = false;
         drawGrid(grid, activeBlock)
     });
 
@@ -418,7 +450,7 @@ window.onload = (event) => {
     };
     websocket.onerror = ({ error }) => {
         // if (loggingOn) {
-            console.log(error);
+        console.log(error);
         // }
     };
 };

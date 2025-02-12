@@ -1,3 +1,7 @@
+:root{
+    --grid-dimension: 20px;
+}
+
 body {
     background-color: rgb(50, 50, 50);
     color: rgb(159, 170, 180);
@@ -48,7 +52,7 @@ button {
     left: 60px;
 }
 #scorediv {
-    height: 100px;
+    height: 75px;
 }
 #controldiv {
     height: 50px;
@@ -56,4 +60,14 @@ button {
 .compact{
     line-height: 20px;
     letter-spacing: -2px;
+}
+
+.grid9x9 {
+    position: relative;
+    left: 75px;
+    display: inline-grid;
+    grid-template-columns: var(--grid-dimension) var(--grid-dimension) var(--grid-dimension);
+    grid-template-rows: var(--grid-dimension) var(--grid-dimension) var(--grid-dimension);
+    width: 75px;
+    text-align: center;
 }

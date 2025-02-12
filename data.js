@@ -1,3 +1,11 @@
+const BLOCK_I = 0;
+const BLOCK_J = 1;
+const BLOCK_L = 2;
+const BLOCK_O = 3;
+const BLOCK_S = 4;
+const BLOCK_T = 5;
+const BLOCK_Z = 6;
+
 const blockCoords = [
     [
         [[0, 1], [1, 1], [2, 1], [3, 1]],

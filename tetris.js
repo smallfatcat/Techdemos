@@ -1,10 +1,14 @@
-const BLOCK_I = 0;
-const BLOCK_J = 1;
-const BLOCK_L = 2;
-const BLOCK_O = 3;
-const BLOCK_S = 4;
-const BLOCK_T = 5;
-const BLOCK_Z = 6;
+const websocket = new WebSocket("ws://localhost:6789/");
+const CLIENT_ID = Math.floor(Math.random() * 1000000);
+
+const loggingOn = false;
+const websocketEnabled = false;
+
+let keys = {};
+let keyTimer = {};
+let keyRepeatTime = {};
+let timeDelay1 = 250;
+let timeDelay2 = 33;
 
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const blockColors = ["⬛", "🟦", "🟧", "🟨", "🟫", "🟩", "🟪", "🟥"]
@@ -16,6 +20,7 @@ let nextBlock = {};
 let grid = [];
 let lastGrid = [];
 let lastActiveBlock = {};
+let lastNextBlock = {};
 let gameOver = false;
 let score = 0;
 let lines = 0;
@@ -27,6 +32,7 @@ let startTime = Date.now();
 let history = [];
 let historyNext = [];
 let historyActiveBlock = [];
+let nextBlockID = 0;
 
 let replayMode = false;
 
@@ -40,13 +46,15 @@ function init() {
     }
     lastGrid = getGridCopy(grid);
     activeBlock = {};
+    nextBlockID = 0;
     nextBlock = {
         x: 3,
         y: 2,
         type: getRandomInt(0, 7),
         rotation: 0,
+        id: nextBlockID,
     }
-    lastActiveBlock = getActiveBlockCopy(nextBlock);
+    lastActiveBlock = getBlockCopy(nextBlock);
 
     gameOver = false;
     score = 0;
@@ -99,6 +107,7 @@ function checkLines() {
 
 function spawnBlock() {
     if (!gameOver) {
+        nextBlockID += 1;
         checkLines();
         if (collidesWithGrid(grid, nextBlock, 0, 0, 0)) {
             console.log("Game Ended");
@@ -109,10 +118,13 @@ function spawnBlock() {
                 x: 3,
                 y: 2,
                 type: nextBlock.type,
-                rotation: 0
+                rotation: 0,
+                id: nextBlock.id,
             }
 
             nextBlock.type = getRandomInt(0, 7);
+            nextBlock.id = nextBlockID;
+
         }
     }
 }
@@ -182,7 +194,7 @@ function renderGridElement(grid, activeBlock) {
 function renderBlockElement(blockType, blockRotation) {
     nextElement = '';
     var size = 3;
-    if (blockType== BLOCK_I || blockType == BLOCK_O) {
+    if (blockType == BLOCK_I || blockType == BLOCK_O) {
         size = 4;
     }
     for (let x = 0; x < size; x++) {
@@ -209,6 +221,7 @@ function renderBlockElement(blockType, blockRotation) {
 }
 
 function animate() {
+    checkKeys();
     if (Date.now() - dropTickStart > speed) {
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
@@ -222,11 +235,17 @@ function animate() {
 
     if (gridChanged(grid, lastGrid)) {
         history.push([Date.now() - startTime, getGridCopy(grid)]);
+        if (websocketEnabled) {
+            websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "g", t: Date.now() - startTime, d: getGridCopy(grid) }));
+        }
     }
-    if (activeBlockChanged(activeBlock, lastActiveBlock)) {
-        historyActiveBlock.push([Date.now() - startTime, getActiveBlockCopy(activeBlock)]);
+    if (blockChanged(activeBlock, lastActiveBlock)) {
+        historyActiveBlock.push([Date.now() - startTime, getBlockCopy(activeBlock)]);
+        if (websocketEnabled) {
+            websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "b", t: Date.now() - startTime, d: getBlockCopy(activeBlock), n: nextBlock.type }));
+        }
     }
-    lastActiveBlock = getActiveBlockCopy(activeBlock);
+    lastActiveBlock = getBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);
     drawGrid(grid, activeBlock);
     if (!gameOver) {
@@ -234,9 +253,12 @@ function animate() {
     }
 }
 
-function activeBlockChanged(activeBlock, lastActiveBlock) {
-    if (activeBlock.x != lastActiveBlock.x || activeBlock.y != lastActiveBlock.y
-        || activeBlock.rotation != lastActiveBlock.rotation || activeBlock.type != lastActiveBlock.type) {
+function blockChanged(block, lastblock) {
+    if (block.x != lastblock.x
+        || block.y != lastblock.y
+        || block.rotation != lastblock.rotation
+        || block.type != lastblock.type
+        || block.id != lastblock.id) {
         return true;
     }
     return false;
@@ -258,14 +280,15 @@ function gridChanged(grid, lastGrid) {
     return changedGrid;
 }
 
-function getActiveBlockCopy(activeBlockOriginal) {
-    let activeBlockCopy = {
-        x: activeBlockOriginal.x,
-        y: activeBlockOriginal.y,
-        type: activeBlockOriginal.type,
-        rotation: activeBlockOriginal.rotation
+function getBlockCopy(blockOriginal) {
+    let blockCopy = {
+        x: blockOriginal.x,
+        y: blockOriginal.y,
+        type: blockOriginal.type,
+        rotation: blockOriginal.rotation,
+        id: blockOriginal.id,
     }
-    return activeBlockCopy
+    return blockCopy
 }
 
 function getGridCopy(originalGrid) {
@@ -280,37 +303,6 @@ function getGridCopy(originalGrid) {
     return copyOfGrid;
 }
 
-window.onload = (event) => {
-    init();
-    // drawGrid(grid, activeBlock);
-    // requestAnimationFrame(animate);
-
-    // Handle user input (add keypress events)
-    document.addEventListener('keydown', function (event) {
-        switch (event.key.toLowerCase()) {
-            case 'a':
-                left();
-                break;
-            case 'd':
-                right();
-                break;
-            case 's':
-                down();
-                break;
-            case 'w':
-                rotateRight();
-                break;
-            case 'e':
-                rotateRight();
-                break;
-            case 'q':
-                rotateLeft();
-                break;
-        }
-        drawGrid(grid, activeBlock)
-    });
-};
-
 function down() {
     if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
         activeBlock.y += 1;
@@ -321,11 +313,13 @@ function down() {
         spawnBlock();
     }
 }
+
 function left() {
     if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
         activeBlock.x -= 1;
     }
 }
+
 function right() {
     if (!collidesWithGrid(grid, activeBlock, 1, 0, 0)) {
         activeBlock.x += 1;
@@ -368,3 +362,95 @@ function skipCheck(x, y, r) {
     return false;
 }
 
+
+function checkKeys() {
+    for (let key of Object.keys(keys)) {
+        if (keys[key] && Date.now() - keyTimer[key] > keyRepeatTime[key]) {
+            keyTimer[key] = Date.now();
+            if(keyRepeatTime[key] == 0){
+                keyRepeatTime[key] = timeDelay1;
+            }
+            else{
+                keyRepeatTime[key] = timeDelay2;
+            }
+            switch (key) {
+                case 'a':
+                    left();
+                    break;
+                case 'd':
+                    right();
+                    break;
+                case 's':
+                    down();
+                    break;
+                case 'w':
+                    rotateRight();
+                    break;
+                case 'e':
+                    rotateRight();
+                    break;
+                case 'q':
+                    rotateLeft();
+                    break;
+            }
+        }
+    }
+
+}
+
+window.onload = (event) => {
+    init();
+
+    // Handle user input (add keypress events)
+    document.addEventListener('keydown', function (event) {
+        if (!keys[event.key.toLowerCase()]) {
+            keys[event.key.toLowerCase()] = true;
+            keyTimer[event.key.toLowerCase()] = Date.now();
+            keyRepeatTime[event.key.toLowerCase()] = 0;
+        }
+        drawGrid(grid, activeBlock)
+    });
+
+    document.addEventListener('keyup', function (event) {
+        keys[event.key.toLowerCase()] = false;
+        drawGrid(grid, activeBlock)
+    });
+
+    websocket.onmessage = ({ data }) => {
+        const event = JSON.parse(data);
+        switch (event.type) {
+            case "g":
+                if (loggingOn) {
+                    console.log(event);
+                }
+                break;
+            case "b":
+                if (loggingOn) {
+                    console.log(event);
+                }
+                break;
+            case "r":
+                if (loggingOn) {
+                    console.log(event);
+                }
+                break;
+            case "open":
+                if (loggingOn) {
+                    console.log(event);
+                }
+                if (websocketEnabled) {
+                    websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "r", t: 0 }));
+                }
+                break;
+            default:
+                if (loggingOn) {
+                    console.error("unsupported event", event);
+                }
+        }
+    };
+    websocket.onerror = ({ error }) => {
+        // if (loggingOn) {
+        console.log(error);
+        // }
+    };
+};

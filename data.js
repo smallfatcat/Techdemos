@@ -6,6 +6,31 @@ const BLOCK_S = 4;
 const BLOCK_T = 5;
 const BLOCK_Z = 6;
 
+// speed values from Tetris Gameboy
+const gravityArray = [
+    883,
+    816,
+    750,
+    683,
+    616,
+    550,
+    466,
+    366,
+    283,
+    183,
+    166,
+    150,
+    133,
+    116,
+    100,
+    100,
+    83,
+    83,
+    66,
+    66,
+    50
+];
+
 const blockCoords = [
     [
         [[0, 1], [1, 1], [2, 1], [3, 1]],

@@ -26,7 +26,7 @@ let score = 0;
 let lines = 0;
 let startLevel = 1;
 let level = startLevel;
-let speed = 800;
+let speed = gravityArray[0];
 let dropTickStart = Date.now();
 let startTime = Date.now();
 let history = [];
@@ -61,7 +61,7 @@ function init() {
     lines = 0;
     startLevel = Number(document.getElementById("startlevel").value);
     level = startLevel;
-    speed = 800;
+    speed = gravityArray[0];
     spawnBlock();
     dropTickStart = Date.now();
     startTime = Date.now();
@@ -110,7 +110,8 @@ function calcLevel(lines) {
 }
 
 function calcSpeed(level) {
-    return Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
+    return gravityArray[level];
+    // return Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
 }
 
 function spawnBlock() {

@@ -2,7 +2,7 @@ const websocket = new WebSocket("ws://localhost:6789/");
 const CLIENT_ID = Math.floor(Math.random() * 1000000);
 
 const loggingOn = false;
-const websocketEnabled = true;
+const websocketEnabled = false;
 
 let keys = {};
 let keyTimer = {};
@@ -266,9 +266,9 @@ function blockChanged(block, lastblock) {
 
 function gridChanged(grid, lastGrid) {
     var changedGrid = false;
-    for (let i = 0; i < grid.length; i++) {
-        for (let j = 0; j < grid[0].length; j++) {
-            if (grid[i][j] != lastGrid[i][j]) {
+    for (let row = 0; row < grid.length; row++) {
+        for (let col = 0; col < grid[0].length; col++) {
+            if (grid[row][col] != lastGrid[row][col]) {
                 changedGrid = true;
                 break;
             }
@@ -352,6 +352,21 @@ function rotateUsingSRS(srsArray) {
     }
 }
 
+function hardDrop() {
+    let locked = false;
+    while (!locked) {
+        if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
+            activeBlock.y += 1;
+            dropTickStart = Date.now();
+        }
+        else {
+            lockBlock(grid);
+            spawnBlock();
+            locked = true;
+        }
+    }
+}
+
 function skipCheck(x, y, r) {
     if (!collidesWithGrid(grid, activeBlock, x, y, r)) {   // left/up
         activeBlock.x += x;
@@ -367,10 +382,10 @@ function checkKeys() {
     for (let key of Object.keys(keys)) {
         if (keys[key] && Date.now() - keyTimer[key] > keyRepeatTime[key]) {
             keyTimer[key] = Date.now();
-            if(keyRepeatTime[key] == 0){
+            if (keyRepeatTime[key] == 0) {
                 keyRepeatTime[key] = timeDelay1;
             }
-            else{
+            else {
                 keyRepeatTime[key] = timeDelay2;
             }
             switch (key) {
@@ -384,7 +399,7 @@ function checkKeys() {
                     down();
                     break;
                 case 'w':
-                    rotateRight();
+                    hardDrop();
                     break;
                 case 'e':
                     rotateRight();
@@ -395,7 +410,6 @@ function checkKeys() {
             }
         }
     }
-
 }
 
 window.onload = (event) => {

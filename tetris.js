@@ -7,8 +7,8 @@ const websocketEnabled = false;
 let keys = {};
 let keyTimer = {};
 let keyRepeatTime = {};
-let timeDelay1 = 400;
-let timeDelay2 = 33;
+let timeDelayDas = 400;
+let timeDelayARE = 33;
 
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const blockColors = ["⬛", "🟦", "🟧", "🟨", "🟫", "🟩", "🟪", "🟥"]
@@ -101,8 +101,16 @@ function checkLines() {
             break;
     }
     lines += clearedCount;
-    level = Math.floor(lines / 5) + startLevel;
-    speed = Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
+    level = calcLevel(lines);
+    speed = calcSpeed(level);
+}
+
+function calcLevel(lines) {
+    return Math.floor(lines / 5) + startLevel;
+}
+
+function calcSpeed(level) {
+    return Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
 }
 
 function spawnBlock() {
@@ -383,10 +391,10 @@ function checkKeys() {
         if (keys[key] && Date.now() - keyTimer[key] > keyRepeatTime[key]) {
             keyTimer[key] = Date.now();
             if (keyRepeatTime[key] == 0) {
-                keyRepeatTime[key] = timeDelay1;
+                keyRepeatTime[key] = timeDelayDas;
             }
             else {
-                keyRepeatTime[key] = timeDelay2;
+                keyRepeatTime[key] = timeDelayARE;
             }
             switch (key) {
                 case 'a':

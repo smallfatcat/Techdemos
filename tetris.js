@@ -11,9 +11,8 @@ let timeDelayDas = 400;
 let timeDelayARE = 33;
 
 let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const blockColors = ["⬛", "🟦", "🟧", "🟨", "🟫", "🟩", "🟪", "🟥"]
+
 const gridHeight = 24;
-const startDisplay = 4;
 
 let activeBlock = {};
 let nextBlock = {};
@@ -75,7 +74,7 @@ function init() {
         id: nextBlockID,
     }
     lastActiveBlock = getBlockCopy(nextBlock);
-
+    
     gameOver = false;
     score = 0;
     lines = 0;
@@ -90,7 +89,27 @@ function init() {
     requestAnimationFrame(animate);
 }
 
-function checkLines() {
+function animate() {
+    checkKeys();
+    highlightKeys();
+    applyGravity();
+    
+    storeHistory();
+    
+    
+    drawGrid(grid, activeBlock);
+    if (!gameOver) {
+        requestAnimationFrame(animate);
+    }
+}
+
+function drawGrid(grid, activeBlock) {
+    document.getElementById("griddiv").innerHTML = renderGridElement(grid, activeBlock);
+    document.getElementById("nextdiv").innerHTML = renderBlockElement(nextBlock.type, 0);
+    document.getElementById("scorediv").innerHTML = "Score: " + score + "<br>" + "Level: " + level + "<br>" + "Lines: " + lines;
+}
+
+function clearLines() {
     var clearedCount = 0;
     for (let row = 0; row < grid.length; row++) {
         lineCleared = true;
@@ -122,8 +141,6 @@ function checkLines() {
             break;
     }
     lines += clearedCount;
-    level = calcLevel(lines, level);
-    speed = calcSpeed(level);
 }
 
 function calcLevel(lines, level) {
@@ -142,7 +159,9 @@ function calcSpeed(level) {
 function spawnBlock() {
     if (!gameOver) {
         nextBlockID += 1;
-        checkLines();
+        clearLines();
+        level = calcLevel(lines, level);
+        speed = calcSpeed(level);
         if (collidesWithGrid(grid, nextBlock, 0, 0, 0)) {
             console.log("Game Ended");
             gameOver = true;
@@ -194,80 +213,6 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
         }
     }
     return false;
-}
-
-function drawGrid(grid, activeBlock) {
-    document.getElementById("griddiv").innerHTML = renderGridElement(grid, activeBlock);
-    document.getElementById("nextdiv").innerHTML = renderBlockElement(nextBlock.type, 0);
-    document.getElementById("scorediv").innerHTML = "Score: " + score + "<br>" + "Level: " + level + "<br>" + "Lines: " + lines;
-}
-
-function renderGridElement(grid, activeBlock) {
-    gridElement = '';
-    for (let row = startDisplay; row < grid.length; row++) {
-        var rowText = '';
-        for (let col = 0; col < 10; col++) {
-            var coords = blockCoords[activeBlock.type][activeBlock.rotation]
-            var noActiveBlockAtThisCoord = true;
-            for (let coord of coords) {
-                var x = activeBlock.x + coord[0];
-                var y = activeBlock.y + coord[1];
-                if (row == y && col == x) {
-                    rowText += blockColors[activeBlock.type + 1];
-                    noActiveBlockAtThisCoord = false;
-                    break;
-                }
-            }
-            if (noActiveBlockAtThisCoord) {
-                rowText += blockColors[grid[row][col]];
-            }
-        }
-        gridElement += rowText + '<br>';
-    }
-    return gridElement;
-}
-
-function renderBlockElement(blockType, blockRotation) {
-    nextElement = '';
-    var size = 3;
-    if (blockType == BLOCK_I || blockType == BLOCK_O) {
-        size = 4;
-    }
-    for (let x = 0; x < size; x++) {
-        var rowText = '';
-        for (let y = 0; y < size; y++) {
-            var coords = blockCoords[blockType][blockRotation];
-            var flag = false;
-            for (let coord of coords) {
-                if (coord[0] == y && coord[1] == x) {
-                    flag = true;
-                    break;
-                }
-            }
-            if (flag) {
-                rowText += blockColors[blockType + 1];
-            }
-            else {
-                rowText += blockColors[0];
-            }
-        }
-        nextElement += rowText + '<br>';;
-    }
-    return nextElement;
-}
-
-function animate() {
-    checkKeys();
-    highlightKeys();
-    applyGravity();
-
-    storeHistory();
-
-    
-    drawGrid(grid, activeBlock);
-    if (!gameOver) {
-        requestAnimationFrame(animate);
-    }
 }
 
 
@@ -481,17 +426,18 @@ window.onload = (event) => {
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {
+        const keyString = event.key.toLowerCase();
         if (reassignMode) {
-            keymap[reassignControl] = event.key.toLowerCase();
+            keymap[reassignControl] = keyString;
             document.getElementById(reassignControl).classList.remove("highlight-yellow");
             document.getElementById(reassignControl).innerHTML = event.key.toUpperCase();
             reassignMode = false;
         }
 
-        if (!keys[event.key.toLowerCase()]) {
-            keys[event.key.toLowerCase()] = true;
-            keyTimer[event.key.toLowerCase()] = Date.now();
-            keyRepeatTime[event.key.toLowerCase()] = 0;
+        if (!keys[keyString]) {
+            keys[keyString] = true;
+            keyTimer[keyString] = Date.now();
+            keyRepeatTime[keyString] = 0;
         }
         drawGrid(grid, activeBlock)
     });

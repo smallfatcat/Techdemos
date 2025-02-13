@@ -38,6 +38,8 @@ let replayMode = false;
 let reassignMode = false;
 let reassignControl = '';
 
+let levelUp = startLevel * 10 + 10;
+
 let keymap = {
     rl: 'q',
     rr: 'e',
@@ -78,6 +80,7 @@ function init() {
     lines = 0;
     startLevel = Number(document.getElementById("startlevel").value);
     level = startLevel;
+    levelUp = (startLevel * 10) + 10;
     speed = gravityArray[0];
     spawnBlock();
     dropTickStart = Date.now();
@@ -103,27 +106,31 @@ function checkLines() {
     }
     switch (clearedCount) {
         case 1:
-            score += 100 * level;
+            score += 40 * (level + 1);
             break;
         case 2:
-            score += 300 * level;
+            score += 100 * (level + 1);
             break;
         case 3:
-            score += 500 * level;
+            score += 300 * (level + 1);
             break;
         case 4:
-            score += 800 * level;
+            score += 1200 * (level + 1);
             break;
         default:
             break;
     }
     lines += clearedCount;
-    level = calcLevel(lines);
+    level = calcLevel(lines, level);
     speed = calcSpeed(level);
 }
 
-function calcLevel(lines) {
-    return Math.floor(lines / 5) + startLevel;
+function calcLevel(lines, level) {
+    if(lines >= levelUp){
+        level += 1;
+        levelUp += 10;
+    }
+    return level;
 }
 
 function calcSpeed(level) {
@@ -156,6 +163,8 @@ function spawnBlock() {
 }
 
 function lockBlock(grid) {
+    score = score += softDrop;
+    softDrop = 0;
     var coords = blockCoords[activeBlock.type][activeBlock.rotation];
     for (var coord of coords) {
         var col = activeBlock.x + coord[0];
@@ -403,10 +412,10 @@ function skipCheck(x, y, r) {
     return false;
 }
 
-function highlightKey(key){
-    switch(key){
+function highlightKey(key) {
+    switch (key) {
         case 'w':
-            if(keys[key]){
+            if (keys[key]) {
                 document.getElementById('mu').classList.add("highlight")
             }
             else {
@@ -414,7 +423,7 @@ function highlightKey(key){
             }
             break;
         case 'a':
-            if(keys[key]){
+            if (keys[key]) {
                 document.getElementById('ml').classList.add("highlight")
             }
             else {
@@ -422,7 +431,7 @@ function highlightKey(key){
             }
             break;
         case 's':
-            if(keys[key]){
+            if (keys[key]) {
                 document.getElementById('md').classList.add("highlight")
             }
             else {
@@ -430,7 +439,7 @@ function highlightKey(key){
             }
             break;
         case 'd':
-            if(keys[key]){
+            if (keys[key]) {
                 document.getElementById('mr').classList.add("highlight")
             }
             else {
@@ -438,7 +447,7 @@ function highlightKey(key){
             }
             break;
         case 'q':
-            if(keys[key]){
+            if (keys[key]) {
                 document.getElementById('rl').classList.add("highlight")
             }
             else {
@@ -446,7 +455,7 @@ function highlightKey(key){
             }
             break;
         case 'e':
-            if(keys[key]){
+            if (keys[key]) {
                 document.getElementById('rr').classList.add("highlight")
             }
             else {
@@ -456,6 +465,7 @@ function highlightKey(key){
     }
 }
 
+let softDrop = 0;
 
 function checkKeys() {
     for (let key of Object.keys(keys)) {
@@ -466,6 +476,10 @@ function checkKeys() {
                 keyRepeatTime[key] = timeDelayDas;
             }
             else {
+                if (key == keymap['md']) {
+                    softDrop += 1;
+                    // console.log(softDrop);
+                }
                 keyRepeatTime[key] = timeDelayARE;
             }
             switch (key) {
@@ -497,13 +511,13 @@ window.onload = (event) => {
 
     // Handle user input (add keypress events)
     document.addEventListener('keydown', function (event) {
-        if(reassignMode){
+        if (reassignMode) {
             keymap[reassignControl] = event.key.toLowerCase();
             document.getElementById(reassignControl).classList.remove("highlight-yellow");
             document.getElementById(reassignControl).innerHTML = event.key.toUpperCase();
             reassignMode = false;
         }
-        
+
         if (!keys[event.key.toLowerCase()]) {
             keys[event.key.toLowerCase()] = true;
             keyTimer[event.key.toLowerCase()] = Date.now();

@@ -126,7 +126,7 @@ function checkLines() {
 }
 
 function calcLevel(lines, level) {
-    if(lines >= levelUp){
+    if (lines >= levelUp) {
         level += 1;
         levelUp += 10;
     }
@@ -413,55 +413,15 @@ function skipCheck(x, y, r) {
 }
 
 function highlightKey(key) {
-    switch (key) {
-        case 'w':
+    for (id in keymap) {
+        if (key == keymap[id]) {
             if (keys[key]) {
-                document.getElementById('mu').classList.add("highlight")
+                document.getElementById(id).classList.add("highlight")
             }
             else {
-                document.getElementById('mu').classList.remove("highlight")
+                document.getElementById(id).classList.remove("highlight")
             }
-            break;
-        case 'a':
-            if (keys[key]) {
-                document.getElementById('ml').classList.add("highlight")
-            }
-            else {
-                document.getElementById('ml').classList.remove("highlight")
-            }
-            break;
-        case 's':
-            if (keys[key]) {
-                document.getElementById('md').classList.add("highlight")
-            }
-            else {
-                document.getElementById('md').classList.remove("highlight")
-            }
-            break;
-        case 'd':
-            if (keys[key]) {
-                document.getElementById('mr').classList.add("highlight")
-            }
-            else {
-                document.getElementById('mr').classList.remove("highlight")
-            }
-            break;
-        case 'q':
-            if (keys[key]) {
-                document.getElementById('rl').classList.add("highlight")
-            }
-            else {
-                document.getElementById('rl').classList.remove("highlight")
-            }
-            break;
-        case 'e':
-            if (keys[key]) {
-                document.getElementById('rr').classList.add("highlight")
-            }
-            else {
-                document.getElementById('rr').classList.remove("highlight")
-            }
-            break;
+        }
     }
 }
 

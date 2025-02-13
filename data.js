@@ -7,7 +7,7 @@ const BLOCK_T = 5;
 const BLOCK_Z = 6;
 
 // speed values from Tetris Gameboy
-const gravityArray = [
+const gravityAtLevel = [
     883,
     816,
     750,

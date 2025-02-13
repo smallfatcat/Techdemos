@@ -33,7 +33,7 @@ function init() {
 }
 
 function animate() {
-    drawGrid(grid, activeBlock);
+    drawGrid(grid, Block);
     requestAnimationFrame(animate);
 }
 
@@ -116,9 +116,9 @@ window.onload = (event) => {
                 console.log(event);
                 break;
             case "b":
-                activeBlock = event.d;
-                activeBlocks[event.cid] = activeBlock;
-                nextBlock.type = event.n;
+                Block = event.d;
+                activeBlocks[event.cid] = Block;
+                Next.type = event.n;
                 console.log(event);
                 break;
             case "r":

@@ -1,7 +1,7 @@
 const websocket = new WebSocket("ws://localhost:6789/");
 const CLIENT_ID = Math.floor(Math.random() * 1000000);
 
-const loggingOn = false;
+const logEnabled = false;
 const websocketEnabled = false;
 
 let keys = {};
@@ -14,26 +14,27 @@ let blankRow = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 const gridHeight = 24;
 
-let activeBlock = {};
-let nextBlock = {};
+let Block = {};
+let Next = {};
 let grid = [];
 let lastGrid = [];
-let lastActiveBlock = {};
-let lastNextBlock = {};
+let lastBlock = {};
+let lastNext = {};
+
 let gameOver = false;
 let score = 0;
 let lines = 0;
 let startLevel = 0;
 let level = startLevel;
-let speed = gravityArray[0];
-let dropTickStart = Date.now();
+let speed = gravityAtLevel[0];
 let startTime = Date.now();
+let dropTickStart = startTime;
+
 let history = [];
 let historyNext = [];
-let historyActiveBlock = [];
+let historyBlock = [];
 let nextBlockID = 0;
 
-let replayMode = false;
 let reassignMode = false;
 let reassignControl = '';
 
@@ -41,12 +42,12 @@ let softDrop = 0;
 let levelUp = startLevel * 10 + 10;
 
 let keymap = {
-    rl: 'q',
-    rr: 'e',
-    mu: 'w',
-    md: 's',
-    ml: 'a',
-    mr: 'd',
+    rotateL: 'q',
+    rotateR: 'e',
+    moveU: 'w',
+    moveD: 's',
+    moveL: 'a',
+    moveR: 'd',
 }
 
 function reassign(elementID) {
@@ -58,22 +59,22 @@ function reassign(elementID) {
 function init() {
     history = [];
     historyNext = [];
-    historyActiveBlock = [];
+    historyBlock = [];
     grid = [];
     for (let i = 0; i < gridHeight; i++) {
         grid.push(blankRow.slice())
     }
     lastGrid = getGridCopy(grid);
-    activeBlock = {};
+    Block = {};
     nextBlockID = 0;
-    nextBlock = {
+    Next = {
         x: 3,
         y: 2,
         type: getRandomInt(0, 7),
         rotation: 0,
         id: nextBlockID,
     }
-    lastActiveBlock = getBlockCopy(nextBlock);
+    lastBlock = getBlockCopy(Next);
     
     gameOver = false;
     score = 0;
@@ -81,11 +82,11 @@ function init() {
     startLevel = Number(document.getElementById("startlevel").value);
     level = startLevel;
     levelUp = (startLevel * 10) + 10;
-    speed = gravityArray[0];
+    speed = gravityAtLevel[0];
     spawnBlock();
     dropTickStart = Date.now();
     startTime = Date.now();
-    drawGrid(grid, activeBlock);
+    drawGrid(grid, Block);
     requestAnimationFrame(animate);
 }
 
@@ -97,7 +98,7 @@ function animate() {
     storeHistory();
     
     
-    drawGrid(grid, activeBlock);
+    drawGrid(grid, Block);
     if (!gameOver) {
         requestAnimationFrame(animate);
     }
@@ -105,7 +106,7 @@ function animate() {
 
 function drawGrid(grid, activeBlock) {
     document.getElementById("griddiv").innerHTML = renderGridElement(grid, activeBlock);
-    document.getElementById("nextdiv").innerHTML = renderBlockElement(nextBlock.type, 0);
+    document.getElementById("nextdiv").innerHTML = renderBlockElement(Next.type, 0);
     document.getElementById("scorediv").innerHTML = "Score: " + score + "<br>" + "Level: " + level + "<br>" + "Lines: " + lines;
 }
 
@@ -152,7 +153,7 @@ function calcLevel(lines, level) {
 }
 
 function calcSpeed(level) {
-    return gravityArray[level];
+    return gravityAtLevel[level];
     // return Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
 }
 
@@ -162,21 +163,21 @@ function spawnBlock() {
         clearLines();
         level = calcLevel(lines, level);
         speed = calcSpeed(level);
-        if (collidesWithGrid(grid, nextBlock, 0, 0, 0)) {
+        if (collidesWithGrid(grid, Next, 0, 0, 0)) {
             console.log("Game Ended");
             gameOver = true;
         }
         else {
-            activeBlock = {
+            Block = {
                 x: 3,
                 y: 2,
-                type: nextBlock.type,
+                type: Next.type,
                 rotation: 0,
-                id: nextBlock.id,
+                id: Next.id,
             }
 
-            nextBlock.type = getRandomInt(0, 7);
-            nextBlock.id = nextBlockID;
+            Next.type = getRandomInt(0, 7);
+            Next.id = nextBlockID;
 
         }
     }
@@ -185,11 +186,11 @@ function spawnBlock() {
 function lockBlock(grid) {
     score = score += softDrop;
     softDrop = 0;
-    var coords = blockCoords[activeBlock.type][activeBlock.rotation];
+    var coords = blockCoords[Block.type][Block.rotation];
     for (var coord of coords) {
-        var col = activeBlock.x + coord[0];
-        var row = activeBlock.y + coord[1];
-        grid[row][col] = activeBlock.type + 1;
+        var col = Block.x + coord[0];
+        var row = Block.y + coord[1];
+        grid[row][col] = Block.type + 1;
     }
 }
 
@@ -219,12 +220,12 @@ function collidesWithGrid(grid, activeBlock, new_x, new_y, new_rotation) {
 function applyGravity() {
     if (Date.now() - dropTickStart > speed) {
         dropTickStart = Date.now();
-        if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
+        if (collidesWithGrid(grid, Block, 0, 1, 0)) {
             lockBlock(grid);
             spawnBlock();
         }
         else {
-            activeBlock.y += 1;
+            Block.y += 1;
         }
     }
 }
@@ -236,13 +237,13 @@ function storeHistory() {
             websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "g", t: Date.now() - startTime, d: getGridCopy(grid) }));
         }
     }
-    if (blockChanged(activeBlock, lastActiveBlock)) {
-        historyActiveBlock.push([Date.now() - startTime, getBlockCopy(activeBlock)]);
+    if (blockChanged(Block, lastBlock)) {
+        historyBlock.push([Date.now() - startTime, getBlockCopy(Block)]);
         if (websocketEnabled) {
-            websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "b", t: Date.now() - startTime, d: getBlockCopy(activeBlock), n: nextBlock.type }));
+            websocket.send(JSON.stringify({ cid: CLIENT_ID, type: "b", t: Date.now() - startTime, d: getBlockCopy(Block), n: Next.type }));
         }
     }
-    lastActiveBlock = getBlockCopy(activeBlock);
+    lastBlock = getBlockCopy(Block);
     lastGrid = getGridCopy(grid);
 }
 
@@ -297,8 +298,8 @@ function getGridCopy(originalGrid) {
 }
 
 function down() {
-    if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
-        activeBlock.y += 1;
+    if (!collidesWithGrid(grid, Block, 0, 1, 0)) {
+        Block.y += 1;
         dropTickStart = Date.now();
     }
     else {
@@ -308,32 +309,32 @@ function down() {
 }
 
 function left() {
-    if (!collidesWithGrid(grid, activeBlock, -1, 0, 0) && activeBlock.y >= 4) {
-        activeBlock.x -= 1;
+    if (!collidesWithGrid(grid, Block, -1, 0, 0) && Block.y >= 4) {
+        Block.x -= 1;
     }
 }
 
 function right() {
-    if (!collidesWithGrid(grid, activeBlock, 1, 0, 0) && activeBlock.y >= 4) {
-        activeBlock.x += 1;
+    if (!collidesWithGrid(grid, Block, 1, 0, 0) && Block.y >= 4) {
+        Block.x += 1;
     }
 }
 
 function rotateLeft() {
-    if (activeBlock.type == BLOCK_I) {
-        rotateUsingSRS(rotIleft[activeBlock.rotation]);
+    if (Block.type == BLOCK_I) {
+        rotateUsingSRS(rotIleft[Block.rotation]);
     }
-    else if (activeBlock.type != BLOCK_O) {
-        rotateUsingSRS(rotJLTSZleft[activeBlock.rotation]);
+    else if (Block.type != BLOCK_O) {
+        rotateUsingSRS(rotJLTSZleft[Block.rotation]);
     }
 }
 
 function rotateRight() {
-    if (activeBlock.type == BLOCK_I) {
-        rotateUsingSRS(rotIright[activeBlock.rotation]);
+    if (Block.type == BLOCK_I) {
+        rotateUsingSRS(rotIright[Block.rotation]);
     }
-    else if (activeBlock.type != BLOCK_O) {
-        rotateUsingSRS(rotJLTSZright[activeBlock.rotation]);
+    else if (Block.type != BLOCK_O) {
+        rotateUsingSRS(rotJLTSZright[Block.rotation]);
     }
 }
 
@@ -348,8 +349,8 @@ function rotateUsingSRS(srsArray) {
 function hardDrop() {
     let locked = false;
     while (!locked) {
-        if (!collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
-            activeBlock.y += 1;
+        if (!collidesWithGrid(grid, Block, 0, 1, 0) && Block.y >= 4) {
+            Block.y += 1;
             // dropTickStart = Date.now();
         }
         else {
@@ -361,10 +362,10 @@ function hardDrop() {
 }
 
 function skipCheck(x, y, r) {
-    if (!collidesWithGrid(grid, activeBlock, x, y, r)) {   // left/up
-        activeBlock.x += x;
-        activeBlock.y += y;
-        activeBlock.rotation = (activeBlock.rotation + r) % 4;
+    if (!collidesWithGrid(grid, Block, x, y, r)) {   // left/up
+        Block.x += x;
+        Block.y += y;
+        Block.rotation = (Block.rotation + r) % 4;
         return true;
     }
     return false;
@@ -398,22 +399,22 @@ function checkKeys() {
                 keyRepeatTime[key] = timeDelayARE;
             }
             switch (key) {
-                case keymap['ml']:
+                case keymap['moveL']:
                     left();
                     break;
-                case keymap['mr']:
+                case keymap['moveR']:
                     right();
                     break;
-                case keymap['md']:
+                case keymap['moveD']:
                     down();
                     break;
-                case keymap['mu']:
+                case keymap['moveU']:
                     hardDrop();
                     break;
-                case keymap['rr']:
+                case keymap['rotateR']:
                     rotateRight();
                     break;
-                case keymap['rl']:
+                case keymap['rotateL']:
                     rotateLeft();
                     break;
             }
@@ -424,7 +425,7 @@ function checkKeys() {
 window.onload = (event) => {
     init();
 
-    // Handle user input (add keypress events)
+    // Detect Key Press and release
     document.addEventListener('keydown', function (event) {
         const keyString = event.key.toLowerCase();
         if (reassignMode) {
@@ -439,34 +440,32 @@ window.onload = (event) => {
             keyTimer[keyString] = Date.now();
             keyRepeatTime[keyString] = 0;
         }
-        drawGrid(grid, activeBlock)
     });
 
     document.addEventListener('keyup', function (event) {
         keys[event.key.toLowerCase()] = false;
-        drawGrid(grid, activeBlock)
     });
 
     websocket.onmessage = ({ data }) => {
         const event = JSON.parse(data);
         switch (event.type) {
             case "g":
-                if (loggingOn) {
+                if (logEnabled) {
                     console.log(event);
                 }
                 break;
             case "b":
-                if (loggingOn) {
+                if (logEnabled) {
                     console.log(event);
                 }
                 break;
             case "r":
-                if (loggingOn) {
+                if (logEnabled) {
                     console.log(event);
                 }
                 break;
             case "open":
-                if (loggingOn) {
+                if (logEnabled) {
                     console.log(event);
                 }
                 if (websocketEnabled) {
@@ -474,7 +473,7 @@ window.onload = (event) => {
                 }
                 break;
             default:
-                if (loggingOn) {
+                if (logEnabled) {
                     console.error("unsupported event", event);
                 }
         }

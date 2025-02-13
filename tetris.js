@@ -38,6 +38,7 @@ let replayMode = false;
 let reassignMode = false;
 let reassignControl = '';
 
+let softDrop = 0;
 let levelUp = startLevel * 10 + 10;
 
 let keymap = {
@@ -257,6 +258,7 @@ function renderBlockElement(blockType, blockRotation) {
 
 function animate() {
     checkKeys();
+    highlightKeys();
     if (Date.now() - dropTickStart > speed) {
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
@@ -412,24 +414,21 @@ function skipCheck(x, y, r) {
     return false;
 }
 
-function highlightKey(key) {
+function highlightKeys() {
     for (id in keymap) {
-        if (key == keymap[id]) {
-            if (keys[key]) {
-                document.getElementById(id).classList.add("highlight")
-            }
-            else {
-                document.getElementById(id).classList.remove("highlight")
-            }
+        if (keys[keymap[id]]) {
+            document.getElementById(id).classList.add("highlight")
+        }
+        else {
+            document.getElementById(id).classList.remove("highlight")
         }
     }
 }
 
-let softDrop = 0;
 
 function checkKeys() {
     for (let key of Object.keys(keys)) {
-        highlightKey(key);
+        // highlightKey(key);
         if (keys[key] && Date.now() - keyTimer[key] > keyRepeatTime[key]) {
             keyTimer[key] = Date.now();
             if (keyRepeatTime[key] == 0) {

@@ -259,6 +259,19 @@ function renderBlockElement(blockType, blockRotation) {
 function animate() {
     checkKeys();
     highlightKeys();
+    applyGravity();
+
+    storeHistory();
+
+    
+    drawGrid(grid, activeBlock);
+    if (!gameOver) {
+        requestAnimationFrame(animate);
+    }
+}
+
+
+function applyGravity() {
     if (Date.now() - dropTickStart > speed) {
         dropTickStart = Date.now();
         if (collidesWithGrid(grid, activeBlock, 0, 1, 0)) {
@@ -269,7 +282,9 @@ function animate() {
             activeBlock.y += 1;
         }
     }
+}
 
+function storeHistory() {
     if (gridChanged(grid, lastGrid)) {
         history.push([Date.now() - startTime, getGridCopy(grid)]);
         if (websocketEnabled) {
@@ -284,10 +299,6 @@ function animate() {
     }
     lastActiveBlock = getBlockCopy(activeBlock);
     lastGrid = getGridCopy(grid);
-    drawGrid(grid, activeBlock);
-    if (!gameOver) {
-        requestAnimationFrame(animate);
-    }
 }
 
 function blockChanged(block, lastblock) {
@@ -352,13 +363,13 @@ function down() {
 }
 
 function left() {
-    if (!collidesWithGrid(grid, activeBlock, -1, 0, 0)) {
+    if (!collidesWithGrid(grid, activeBlock, -1, 0, 0) && activeBlock.y >= 4) {
         activeBlock.x -= 1;
     }
 }
 
 function right() {
-    if (!collidesWithGrid(grid, activeBlock, 1, 0, 0)) {
+    if (!collidesWithGrid(grid, activeBlock, 1, 0, 0) && activeBlock.y >= 4) {
         activeBlock.x += 1;
     }
 }

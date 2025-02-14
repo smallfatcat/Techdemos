@@ -39,8 +39,10 @@ let canvas = undefined;
 let ctx = undefined;
 
 let completed = 0;
+const startTime = Date.now();
 const cellSize = 10;
 const gSize = 100;
+const loopLimit = 100;
 let gCons = [];
 const neighbourOffsets = [gSize * -1, gSize, -1, 1];
 for (let i = 0; i < gSize * gSize; i++) {
@@ -112,22 +114,18 @@ function getSmallest() {
     for (let i in gCons) {
         if (gCons[i].length == 1) {
             completed += 1;
-            // continue;
         }
         if (gCons[i].length == 0) {
             console.log("null");
-            // continue;
         }
         if (gCons[i].length <= lowest && gCons[i].length > 1) {
             lowest = gCons[i].length;
             lowestIndexes.push(i);
         }
     }
-    let r = Math.floor(Math.random() * lowestIndexes.length);
+    let r = Math.floor(Math.random() * lowestIndexes.length)
     return Number(lowestIndexes.length > 0 ? lowestIndexes[r] : -1);
 }
-
-let loopLimit = 100;
 
 function animate(lastFrameTime) {
     let i = 0;
@@ -139,7 +137,12 @@ function animate(lastFrameTime) {
         }
     }
     draw(ctx);
-    requestAnimationFrame(animate);
+    if (completed != gSize * gSize) {
+        requestAnimationFrame(animate);
+    }
+    else {
+        console.log("Completed in " + (Date.now() - startTime) + "ms");
+    }
 }
 
 
@@ -149,7 +152,6 @@ function draw(ctx) {
         ctx.fillStyle = gCons[i].length == 1 ? colors[gCons[i][0]] : "black";
         let coord = indexToCoord(i);
         ctx.fillRect(coord[0] * cellSize, coord[1] * cellSize, cellSize, cellSize);
-        // console.log(coord[0] * 10, coord[1] * 10, 10, 10);
     }
 
     // ctx.strokeStyle = 'gray';

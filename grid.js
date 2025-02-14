@@ -40,7 +40,7 @@ let ctx = undefined;
 
 let completed = 0;
 const cellSize = 10;
-const gSize = 50;
+const gSize = 100;
 let gCons = [];
 const neighbourOffsets = [gSize * -1, gSize, -1, 1];
 for (let i = 0; i < gSize * gSize; i++) {
@@ -103,38 +103,43 @@ function collapse(i) {
     gCons[i] = [gCons[i][r]];
 }
 
+let completedCells = new Set();
 
 function getSmallest() {
     completed = 0;
     let lowest = Infinity;
     let lowestIndexes = [];
-    let otherIndexes = [];
     for (let i in gCons) {
+        // if(completedCells.has(i)){
+        //     continue;
+        // }
         if (gCons[i].length == 1) {
             completed += 1;
+            // completedCells.add(i);
+            continue;
         }
         if (gCons[i].length <= lowest && gCons[i].length > 1) {
             lowest = gCons[i].length;
             lowestIndexes.push(i);
         }
     }
-    // console.log("completed:" + completed);
-    console.log(lowestIndexes.length);
-    let r = Math.floor(Math.random()*lowestIndexes.length);
+    let r = Math.floor(Math.random() * lowestIndexes.length);
     return Number(lowestIndexes.length > 0 ? lowestIndexes[r] : -1);
 }
 
+let previousFrameTime = 0;
+
 function animate(lastFrameTime) {
-    let i = getSmallest();
-    if (completed != gSize * gSize) {
-        collapse(i);
-        propogateConstraints(i);
-        draw(ctx);
-        requestAnimationFrame(animate);
+    let i = 0;
+    for (let j = 0; j < 100; j++) {
+        i = getSmallest();
+        if (completed != gSize * gSize) {
+            collapse(i);
+            propogateConstraints(i);
+        }
     }
-    else {
-        console.log("Completed");
-    }
+    draw(ctx);
+    requestAnimationFrame(animate);
 }
 
 

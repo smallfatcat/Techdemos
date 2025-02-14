@@ -1,7 +1,7 @@
 const gridWidth = 300;
 const gridHeight = 300;
-const cellWidth = 30;
-const cellHeight = 30;
+const cellWidth = 10;
+const cellHeight = 10;
 const maxCol = gridWidth / cellWidth;
 const maxRow = gridHeight / cellHeight;
 
@@ -29,62 +29,100 @@ class Cell {
         this.downCol = this.col;
     }
 
-    draw(ctx) {
-        ctx.lineWidth = 2;
-        ctx.fillStyle = this.constraints.length == 1 ? colors[this.constraints[0]] : colors[this.type];
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.strokeStyle = 'gray';
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
-        ctx.font = "10px Arial";
-        ctx.fillStyle = "white";
-        ctx.fillText(this.constraints.length, this.x + cellWidth / 2, this.y + cellHeight / 2);
-    }
+    // draw(ctx) {
+    //     ctx.lineWidth = 2;
+    //     ctx.fillStyle = this.constraints.length == 1 ? colors[this.constraints[0]] : colors[this.type];
+    //     ctx.fillRect(this.x, this.y, this.width, this.height);
+    //     ctx.strokeStyle = 'gray';
+    //     ctx.strokeRect(this.x, this.y, this.width, this.height);
+    //     ctx.font = "10px Arial";
+    //     ctx.fillStyle = "white";
+    //     ctx.fillText(this.constraints.length, this.x + cellWidth / 2, this.y + cellHeight / 2);
+    // }
 
-    applyConstraints(constraints) {
-        if (this.constraints.length > 0) {
-            let constraintChanged = false;
-            let combinedConstraints = new Set();
-            for (let c of constraints) {
-                for (let type of neighbours[c]) {
-                    combinedConstraints.add(type);
-                }
-            }
+    // applyConstraints(constraints) {
+    //     if (this.constraints.length > 0) {
+    //         let constraintChanged = false;
+    //         let combinedConstraints = new Set();
+    //         for (let c of constraints) {
+    //             for (let type of neighbours[c]) {
+    //                 combinedConstraints.add(type);
+    //             }
+    //         }
 
-            for (let constraint of this.constraints) {
-            // for (let i = 0; i < this.constraints; i++){
-                if (!combinedConstraints.has(constraint)) {
-                    this.constraints.splice(this.constraints.indexOf(constraint), 1)
-                    constraintChanged = true;
-                }
-            }
-            if (constraintChanged) {
-                applyConstraintToNeighbour(this);
-            };
-        }
-    }
+    //         for (let constraint of this.constraints) {
+    //         // for (let i = 0; i < this.constraints; i++){
+    //             if (!combinedConstraints.has(constraint)) {
+    //                 this.constraints.splice(this.constraints.indexOf(constraint), 1)
+    //                 constraintChanged = true;
+    //             }
+    //         }
+    //         if (constraintChanged) {
+    //             applyConstraintToNeighbour(this);
+    //         };
+    //     }
+    // }
 
-    collapse() {
-        this.constraints = [this.constraints[Math.floor(Math.random() * this.constraints.length)]];
-    }
+    // collapse() {
+    //     this.constraints = [this.constraints[Math.floor(Math.random() * this.constraints.length)]];
+    // }
 
 }
 
-function applyConstraintToNeighbour(cell) {
+function draw(ctx, cell) {
+    ctx.lineWidth = 2;
+    ctx.fillStyle = cell.constraints.length == 1 ? colors[cell.constraints[0]] : colors[cell.type];
+    ctx.fillRect(cell.x, cell.y, cell.width, cell.height);
+    ctx.strokeStyle = 'gray';
+    ctx.strokeRect(cell.x, cell.y, cell.width, cell.height);
+    // ctx.font = "10px Arial";
+    // ctx.fillStyle = "white";
+    // ctx.fillText(cell.constraints.length, cell.x + cellWidth / 2, cell.y + cellHeight / 2);
+}
+
+function applyConstraints(constraints, cell) {
+    if (cell.constraints.length > 0) {
+        let constraintChanged = false;
+        let combinedConstraints = new Set();
+        for (let c of constraints) {
+            for (let type of neighbours[c]) {
+                combinedConstraints.add(type);
+            }
+        }
+
+        for (let constraint of cell.constraints) {
+            // for (let i = 0; i < cell.constraints; i++){
+            if (!combinedConstraints.has(constraint)) {
+                cell.constraints.splice(cell.constraints.indexOf(constraint), 1)
+                constraintChanged = true;
+            }
+        }
+        if (constraintChanged) {
+            applyConstraintToNeighbour(constraints, cell);
+        };
+    }
+}
+
+function collapse(cell) {
+    cell.constraints = [cell.constraints[Math.floor(Math.random() * cell.constraints.length)]];
+}
+
+function applyConstraintToNeighbour(constraints, cell) {
     if (cell.leftCol != undefined) {
         let targetCell = cells[cell.leftRow][cell.leftCol];
-        targetCell.applyConstraints(cell.constraints);
+        applyConstraints(cell.constraints, targetCell);
     }
     if (cell.rightCol != undefined) {
         let targetCell = cells[cell.rightRow][cell.rightCol];
-        targetCell.applyConstraints(cell.constraints);
+        applyConstraints(cell.constraints, targetCell);
     }
     if (cell.upRow != undefined) {
         let targetCell = cells[cell.upRow][cell.upCol];
-        targetCell.applyConstraints(cell.constraints);
+        applyConstraints(cell.constraints, targetCell);
     }
     if (cell.downRow != undefined) {
         let targetCell = cells[cell.downRow][cell.downCol];
-        targetCell.applyConstraints(cell.constraints);
+        applyConstraints(cell.constraints, targetCell);
     }
 }
 
@@ -105,7 +143,7 @@ const defaultConstraints = [
 ]
 
 const neighbours = [
-    [0, 1],
+    [0, 1,],
     [0, 1, 2],
     [1, 2, 3],
     [2, 3]
@@ -136,18 +174,52 @@ window.onload = (event) => {
         let y = Math.floor(event.offsetY / cellHeight);
         // console.log(event.offsetX, event.offsetY, x, y);
         targetCell(x, y);
-
     });
 }
 
 function targetCell(x, y) {
-    // console.log(colors[cells[x][y].type]);
-    // let newcolor = (cells[x][y].type + 1) % colors.length;
-    // cells[x][y].type = newcolor;
     oldCells = JSON.stringify(cells);
-    cells[x][y].collapse();
-    applyConstraintToNeighbour(cells[x][y])
 
+    collapse(cells[x][y]);
+    applyConstraintToNeighbour(cells[x][y].constraints, cells[x][y])
+
+
+    let target = getLowestEntropyCell(cells);
+    collapse(target);
+    applyConstraintToNeighbour(target.constraints, target);
+
+    if(checkForNull(cells)){
+        cells = JSON.parse(oldCells);
+    }
+}
+
+function getLowestEntropyCell(cells) {
+    lowestX = 0;
+    lowestY = 0;
+    lowestEntropy = Infinity;
+    for (let x = 0; x < maxCol; x++) {
+        for (let y = 0; y < maxRow; y++) {
+            let entropy = cells[x][y].constraints.length;
+            if (entropy < lowestEntropy && entropy > 1) {
+                lowestEntropy = entropy;
+                lowestX = x;
+                lowestY = y;
+            }
+        }
+    }
+    return cells[lowestX][lowestY];
+}
+
+function checkForNull(cells) {
+    for (let x = 0; x < maxCol; x++) {
+        for (let y = 0; y < maxRow; y++) {
+            let entropy = cells[x][y].constraints.length;
+            if (entropy == 0) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 function getRandomColor() {
@@ -162,7 +234,7 @@ function animate(lastFrameTime) {
     previousFrameTime = lastFrameTime;
     for (let y = 0; y < cells.length; y++) {
         for (let x = 0; x < cells[0].length; x++) {
-            cells[x][y].draw(ctx);
+            draw(ctx, cells[x][y]);
         }
     }
 
@@ -171,6 +243,7 @@ function animate(lastFrameTime) {
     //     physics();
     // }
     requestAnimationFrame(animate);
+    targetCell(5,5);
 }
 
 function physics() {

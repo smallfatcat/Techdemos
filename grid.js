@@ -21,25 +21,25 @@ const defaultConstraints = [
 ];
 
 const ratios = [
+    2,
     5,
     5,
     5,
     5,
     5,
     5,
-    5,
-    5,
+    2,
 ];
 
 const neighbours = [
-    [0, 1, 2],     // 0
+    [0, 1],     // 0
     [0, 1, 2],     // 1
-    [0, 1, 2, 3],  // 2
+    [1, 2, 3],  // 2
     [2, 3, 4],     // 3
     [3, 4, 5],  // 4
-    [4, 5, 6, 7],     // 5
+    [4, 5, 6],     // 5
     [5, 6, 7],     // 6
-    [5, 6, 7],     // 7
+    [6, 7],     // 7
 ];
 
 // let nullcount = 0;
@@ -49,7 +49,7 @@ let ctx = undefined;
 let completed = 0;
 const startTime = Date.now();
 const cellSize = 10;
-const gSize = 100;
+const gSize = 50;
 const loopLimit = 100;
 let gCons = [];
 const neighbourOffsets = [gSize * -1, gSize, -1, 1];

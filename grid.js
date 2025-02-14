@@ -1,3 +1,34 @@
+const colors = [
+    "blue",
+    "blue",
+    "yellow",
+    "green",
+    "darkgreen",
+    "brown",
+];
+
+const defaultConstraints = [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+]
+
+const neighbours = [
+    [0, 1, 3],
+    [0, 1, 2, 3, 4,],
+    [1, 2, 3],
+    [0, 1, 2, 3, 4,],
+    [1, 3, 4, 5],
+    [4, 5],
+];
+
+let nullcount = 0;
+let canvas = undefined;
+let ctx = undefined;
+let cells = [];
 const gridWidth = 500;
 const gridHeight = 500;
 const cellWidth = 10;
@@ -87,39 +118,6 @@ function applyConstraintToNeighbour(constraints, cell) {
     }
 }
 
-
-
-const colors = [
-    "blue",
-    "blue",
-    "yellow",
-    "green",
-    "darkgreen",
-    "brown",
-];
-
-const defaultConstraints = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-]
-
-const neighbours = [
-    [0, 1, 3],
-    [0, 1, 2, 3, 4,],
-    [1, 2, 3],
-    [0, 1, 2, 3, 4,],
-    [1, 3, 4, 5],
-    [4, 5],
-];
-
-let canvas = undefined;
-let ctx = undefined;
-let cells = [];
-
 for (let x = 0; x < gridWidth; x += cellWidth) {
     rows = [];
     for (let y = 0; y < gridHeight; y += cellHeight) {
@@ -139,18 +137,17 @@ window.onload = (event) => {
     document.addEventListener('mousedown', function (event) {
         let x = Math.floor(event.offsetX / cellWidth);
         let y = Math.floor(event.offsetY / cellHeight);
-        targetCell(x, y);
+        targetCell();
     });
 }
 
-function targetCell(x, y) {
+function targetCell() {
     oldCells = JSON.stringify(cells);
 
-    // collapse(cells[x][y]);
-    // applyConstraintToNeighbour(cells[x][y].constraints, cells[x][y])
-
-
     let target = getLowestEntropyCell(cells);
+    if(target == undefined){
+        return;
+    }
     collapse(target);
     applyConstraintToNeighbour(target.constraints, target);
 
@@ -189,10 +186,13 @@ function getLowestEntropyCell(cells) {
         nullcount = 0;
         return cells[highestX[j]][highestY[j]];
     }
-    return cells[lowestX[i]][lowestY[i]];
-}
 
-let nullcount = 0;
+    if(lowestX.length > 0){
+        return cells[lowestX[i]][lowestY[i]];
+    }
+
+    return undefined;
+}
 
 function checkForNull(cells) {
     for (let x = 0; x < maxCol; x++) {
@@ -200,7 +200,6 @@ function checkForNull(cells) {
             let entropy = cells[x][y].constraints.length;
             if (entropy == 0) {
                 nullcount += 1;
-                // console.log("null:", x, y, nullcount)
                 return true;
             }
         }
@@ -226,7 +225,5 @@ function animate(lastFrameTime) {
     }
 
     requestAnimationFrame(animate);
-    targetCell(maxRow / 2, maxCol / 2);
+    targetCell();
 }
-
-

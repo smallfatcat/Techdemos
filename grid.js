@@ -21,14 +21,14 @@ const defaultConstraints = [
 ];
 
 const ratios = [
-    10,
-    5,
-    2,
     5,
     5,
     5,
     5,
-    2,
+    5,
+    5,
+    5,
+    5,
 ];
 
 const neighbours = [
@@ -126,7 +126,7 @@ function collapse(i) {
     }
 }
 
-function getSmallest() {
+function lowestEntropy() {
     completed = 0;
     let lowest = Infinity;
     let lowestIndexes = [];
@@ -137,8 +137,13 @@ function getSmallest() {
         if (gCons[i].length == 0) {
             console.log("null");
         }
-        if (gCons[i].length <= lowest && gCons[i].length > 1) {
+        if (gCons[i].length < lowest && gCons[i].length > 1) {
             lowest = gCons[i].length;
+            lowestIndexes = [];
+            lowestIndexes.push(i);
+        }
+        if (gCons[i].length == lowest && gCons[i].length > 1) {
+            // lowest = gCons[i].length;
             lowestIndexes.push(i);
         }
     }
@@ -149,7 +154,7 @@ function getSmallest() {
 function animate(lastFrameTime) {
     let i = 0;
     for (let j = 0; j < loopLimit; j++) {
-        i = getSmallest();
+        i = lowestEntropy();
         if (completed != gSize * gSize) {
             collapse(i);
             propogateConstraints(i);

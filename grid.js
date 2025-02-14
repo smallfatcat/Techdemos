@@ -1,10 +1,12 @@
 const colors = [
-    "blue",
+    "darkblue",
     "blue",
     "yellow",
     "green",
     "darkgreen",
+    "orange",
     "brown",
+    "white",
 ];
 
 const defaultConstraints = [
@@ -14,24 +16,30 @@ const defaultConstraints = [
     3,
     4,
     5,
+    6,
+    7,
 ];
 
-// const ratios = [
-//     5,
-//     5,
-//     5,
-//     5,
-//     5,
-//     5,
-// ];
+const ratios = [
+    10,
+    5,
+    2,
+    5,
+    5,
+    5,
+    5,
+    2,
+];
 
 const neighbours = [
-    [0, 1],     // 0
-    [1, 2],     // 1
-    [1, 2, 3],  // 2
+    [0, 1, 2],     // 0
+    [0, 1, 2],     // 1
+    [0, 1, 2, 3],  // 2
     [2, 3, 4],     // 3
     [3, 4, 5],  // 4
-    [4, 5],     // 5
+    [4, 5, 6, 7],     // 5
+    [5, 6, 7],     // 6
+    [5, 6, 7],     // 7
 ];
 
 // let nullcount = 0;
@@ -101,11 +109,22 @@ function getValids(constraints) {
 }
 
 function collapse(i) {
-    let r = Math.floor(Math.random() * gCons[i].length)
-    gCons[i] = [gCons[i][r]];
+    let ratioTotal = 0;
+    let base = 0;
+    let r = 0;
+    for (let c in gCons[i]){
+        ratioTotal += ratios[gCons[i][c]];
+    }
+    r = Math.floor(Math.random() * ratioTotal);
+    for (let c in gCons[i]){
+        // console.log(i, r, ratioTotal, gCons[i], gCons[i][c]);
+        if(r <  (ratios[gCons[i][c]] + base)){
+            gCons[i] = [gCons[i][c]];
+            break;
+        }    
+        base += gCons[i][c];
+    }
 }
-
-let completedCells = new Set();
 
 function getSmallest() {
     completed = 0;
@@ -166,8 +185,12 @@ window.onload = (event) => {
     ctx = canvas.getContext("2d");
     canvas.width = gSize * cellSize;
     canvas.height = gSize * cellSize;
-    collapse((gSize * gSize) / 2 + gSize / 2);
-    propogateConstraints((gSize * gSize) / 2 + gSize / 2);
+    for (let i = 0; i < 1; i++){
+        let r = Math.floor(Math.random()*gSize*gSize)
+        collapse(r);
+        // gCons[r] = [0];
+        propogateConstraints(r);
+    }
     draw(ctx);
     animate();
 }

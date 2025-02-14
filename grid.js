@@ -92,31 +92,28 @@ function applyConstraintToNeighbour(cell) {
 
 const colors = [
     "blue",
-    "green",
     "yellow",
-    "brown",
-    'white',
+    "green",
+    'brown'
 ];
 
 const defaultConstraints = [
     0,
     1,
     2,
-    3,
-    4,
+    3
 ]
 
 const neighbours = [
-    [0, 2],
-    [2, 1, 3],
-    [0, 2, 1, 3],
-    [1, 2, 3, 4],
-    [3, 4]
+    [0, 1],
+    [0, 1, 2],
+    [1, 2, 3],
+    [2, 3]
 ];
 
 let canvas = undefined;
 let ctx = undefined;
-const cells = [];
+let cells = [];
 
 for (let x = 0; x < gridWidth; x += cellWidth) {
     rows = [];
@@ -147,6 +144,7 @@ function targetCell(x, y) {
     // console.log(colors[cells[x][y].type]);
     // let newcolor = (cells[x][y].type + 1) % colors.length;
     // cells[x][y].type = newcolor;
+    oldCells = JSON.stringify(cells);
     cells[x][y].collapse();
     applyConstraintToNeighbour(cells[x][y])
 

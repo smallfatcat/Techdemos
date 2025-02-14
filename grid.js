@@ -110,13 +110,13 @@ function getSmallest() {
     let lowest = Infinity;
     let lowestIndexes = [];
     for (let i in gCons) {
-        // if(completedCells.has(i)){
-        //     continue;
-        // }
         if (gCons[i].length == 1) {
             completed += 1;
-            // completedCells.add(i);
-            continue;
+            // continue;
+        }
+        if (gCons[i].length == 0) {
+            console.log("null");
+            // continue;
         }
         if (gCons[i].length <= lowest && gCons[i].length > 1) {
             lowest = gCons[i].length;
@@ -127,11 +127,11 @@ function getSmallest() {
     return Number(lowestIndexes.length > 0 ? lowestIndexes[r] : -1);
 }
 
-let previousFrameTime = 0;
+let loopLimit = 100;
 
 function animate(lastFrameTime) {
     let i = 0;
-    for (let j = 0; j < 100; j++) {
+    for (let j = 0; j < loopLimit; j++) {
         i = getSmallest();
         if (completed != gSize * gSize) {
             collapse(i);

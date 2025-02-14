@@ -94,8 +94,8 @@ const colors = [
     "blue",
     "yellow",
     "green",
+    "darkgreen",
     "brown",
-    "darkgreen"
 ];
 
 const defaultConstraints = [
@@ -108,12 +108,12 @@ const defaultConstraints = [
 ]
 
 const neighbours = [
-    [0, 1],
-    [0, 1, 2],
+    [0, 1, 3],
+    [0, 1, 2, 3, 4,],
     [1, 2, 3],
-    [1, 2, 3, 4, 5],
-    [3, 4],
-    [3, 5]
+    [0, 1, 2, 3, 4,],
+    [1, 3, 4, 5],
+    [4, 5],
 ];
 
 let canvas = undefined;

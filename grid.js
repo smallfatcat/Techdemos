@@ -14,15 +14,24 @@ const defaultConstraints = [
     3,
     4,
     5,
-]
+];
+
+const ratios = [
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+];
 
 const neighbours = [
-    [0, 1, 3],
-    [0, 1, 2, 3, 4,],
-    [1, 2, 3],
-    [0, 1, 2, 3, 4,],
-    [1, 3, 4, 5],
-    [4, 5],
+    [0, 1],
+    [0, 1, 2],
+    [1, 2, 3, 4],
+    [2, 3, 4],
+    [3, 4, 5],
+    [3, 4, 5],
 ];
 
 let nullcount = 0;
@@ -31,8 +40,8 @@ let ctx = undefined;
 let cells = [];
 const gridWidth = 500;
 const gridHeight = 500;
-const cellWidth = 10;
-const cellHeight = 10;
+const cellWidth = 20;
+const cellHeight = 20;
 const maxCol = gridWidth / cellWidth;
 const maxRow = gridHeight / cellHeight;
 const nullLimit = 25;
@@ -96,7 +105,21 @@ function applyConstraints(constraints, cell) {
 }
 
 function collapse(cell) {
-    cell.constraints = [cell.constraints[Math.floor(Math.random() * cell.constraints.length)]];
+    let totalOfRatios = 0;
+    for (let i in cell.constraints) {
+        totalOfRatios += ratios[cell.constraints[i]];
+    }
+    let r = Math.floor(Math.random() * totalOfRatios);
+
+    let base = 0;
+    for (let i in cell.constraints) {
+        if (r < ratios[cell.constraints[i]] + base) {
+            cell.constraints = [cell.constraints[i]];
+            break;
+        }
+        base += ratios[cell.constraints[i]];
+    }
+    // cell.constraints = [cell.constraints[Math.floor(Math.random() * cell.constraints.length)]];
 }
 
 function applyConstraintToNeighbour(constraints, cell) {
@@ -145,7 +168,7 @@ function targetCell() {
     oldCells = JSON.stringify(cells);
 
     let target = getLowestEntropyCell(cells);
-    if(target == undefined){
+    if (target == undefined) {
         return;
     }
     collapse(target);
@@ -182,12 +205,12 @@ function getLowestEntropyCell(cells) {
     }
     let i = Math.floor(Math.random() * lowestX.length);
     let j = Math.floor(Math.random() * highestX.length);
-    if(nullcount > nullLimit){
+    if (nullcount > nullLimit) {
         nullcount = 0;
         return cells[highestX[j]][highestY[j]];
     }
 
-    if(lowestX.length > 0){
+    if (lowestX.length > 0) {
         return cells[lowestX[i]][lowestY[i]];
     }
 

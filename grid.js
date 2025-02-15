@@ -1,13 +1,12 @@
 const colors = [
-    "darkblue",
-    "blue",
-    "yellow",
-    "green",
-    "darkgreen",
-    "orange",
-    "brown",
-    "white",
-    // "blue",
+    "darkblue",     // 0
+    "blue",         // 1
+    "yellow",       // 2
+    "green",        // 3
+    "darkgreen",    // 4    
+    "orange",       // 5
+    "brown",        // 6
+    "white",        // 7
 ];
 
 const defaultConstraints = [
@@ -22,14 +21,14 @@ const defaultConstraints = [
 ];
 
 const ratios = [
-    20,
-    30,
-    20,
-    20,
-    30,
-    10,
-    10,
-    5,
+    10,     // 0
+    2,     // 1
+    20,     // 2
+    40,     // 3
+    30,     // 4
+    10,     // 5
+    20,     // 6
+    5,      // 7
 ];
 
 const neighbours = [
@@ -37,9 +36,9 @@ const neighbours = [
     [0, 1, 2],     // 1
     [1, 2, 3],  // 2
     [2, 3, 4],     // 3
-    [3, 4, 5],  // 4
+    [3, 4, 5, 6],  // 4
     [4, 5, 6],     // 5
-    [5, 6, 7],     // 6
+    [4, 5, 6, 7],     // 6
     [6, 7],     // 7
 ];
 
@@ -49,9 +48,18 @@ let ctx = undefined;
 let completed = 0;
 let startTime = Date.now();
 const cellSize = 10;
-const gSize = 50;
+const gSize = 100;
 const loopLimit = 100;
-const neighbourOffsets = [gSize * -1, gSize, -1, 1];
+const neighbourOffsets = [
+    gSize * -1,
+    gSize * -1 - 1,
+    gSize * -1 + 1,
+    gSize,
+    gSize - 1,
+    gSize + 1,
+    -1,
+    1,
+];
 
 function indexToCoord(i) {
     let x = i % gSize;
@@ -182,7 +190,7 @@ function draw(ctx) {
 let gCons = [];
 let grids = [];
 
-function initGrid(){
+function initGrid() {
     startTime = 0;
     completed = 0;
     gCons = [];

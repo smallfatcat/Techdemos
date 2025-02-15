@@ -7,6 +7,7 @@ const colors = [
     "orange",
     "brown",
     "white",
+    // "blue",
 ];
 
 const defaultConstraints = [
@@ -21,14 +22,14 @@ const defaultConstraints = [
 ];
 
 const ratios = [
-    2,
-    5,
-    5,
-    5,
-    5,
-    5,
-    5,
-    2,
+    10,
+    20,
+    20,
+    20,
+    30,
+    10,
+    10,
+    10,
 ];
 
 const neighbours = [
@@ -42,7 +43,6 @@ const neighbours = [
     [6, 7],     // 7
 ];
 
-// let nullcount = 0;
 let canvas = undefined;
 let ctx = undefined;
 
@@ -112,17 +112,16 @@ function collapse(i) {
     let ratioTotal = 0;
     let base = 0;
     let r = 0;
-    for (let c in gCons[i]){
-        ratioTotal += ratios[gCons[i][c]];
+    for (let c of gCons[i]) {
+        ratioTotal += ratios[c];
     }
     r = Math.floor(Math.random() * ratioTotal);
-    for (let c in gCons[i]){
-        // console.log(i, r, ratioTotal, gCons[i], gCons[i][c]);
-        if(r <  (ratios[gCons[i][c]] + base)){
-            gCons[i] = [gCons[i][c]];
+    for (let c of gCons[i]) {
+        if (r < (ratios[c] + base)) {
+            gCons[i] = [c];
             break;
-        }    
-        base += gCons[i][c];
+        }
+        base += ratios[c];
     }
 }
 
@@ -143,7 +142,6 @@ function lowestEntropy() {
             lowestIndexes.push(i);
         }
         if (gCons[i].length == lowest && gCons[i].length > 1) {
-            // lowest = gCons[i].length;
             lowestIndexes.push(i);
         }
     }
@@ -190,8 +188,8 @@ window.onload = (event) => {
     ctx = canvas.getContext("2d");
     canvas.width = gSize * cellSize;
     canvas.height = gSize * cellSize;
-    for (let i = 0; i < 1; i++){
-        let r = Math.floor(Math.random()*gSize*gSize)
+    for (let i = 0; i < 1; i++) {
+        let r = Math.floor(Math.random() * gSize * gSize)
         collapse(r);
         // gCons[r] = [0];
         propogateConstraints(r);

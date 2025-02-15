@@ -22,14 +22,14 @@ const defaultConstraints = [
 ];
 
 const ratios = [
-    10,
     20,
+    30,
     20,
     20,
     30,
     10,
     10,
-    10,
+    5,
 ];
 
 const neighbours = [

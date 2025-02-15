@@ -21,14 +21,14 @@ const defaultConstraints = [
 ];
 
 const ratios = [
-    10,     // 0
-    2,     // 1
+    20,     // 0
+    20,     // 1
     20,     // 2
-    40,     // 3
+    30,     // 3
     30,     // 4
     10,     // 5
     20,     // 6
-    5,      // 7
+    10,      // 7
 ];
 
 const neighbours = [
@@ -42,23 +42,23 @@ const neighbours = [
     [6, 7],     // 7
 ];
 
-let canvas = undefined;
-let ctx = undefined;
+let tileCanvas = undefined;
+let tilectx = undefined;
 
 let completed = 0;
 let startTime = Date.now();
 const cellSize = 10;
-const gSize = 100;
+const gSize = 50;
 const loopLimit = 100;
 const neighbourOffsets = [
     gSize * -1,
     gSize * -1 - 1,
     gSize * -1 + 1,
+    -1,
+    1,
     gSize,
     gSize - 1,
     gSize + 1,
-    -1,
-    1,
 ];
 
 function indexToCoord(i) {
@@ -88,14 +88,14 @@ function propogateConstraints(i) {
         if ((i + neighbourOffset < 0) || (i + neighbourOffset >= gSize * gSize)) {
             continue;
         }
-        if (gCons[i + neighbourOffset].length < 2) {
+        if (tilePixels[i + neighbourOffset].length < 2) {
             continue;
         }
-        let newCons = removeConstraints(gCons[i + neighbourOffset], getValids(gCons[i]));
-        if (newCons.length == gCons[i + neighbourOffset].length || newCons.length == 0) {
+        let newCons = removeConstraints(tilePixels[i + neighbourOffset], getValids(tilePixels[i]));
+        if (newCons.length == tilePixels[i + neighbourOffset].length || newCons.length == 0) {
             return;
         }
-        gCons[i + neighbourOffset] = newCons;
+        tilePixels[i + neighbourOffset] = newCons;
         propogateConstraints(i + neighbourOffset);
     }
 }
@@ -116,13 +116,13 @@ function collapse(i) {
     let ratioTotal = 0;
     let base = 0;
     let r = 0;
-    for (let c of gCons[i]) {
+    for (let c of tilePixels[i]) {
         ratioTotal += ratios[c];
     }
     r = Math.floor(Math.random() * ratioTotal);
-    for (let c of gCons[i]) {
+    for (let c of tilePixels[i]) {
         if (r < (ratios[c] + base)) {
-            gCons[i] = [c];
+            tilePixels[i] = [c];
             break;
         }
         base += ratios[c];
@@ -133,19 +133,19 @@ function lowestEntropy() {
     completed = 0;
     let lowest = Infinity;
     let lowestIndexes = [];
-    for (let i in gCons) {
-        if (gCons[i].length == 1) {
+    for (let i in tilePixels) {
+        if (tilePixels[i].length == 1) {
             completed += 1;
         }
-        if (gCons[i].length == 0) {
+        if (tilePixels[i].length == 0) {
             console.log("null");
         }
-        if (gCons[i].length < lowest && gCons[i].length > 1) {
-            lowest = gCons[i].length;
+        if (tilePixels[i].length < lowest && tilePixels[i].length > 1) {
+            lowest = tilePixels[i].length;
             lowestIndexes = [];
             lowestIndexes.push(i);
         }
-        if (gCons[i].length == lowest && gCons[i].length > 1) {
+        if (tilePixels[i].length == lowest && tilePixels[i].length > 1) {
             lowestIndexes.push(i);
         }
     }
@@ -162,20 +162,20 @@ function animate(lastFrameTime) {
             propogateConstraints(i);
         }
     }
-    draw(ctx);
+    draw(tilectx);
     if (completed != gSize * gSize) {
         requestAnimationFrame(animate);
     }
     else {
         console.log("Completed in " + (Date.now() - startTime) + "ms");
-        grids.push(gCons);
+        grids.push(tilePixels);
     }
 }
 
 function draw(ctx) {
-    for (let i in gCons) {
+    for (let i in tilePixels) {
         ctx.lineWidth = 2;
-        ctx.fillStyle = gCons[i].length == 1 ? colors[gCons[i][0]] : "black";
+        ctx.fillStyle = tilePixels[i].length == 1 ? colors[tilePixels[i][0]] : "black";
         let coord = indexToCoord(i);
         ctx.fillRect(coord[0] * cellSize, coord[1] * cellSize, cellSize, cellSize);
     }
@@ -187,34 +187,52 @@ function draw(ctx) {
     // ctx.fillText(cell.constraints.length, cell.x + cellWidth / 2, cell.y + cellHeight / 2);
 }
 
-let gCons = [];
+let tilePixels = [];
 let grids = [];
 
-function initGrid() {
-    startTime = 0;
-    completed = 0;
-    gCons = [];
-    for (let i = 0; i < gSize * gSize; i++) {
-        gCons.push(defaultConstraints.slice());
+function copyGridEdge(edge) {
+    if (grids.length > 0) {
+        if (edge = "right") {
+            for (let i = gSize - 1; i < gSize * gSize; i += gSize) {
+                tilePixels[i - gSize + 1] = grids[grids.length - 1][i];
+            }
+        }
     }
+}
+
+function initGrid() {
+    startTime = Date.now();
+    completed = 0;
+    tilePixels = [];
+    for (let i = 0; i < gSize * gSize; i++) {
+        tilePixels.push(defaultConstraints.slice());
+    }
+    copyGridEdge("right");
     for (let i = 0; i < 1; i++) {
         let r = Math.floor(Math.random() * gSize * gSize)
-        collapse(r);
-        propogateConstraints(r);
+        if (grids.length > 0) {
+            for ( r = 0; r < gSize * gSize; r += gSize){
+                propogateConstraints(r);
+            }
+        }
+        else {
+            collapse(r);
+            propogateConstraints(r);
+        }
     }
     animate();
     console.log("Init")
 }
 
 window.onload = (event) => {
-    canvas = document.getElementById("gridCanvas");
-    ctx = canvas.getContext("2d");
-    canvas.width = gSize * cellSize;
-    canvas.height = gSize * cellSize;
+    tileCanvas = document.getElementById("gridCanvas");
+    tilectx = tileCanvas.getContext("2d");
+    tileCanvas.width = gSize * cellSize;
+    tileCanvas.height = gSize * cellSize;
     initGrid();
 }
 
 function loadGrid(i) {
-    gCons = grids[i];
-    draw(ctx);
+    tilePixels = grids[i];
+    draw(tilectx);
 }

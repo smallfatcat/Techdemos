@@ -47,15 +47,11 @@ let canvas = undefined;
 let ctx = undefined;
 
 let completed = 0;
-const startTime = Date.now();
+let startTime = Date.now();
 const cellSize = 10;
 const gSize = 50;
 const loopLimit = 100;
-let gCons = [];
 const neighbourOffsets = [gSize * -1, gSize, -1, 1];
-for (let i = 0; i < gSize * gSize; i++) {
-    gCons.push(defaultConstraints.slice());
-}
 
 function indexToCoord(i) {
     let x = i % gSize;
@@ -164,9 +160,9 @@ function animate(lastFrameTime) {
     }
     else {
         console.log("Completed in " + (Date.now() - startTime) + "ms");
+        grids.push(gCons);
     }
 }
-
 
 function draw(ctx) {
     for (let i in gCons) {
@@ -183,17 +179,34 @@ function draw(ctx) {
     // ctx.fillText(cell.constraints.length, cell.x + cellWidth / 2, cell.y + cellHeight / 2);
 }
 
+let gCons = [];
+let grids = [];
+
+function initGrid(){
+    startTime = 0;
+    completed = 0;
+    gCons = [];
+    for (let i = 0; i < gSize * gSize; i++) {
+        gCons.push(defaultConstraints.slice());
+    }
+    for (let i = 0; i < 1; i++) {
+        let r = Math.floor(Math.random() * gSize * gSize)
+        collapse(r);
+        propogateConstraints(r);
+    }
+    animate();
+    console.log("Init")
+}
+
 window.onload = (event) => {
     canvas = document.getElementById("gridCanvas");
     ctx = canvas.getContext("2d");
     canvas.width = gSize * cellSize;
     canvas.height = gSize * cellSize;
-    for (let i = 0; i < 1; i++) {
-        let r = Math.floor(Math.random() * gSize * gSize)
-        collapse(r);
-        // gCons[r] = [0];
-        propogateConstraints(r);
-    }
+    initGrid();
+}
+
+function loadGrid(i) {
+    gCons = grids[i];
     draw(ctx);
-    animate();
 }

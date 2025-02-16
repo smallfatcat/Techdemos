@@ -34,10 +34,12 @@ function makeTiles() {
 
 function draw(ctx, tiles) {
     for (let i = 0; i < tiles.length; i++) {
+        drawTile(ctx, 0, i * 30, i)
+        let jump = 0;
         for (let j = 0; j < possibilities[i].length; j++) {
-            for (let k = 0; k < possibilities[i][j].length; k++) {
-                let jump = (k == 0) ? 10 : 0;
-                drawTile(ctx, j * 80 + k * 20 + jump, i * 30, possibilities[i][j][k])
+            jump += 20;
+            for (let k = 0; k < possibilities[i].length; k++) {
+                drawTile(ctx, j * 80 + k * 20 + 20 + jump, i * 30, possibilities[i][j][k])
             }
         }
     }

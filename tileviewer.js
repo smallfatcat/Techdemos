@@ -1,30 +1,78 @@
+const noOfColors = 2;
 let tiles = makeTiles();
 let possibilities = generatePossibilities();
-const gSize = 500;
+const gSize = 3000;
 const tSize = 10;
 const colors = [
-    "green",
     "blue",
+    "yellow",
+    "green",
+    "brown",
+    "grey"
 ];
 
 window.onload = (event) => {
     tileCanvas = document.getElementById("tileCanvas");
     tilectx = tileCanvas.getContext("2d");
-    tileCanvas.width = gSize * tSize;
-    tileCanvas.height = gSize * tSize;
+    tileCanvas.width = gSize;
+    tileCanvas.height = gSize;
 
     // initGrid();
     draw(tilectx, tiles);
 
 }
 
+
 function makeTiles() {
     let tiles = [];
-    for (let i = 0; i < 2; i++) {
-        for (let j = 0; j < 2; j++) {
-            for (let k = 0; k < 2; k++) {
-                for (let l = 0; l < 2; l++) {
+    for (let i = 0; i < noOfColors; i++) {
+        for (let j = 0; j < noOfColors; j++) {
+            for (let k = 0; k < noOfColors; k++) {
+                for (let l = 0; l < noOfColors; l++) {
                     tiles.push([i, j, k, l]);
+                }
+            }
+        }
+    }
+
+    let c = 1;
+    let skipFirst = true;
+    for (let i = 0; i < noOfColors; i++) {
+        for (let j = 0; j < noOfColors; j++) {
+            for (let k = 0; k < noOfColors; k++) {
+                for (let l = 0; l < noOfColors; l++) {
+                    if(!skipFirst){
+                        tiles.push([i + c, j + c, k + c, l + c]);
+                    }
+                    skipFirst = false;
+                }
+            }
+        }
+    }
+    c = 2;
+    skipFirst = true;
+    for (let i = 0; i < noOfColors; i++) {
+        for (let j = 0; j < noOfColors; j++) {
+            for (let k = 0; k < noOfColors; k++) {
+                for (let l = 0; l < noOfColors; l++) {
+                    if(!skipFirst){
+                        tiles.push([i + c, j + c, k + c, l + c]);
+                    }
+                    skipFirst = false;
+                }
+            }
+        }
+    }
+    c = 3;
+    skipFirst = true;
+    for (let i = 0; i < noOfColors; i++) {
+        for (let j = 0; j < noOfColors; j++) {
+            for (let k = 0; k < noOfColors; k++) {
+                for (let l = 0; l < noOfColors; l++) {
+                    if(!skipFirst){
+                        tiles.push([i + c, j + c, k + c, l + c]);
+                    }
+                    skipFirst = false;
                 }
             }
         }
@@ -39,7 +87,7 @@ function draw(ctx, tiles) {
         for (let j = 0; j < possibilities[i].length; j++) {
             jump += 20;
             for (let k = 0; k < possibilities[i][j].length; k++) {
-                drawTile(ctx, j * 80 + k * 20 + 20 + jump, i * 30, possibilities[i][j][k])
+                drawTile(ctx, j * 160 + k * 20 + 20 + jump, i * 30, possibilities[i][j][k])
             }
         }
     }

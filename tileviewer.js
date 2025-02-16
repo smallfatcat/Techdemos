@@ -38,17 +38,11 @@ function draw(ctx, tiles) {
         let jump = 0;
         for (let j = 0; j < possibilities[i].length; j++) {
             jump += 20;
-            for (let k = 0; k < possibilities[i].length; k++) {
+            for (let k = 0; k < possibilities[i][j].length; k++) {
                 drawTile(ctx, j * 80 + k * 20 + 20 + jump, i * 30, possibilities[i][j][k])
             }
         }
     }
-
-    // ctx.strokeStyle = 'gray';
-    // ctx.strokeRect(cell.x, cell.y, cell.width, cell.height);
-    // ctx.font = "10px Arial";
-    // ctx.fillStyle = "white";
-    // ctx.fillText(cell.constraints.length, cell.x + cellWidth / 2, cell.y + cellHeight / 2);
 }
 
 function drawTile(ctx, x, y, tileIndex) {
@@ -59,6 +53,10 @@ function drawTile(ctx, x, y, tileIndex) {
         ctx.fillStyle = colors[tiles[tileIndex][j]];
         ctx.fillRect(x + offset_x, y + offset_y, tSize, tSize);
     }
+    ctx.font = "12px Arial";
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.fillText(tileIndex, x + 10, y + 14);
 }
 
 

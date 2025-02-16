@@ -1,4 +1,5 @@
 let tiles = makeTiles();
+let possibilities = generatePossibilities();
 const gSize = 500;
 const tSize = 10;
 const colors = [
@@ -33,14 +34,11 @@ function makeTiles() {
 
 function draw(ctx, tiles) {
     for (let i = 0; i < tiles.length; i++) {
-        for (let j = 0; j < 4; j++) {
-            let x = j % 2;
-            let y = Math.floor(j / 2);
-            let x_shift = i * tSize * 2;
-            let y_shift = 0;
-            ctx.lineWidth = 2;
-            ctx.fillStyle = colors[tiles[i][j]];
-            ctx.fillRect(x * tSize + x_shift, y * tSize + y_shift, tSize, tSize);
+        for (let j = 0; j < possibilities[i].length; j++) {
+            for (let k = 0; k < possibilities[i][j].length; k++) {
+                let jump = (k == 0) ? 10 : 0;
+                drawTile(ctx, j * 80 + k * 20 + jump, i * 30, possibilities[i][j][k])
+            }
         }
     }
 
@@ -49,6 +47,16 @@ function draw(ctx, tiles) {
     // ctx.font = "10px Arial";
     // ctx.fillStyle = "white";
     // ctx.fillText(cell.constraints.length, cell.x + cellWidth / 2, cell.y + cellHeight / 2);
+}
+
+function drawTile(ctx, x, y, tileIndex) {
+    for (let j = 0; j < 4; j++) {
+        let offset_x = (j % 2) * tSize;
+        let offset_y = Math.floor(j / 2) * tSize;
+        ctx.lineWidth = 2;
+        ctx.fillStyle = colors[tiles[tileIndex][j]];
+        ctx.fillRect(x + offset_x, y + offset_y, tSize, tSize);
+    }
 }
 
 

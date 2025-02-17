@@ -290,3 +290,12 @@ function coordToIndex(coord) {
     let i = coord[0] + coord[1] * gridSize;
     return i;
 }
+
+function convertGrid(a, b) {
+    let temp = Math.sqrt(b.length) / 2;
+    for(let i in a){
+        y = Math.floor(i/temp) * temp;
+        b[Number(i) + temp + y] =  a[i];
+    }
+    return b;
+}

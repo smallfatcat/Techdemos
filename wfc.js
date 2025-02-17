@@ -86,7 +86,10 @@ function wfc() {
             let i = stack.pop();
             for (let d = 0; d < 4; d++) {
                 let possible = getPossible(i, d);
-                // TODO: handle left and right edge
+                // handle left and right edge
+                if ((d == 1 && i % gridSize == gridSize - 1) || (d == 3 && i % gridSize == 0)){
+                    continue;
+                }
                 let target = i + directions[d];
                 let reduced = constrain(target, possible);
                 if (reduced) {

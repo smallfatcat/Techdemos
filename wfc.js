@@ -89,7 +89,6 @@ function wfc() {
                     stack.push(target);
                 }
             }
-
         }
     }
     drawGrid(tilectx, grid);
@@ -151,7 +150,7 @@ function lowestEntropy() {
 
 function constrain(i, newConstraints) {
     let reduced = false;
-    if (i > 0 && i < grid.length && grid[i].length > 1) {
+    if (i >= 0 && i < grid.length && grid[i].length > 1) {
         let oldConstraints = grid[i];
         let res = [];
         for (let j = 0; j < oldConstraints.length; j++) {

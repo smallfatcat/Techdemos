@@ -280,22 +280,27 @@ function drawTile(ctx, x, y, tileIndex, showLabels, i) {
     }
 }
 
-function indexToCoord(i) {
-    let x = i % gridSize;
-    let y = Math.floor(i / gridSize);
-    return [x, y];
+function indexToCoord(i, width) {
+    let x = i % width;
+    let y = Math.floor(i / width);
+    return {x: x, y: y};
 }
 
-function coordToIndex(coord) {
-    let i = coord[0] + coord[1] * gridSize;
+function coordToIndex(coords, width) {
+    let i = coords.x + coords.y * width;
     return i;
 }
 
-function convertGrid(a, b) {
-    let temp = Math.sqrt(b.length) / 2;
+function convertGrid(a, b, x, y) {
+    // copies grid into bigger grid
+    let widthA = Math.sqrt(a.length);
+    let widthB = Math.sqrt(b.length);
     for(let i in a){
-        y = Math.floor(i/temp) * temp;
-        b[Number(i) + temp + y] =  a[i];
+        let coords = indexToCoord(i, widthA);
+        coords.x += x * widthA;
+        coords.y += y * widthA
+        let j = coordToIndex(coords, widthB);
+        b[j] = a[Number(i)];
     }
     return b;
 }

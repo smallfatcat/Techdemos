@@ -1,9 +1,10 @@
+let reducedSet = new Set();
 let animate = true;
 let labels = true;
 const noOfColors = 2;
 let tiles = makeTiles();
 let possibilities = generatePossibilities();
-const gridSize = 200;
+const gridSize = 50;
 const width = gridSize * 20;
 const height = gridSize * 20;
 const tSize = 10;
@@ -47,7 +48,6 @@ function initGrid() {
     }
 }
 
-
 window.onload = (event) => {
     tileCanvas = document.getElementById("tileCanvas");
     tilectx = tileCanvas.getContext("2d");
@@ -55,24 +55,8 @@ window.onload = (event) => {
     tileCanvas.height = height;
 
     initGrid();
-    // drawPossibilities(tilectx, tiles);
-    // randomiseGrid();
     drawGrid(tilectx, grid);
 
-}
-
-function collapse(i) {
-    let constraints = grid[i];
-    let r = Math.floor(Math.random() * constraints.length);
-    grid[i] = [constraints[r]];
-    // console.log(reducedSet);
-    reducedSet.delete(i);
-}
-
-function randomiseGrid() {
-    for (let i = 0; i < grid.length; i++) {
-        collapse(i);
-    }
 }
 
 function generateButton() {
@@ -81,7 +65,6 @@ function generateButton() {
     labels = true;
     wfc();
 }
-
 
 function wfc() {
     for (let j = 0; j < loopCount; j++) {
@@ -98,8 +81,6 @@ function wfc() {
 
         while (stack.length > 0) {
             let i = stack.pop();
-            // console.log(i);
-            let constraints = grid[i];
             for (let d = 0; d < 4; d++) {
                 let possible = getPossible(i, d);
                 let target = i + directions[d]
@@ -117,11 +98,17 @@ function wfc() {
     }
 }
 
+function collapse(i) {
+    let constraints = grid[i];
+    let r = Math.floor(Math.random() * constraints.length);
+    grid[i] = [constraints[r]];
+    reducedSet.delete(i);
+}
+
 function getPossible(i, direction) {
     let tile = grid[i];
     let possibleSet = new Set();
     for (let j = 0; j < tile.length; j++) {
-        // console.log(tile[j]);
         let temp = possibilities[tile[j]][direction];
         for (let possible of temp) {
             possibleSet.add(possible);
@@ -160,8 +147,6 @@ function lowestEntropy() {
     let r = Math.floor(Math.random() * lowestIDs.length);
     return lowestIDs[r];
 }
-
-let reducedSet = new Set();
 
 function constrain(i, newConstraints) {
     let reduced = false;
@@ -226,46 +211,6 @@ function makeTiles() {
     }
 }
 
-function drawPossibilities(ctx, tiles) {
-    for (let i = 0; i < tiles.length; i++) {
-        drawTile(ctx, 0, i * 30, i)
-        let jump = 0;
-        for (let j = 0; j < possibilities[i].length; j++) {
-            jump += 20;
-            for (let k = 0; k < possibilities[i][j].length; k++) {
-                drawTile(ctx, j * 320 + k * 20 + 20 + jump, i * 30, possibilities[i][j][k])
-            }
-        }
-    }
-}
-
-function drawGrid(ctx, grid) {
-    for (let i = 0; i < grid.length; i++) {
-        let coords = indexToCoord(i);
-        drawTile(ctx, coords[0] * 20, coords[1] * 20, grid[i][0], labels, i)
-    }
-}
-
-function drawTile(ctx, x, y, tileIndex, showLabels, i) {
-    // console.log(x, y, tileIndex);
-    for (let j = 0; j < 4; j++) {
-        let offset_x = (j % 2) * tSize;
-        let offset_y = Math.floor(j / 2) * tSize;
-        ctx.lineWidth = 2;
-        let tileColor = grid[i].length == 1 ? tiles[tileIndex][j] : 0;
-        ctx.fillStyle = colors[tileColor];
-        ctx.fillRect(x + offset_x, y + offset_y, tSize, tSize);
-    }
-    if (showLabels) {
-        ctx.font = "12px Arial";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-        ctx.fillText(grid[i].length, x + 10, y + 14);
-    }
-}
-
-
-
 function generatePossibilities() {
     let possibleForTile = [];
     let directions = [
@@ -290,6 +235,43 @@ function generatePossibilities() {
     }
 
     return possibleForTile;
+}
+
+function drawPossibilities(ctx, tiles) {
+    for (let i = 0; i < tiles.length; i++) {
+        drawTile(ctx, 0, i * 30, i)
+        let jump = 0;
+        for (let j = 0; j < possibilities[i].length; j++) {
+            jump += 20;
+            for (let k = 0; k < possibilities[i][j].length; k++) {
+                drawTile(ctx, j * 320 + k * 20 + 20 + jump, i * 30, possibilities[i][j][k])
+            }
+        }
+    }
+}
+
+function drawGrid(ctx, grid) {
+    for (let i = 0; i < grid.length; i++) {
+        let coords = indexToCoord(i);
+        drawTile(ctx, coords[0] * 20, coords[1] * 20, grid[i][0], labels, i)
+    }
+}
+
+function drawTile(ctx, x, y, tileIndex, showLabels, i) {
+    for (let j = 0; j < 4; j++) {
+        let offset_x = (j % 2) * tSize;
+        let offset_y = Math.floor(j / 2) * tSize;
+        ctx.lineWidth = 2;
+        let tileColor = grid[i].length == 1 ? tiles[tileIndex][j] : 0;
+        ctx.fillStyle = colors[tileColor];
+        ctx.fillRect(x + offset_x, y + offset_y, tSize, tSize);
+    }
+    if (showLabels) {
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.fillText(grid[i].length, x + 10, y + 14);
+    }
 }
 
 function indexToCoord(i) {

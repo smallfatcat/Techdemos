@@ -304,3 +304,32 @@ function convertGrid(a, b, x, y) {
     }
     return b;
 }
+
+function flattenGrid(grid) {
+    let newGrid = [];
+    for (tileID of grid) {
+        newGrid.push(tileID[0]);
+    }
+    return newGrid;
+}
+
+function unflattenGrid(grid) {
+    let newGrid = [];
+    for (tileID of grid) {
+        newGrid.push([tileID]);
+    }
+    return newGrid;
+}
+
+function doubleGrid(grid) {
+    let widthA = Math.sqrt(grid.length)
+    // let a = flattenGrid(grid);
+    let a = grid;
+    let b = Array((widthA * 2) * (widthA * 2)).fill(0);
+    // let newGrid = unflattenGrid(convertGrid(a, b, 1, 0));
+    let newGrid = convertGrid(a, b, 1, 0);
+    grid = newGrid;
+    gridSize *= 2;
+    drawGrid(tilectx, newGrid)
+    return newGrid;
+}

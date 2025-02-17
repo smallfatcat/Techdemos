@@ -3,7 +3,7 @@ let labels = true;
 const noOfColors = 2;
 let tiles = makeTiles();
 let possibilities = generatePossibilities();
-const gridSize = 50;
+const gridSize = 200;
 const width = gridSize * 20;
 const height = gridSize * 20;
 const tSize = 10;
@@ -36,7 +36,7 @@ const directions = [
     -1,
 ];
 
-function initGrid(){
+function initGrid() {
     grid = [];
     for (let i = 0; i < gridSize * gridSize; i++) {
         let constraints = [];
@@ -65,6 +65,8 @@ function collapse(i) {
     let constraints = grid[i];
     let r = Math.floor(Math.random() * constraints.length);
     grid[i] = [constraints[r]];
+    // console.log(reducedSet);
+    reducedSet.delete(i);
 }
 
 function randomiseGrid() {
@@ -73,7 +75,7 @@ function randomiseGrid() {
     }
 }
 
-function generateButton(){
+function generateButton() {
     initGrid();
     animate = true;
     labels = true;
@@ -84,7 +86,7 @@ function generateButton(){
 function wfc() {
     for (let j = 0; j < loopCount; j++) {
         let lowest = lowestEntropy();
-        if(lowest == undefined){
+        if (lowest == undefined) {
             animate = false;
             console.log("finished");
             labels = false;
@@ -110,7 +112,7 @@ function wfc() {
         }
     }
     drawGrid(tilectx, grid);
-    if(animate){
+    if (animate) {
         requestAnimationFrame(wfc);
     }
 }
@@ -131,32 +133,54 @@ function getPossible(i, direction) {
 function lowestEntropy() {
     let lowest = Infinity;
     let lowestIDs = [];
-    for (let i = 0; i < grid.length; i++) {
-        let entropy = grid[i].length;
-        if (entropy < lowest && entropy > 1) {
-            lowest = entropy;
-            lowestIDs = [];
+    if (reducedSet.size > 0) {
+        for (i of reducedSet) {
+            let entropy = grid[i].length;
+            if (entropy < lowest && entropy > 1) {
+                lowest = entropy;
+                lowestIDs = [];
+            }
+            if (entropy == lowest) {
+                lowestIDs.push(i);
+            }
         }
-        if (entropy == lowest) {
-            lowestIDs.push(i);
+    }
+    else {
+        for (let i = 0; i < grid.length; i++) {
+            let entropy = grid[i].length;
+            if (entropy < lowest && entropy > 1) {
+                lowest = entropy;
+                lowestIDs = [];
+            }
+            if (entropy == lowest) {
+                lowestIDs.push(i);
+            }
         }
     }
     let r = Math.floor(Math.random() * lowestIDs.length);
     return lowestIDs[r];
 }
 
+let reducedSet = new Set();
+
 function constrain(i, newConstraints) {
     let reduced = false;
     if (i > 0 && i < grid.length && grid[i].length > 1) {
         let oldConstraints = grid[i];
         let res = [];
-        for (let i = 0; i < oldConstraints.length; i++) {
-            let constraint = oldConstraints[i];
+        for (let j = 0; j < oldConstraints.length; j++) {
+            let constraint = oldConstraints[j];
             if (newConstraints.has(constraint)) {
                 res.push(constraint);
             }
         }
         if (res.length > 0 && res.length != grid[i].length) {
+            if (res.length > 1) {
+                reducedSet.add(i);
+            }
+            else {
+                reducedSet.delete(i);
+            }
             reduced = true;
             grid[i] = res;
         }

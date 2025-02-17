@@ -4,7 +4,7 @@ let labels = true;
 const noOfColors = 2;
 let tiles = makeTiles();
 let possibilities = generatePossibilities();
-const gridSize = 100;
+let gridSize = 50;
 const width = gridSize * 20;
 const height = gridSize * 20;
 const tSize = 10;
@@ -259,11 +259,11 @@ function drawPossibilities(ctx, tiles) {
 function drawGrid(ctx, grid) {
     for (let i = 0; i < grid.length; i++) {
         let coords = indexToCoord(i, gridSize);
-        drawTile(ctx, coords.x * 20, coords.y * 20, grid[i][0], labels, i)
+        drawTile(ctx, coords.x * 20, coords.y * 20, grid[i][0], labels, i, grid)
     }
 }
 
-function drawTile(ctx, x, y, tileIndex, showLabels, i) {
+function drawTile(ctx, x, y, tileIndex, showLabels, i, grid) {
     for (let j = 0; j < 4; j++) {
         let offset_x = (j % 2) * tSize;
         let offset_y = Math.floor(j / 2) * tSize;
@@ -283,7 +283,7 @@ function drawTile(ctx, x, y, tileIndex, showLabels, i) {
 function indexToCoord(i, width) {
     let x = i % width;
     let y = Math.floor(i / width);
-    return {x: x, y: y};
+    return { x: x, y: y };
 }
 
 function coordToIndex(coords, width) {
@@ -295,7 +295,7 @@ function convertGrid(a, b, x, y) {
     // copies grid into bigger grid
     let widthA = Math.sqrt(a.length);
     let widthB = Math.sqrt(b.length);
-    for(let i in a){
+    for (let i in a) {
         let coords = indexToCoord(i, widthA);
         coords.x += x * widthA;
         coords.y += y * widthA

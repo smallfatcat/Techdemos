@@ -99,6 +99,7 @@ function wfc() {
 }
 
 function collapse(i) {
+    // TODO: use probabilty to determine most likely collapse
     let constraints = grid[i];
     let r = Math.floor(Math.random() * constraints.length);
     grid[i] = [constraints[r]];

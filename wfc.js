@@ -258,8 +258,8 @@ function drawPossibilities(ctx, tiles) {
 
 function drawGrid(ctx, grid) {
     for (let i = 0; i < grid.length; i++) {
-        let coords = indexToCoord(i);
-        drawTile(ctx, coords[0] * 20, coords[1] * 20, grid[i][0], labels, i)
+        let coords = indexToCoord(i, gridSize);
+        drawTile(ctx, coords.x * 20, coords.y * 20, grid[i][0], labels, i)
     }
 }
 

@@ -45,14 +45,14 @@ window.onload = (event) => {
     paletteCanvas.height = tSize;
 
     initGrid();
-    draw(tilectx, tilePixels, gSize, gSize);
-    draw(palettectx, palettePixels, 10, 1);
+    drawPossibilities(tilectx, tilePixels, gSize, gSize);
+    drawPossibilities(palettectx, palettePixels, 10, 1);
 
     tileCanvas.addEventListener('mousedown', function (event) {
         console.log(event.offsetX, event.offsetY);
         if (event.offsetX < tileCanvas.width && event.offsetY < tileCanvas.height) {
             tilePixels[coordToIndex([Math.floor(event.offsetX / tSize), Math.floor(event.offsetY / tSize)])] = paletteSelected;
-            draw(tilectx, tilePixels, gSize);
+            drawPossibilities(tilectx, tilePixels, gSize);
         }
     });
     paletteCanvas.addEventListener('mousedown', function (event) {
@@ -61,7 +61,7 @@ window.onload = (event) => {
             console.log(coordToIndex([Math.floor(event.offsetX / tSize), Math.floor(event.offsetY / tSize)]));
             paletteSelected = coordToIndex([Math.floor(event.offsetX / tSize), Math.floor(event.offsetY / tSize)]);
             // palettePixels[coordToIndex([Math.floor(event.offsetX / tSize), Math.floor(event.offsetY / tSize)])] = 1;
-            draw(palettectx, palettePixels, gSize);
+            drawPossibilities(palettectx, palettePixels, gSize);
         }
     });
 }
@@ -205,10 +205,10 @@ function initGrid() {
 
 function saveTile() {
     savedTiles.push(tilePixels.slice());
-    draw(savedctx, savedTiles[savedTiles.length - 1], gSize, gSize);
+    drawPossibilities(savedctx, savedTiles[savedTiles.length - 1], gSize, gSize);
 }
 
-function draw(ctx, pixels, width) {
+function drawPossibilities(ctx, pixels, width) {
     for (let i in pixels) {
         ctx.lineWidth = 2;
         ctx.fillStyle = colors[pixels[i]];

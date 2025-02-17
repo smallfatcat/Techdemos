@@ -1,12 +1,11 @@
 const colors = [
-    "darkblue",     // 0
-    "blue",         // 1
-    "yellow",       // 2
-    "green",        // 3
-    "darkgreen",    // 4    
-    "orange",       // 5
-    "brown",        // 6
-    "white",        // 7
+    "darkblue",
+    "blue",
+    "yellow",
+    "green",
+    "brown",
+    "orange",
+    "darkgrey",
 ];
 
 const defaultConstraints = [
@@ -17,18 +16,18 @@ const defaultConstraints = [
     4,
     5,
     6,
-    7,
+
 ];
 
 const ratios = [
-    20,     // 0
+    30,     // 0
     20,     // 1
     20,     // 2
-    30,     // 3
-    30,     // 4
+    20,     // 3
+    10,     // 4
     10,     // 5
     20,     // 6
-    10,      // 7
+
 ];
 
 const neighbours = [
@@ -38,8 +37,7 @@ const neighbours = [
     [2, 3, 4],     // 3
     [3, 4, 5, 6],  // 4
     [4, 5, 6],     // 5
-    [4, 5, 6, 7],     // 6
-    [6, 7],     // 7
+    [4, 5, 6],     // 6
 ];
 
 let tileCanvas = undefined;
@@ -162,7 +160,7 @@ function animate(lastFrameTime) {
             propogateConstraints(i);
         }
     }
-    draw(tilectx);
+    drawPossibilities(tilectx);
     if (completed != gSize * gSize) {
         requestAnimationFrame(animate);
     }
@@ -172,7 +170,7 @@ function animate(lastFrameTime) {
     }
 }
 
-function draw(ctx) {
+function drawPossibilities(ctx) {
     for (let i in tilePixels) {
         ctx.lineWidth = 2;
         ctx.fillStyle = tilePixels[i].length == 1 ? colors[tilePixels[i][0]] : "black";
@@ -234,5 +232,5 @@ window.onload = (event) => {
 
 function loadGrid(i) {
     tilePixels = grids[i];
-    draw(tilectx);
+    drawPossibilities(tilectx);
 }

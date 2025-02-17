@@ -4,19 +4,20 @@ let labels = true;
 const noOfColors = 2;
 let tiles = makeTiles();
 let possibilities = generatePossibilities();
-const gridSize = 50;
+const gridSize = 100;
 const width = gridSize * 20;
 const height = gridSize * 20;
 const tSize = 10;
-const loopCount = 20;
+let loopCount = 20;
 let grid = [];
 const colors = [
-    "darkblue",
+    'darkblue',
     "blue",
-    "yellow",
+    "#c9bd14",   // sand
     "green",
     "darkgreen",
-    "brown",
+    "#916b13",   // dirt
+    "#75451d",   // dark dirt
     "darkgrey",
 ];
 
@@ -28,6 +29,7 @@ const defaultConstraints = [
     4,
     5,
     6,
+    7,
 ];
 
 const directions = [
@@ -67,6 +69,7 @@ function generateButton() {
 }
 
 function wfc() {
+    loopCount = document.getElementById("speed").value;
     for (let j = 0; j < loopCount; j++) {
         let lowest = lowestEntropy();
         if (lowest == undefined) {
@@ -83,7 +86,8 @@ function wfc() {
             let i = stack.pop();
             for (let d = 0; d < 4; d++) {
                 let possible = getPossible(i, d);
-                let target = i + directions[d]
+                // TODO: handle left and right edge
+                let target = i + directions[d];
                 let reduced = constrain(target, possible);
                 if (reduced) {
                     stack.push(target);
@@ -190,6 +194,8 @@ function makeTiles() {
     getExtra(3, noOfColors);
     getExtra(4, noOfColors);
     getExtra(5, noOfColors);
+    getExtra(6, noOfColors);
+    // getExtra(7, noOfColors);
 
     return tiles;
 

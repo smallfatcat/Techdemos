@@ -1,4 +1,5 @@
 let reducedSet = new Set();
+let showTileID = false;
 let animate = true;
 let labels = true;
 const noOfColors = 2;
@@ -56,9 +57,19 @@ window.onload = (event) => {
     tileCanvas.width = width;
     tileCanvas.height = height;
 
+    tilePreviewCanvas = document.getElementById("tilePreviewCanvas");
+    tilePreviewctx = tilePreviewCanvas.getContext("2d");
+    tilePreviewCanvas.width = width;
+    tilePreviewCanvas.height = Math.ceil(tiles.length / gridSize) * 20;
+
     initGrid();
     drawGrid(tilectx, grid);
-
+    tilePreviewGrid = [];
+    for( let i = 0; i < tiles.length; i++){
+        tilePreviewGrid.push([i])
+    }
+    showTileID = true;
+    drawGrid(tilePreviewctx, tilePreviewGrid);
 }
 
 function generateButton() {
@@ -90,7 +101,7 @@ function wfc() {
                 if ((d == 1 && i % gridSize == gridSize - 1) || (d == 3 && i % gridSize == 0)){
                     continue;
                 }
-                let target = i + directions[d];
+                    let target = i + directions[d];
                 let reduced = constrain(target, possible);
                 if (reduced) {
                     stack.push(target);
@@ -98,6 +109,7 @@ function wfc() {
             }
         }
     }
+    showTileID = false;
     drawGrid(tilectx, grid);
     if (animate) {
         requestAnimationFrame(wfc);
@@ -279,7 +291,7 @@ function drawTile(ctx, x, y, tileIndex, showLabels, i, grid) {
         ctx.font = "12px Arial";
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
-        ctx.fillText(grid[i].length, x + 10, y + 14);
+        ctx.fillText(showTileID ? grid[i][0]: grid[i].length, x + 10, y + 14);
     }
 }
 

@@ -3,10 +3,15 @@ let gTiles = [];
 let config = {};
 config.width = 1000;
 config.height = 1000;
-config.uniqueEdges = 5;
+config.uniqueEdges = 2;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
 
+
+const EDGE_N = 0;
+const EDGE_E = 1;
+const EDGE_S = 2;
+const EDGE_W = 3;
 
 const roadColor = [
     "green",
@@ -17,47 +22,50 @@ const roadColor = [
 ];
 
 class Tile {
-    constructor(x, y, rot, edges, pixels, size, color) {
-        this.x = x;
-        this.y = y;
-        this.rot = rot;
-        this.edges = edges;
-        this.pixels = pixels;
-        this.size = size;
-        this.color = color;
+    constructor(parameters) {
+        this.x = parameters.x ? parameters.x : 0;
+        this.y = parameters.y ? parameters.y : 0;
+        this.rot = parameters.rot ? parameters.rot : 0;
+        this.edges = parameters.edges ? parameters.edges : [];
+        this.pixels = parameters.pixels ? parameters.pixels : [];
+        this.size = parameters.size ? parameters.size : 20;
+        this.color = parameters.color ? parameters.color : "green";
+        this.possible = parameters.possible ? parameters.possible : [[], [], [], []];
+        this.id = parameters.id ? parameters.id : 0;
+        this.neighbours = parameters.neighbours ? parameters.neighbours : [];
     }
 
     draw(ctx) {
         ctx.lineWidth = 2;
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.size, this.size);
-        let temp = this.size / 2;
-        if (this.edges[0]) {
-            ctx.strokeStyle = roadColor[this.edges[0]];
+        let edgeOffset = this.size / 2;
+        if (this.edges[EDGE_N]) {
+            ctx.strokeStyle = roadColor[this.edges[EDGE_N]];
             ctx.beginPath();
-            ctx.moveTo(this.x + temp, this.y);
-            ctx.lineTo(this.x + temp, this.y + temp);
+            ctx.moveTo(this.x + edgeOffset, this.y);
+            ctx.lineTo(this.x + edgeOffset, this.y + edgeOffset);
             ctx.stroke();
         }
-        if (this.edges[1]) {
-            ctx.strokeStyle = roadColor[this.edges[1]];
+        if (this.edges[EDGE_E]) {
+            ctx.strokeStyle = roadColor[this.edges[EDGE_E]];
             ctx.beginPath();
-            ctx.moveTo(this.x + this.size, this.y + temp);
-            ctx.lineTo(this.x + temp, this.y + temp);
+            ctx.moveTo(this.x + this.size, this.y + edgeOffset);
+            ctx.lineTo(this.x + edgeOffset, this.y + edgeOffset);
             ctx.stroke();
         }
-        if (this.edges[2]) {
-            ctx.strokeStyle = roadColor[this.edges[2]];
+        if (this.edges[EDGE_S]) {
+            ctx.strokeStyle = roadColor[this.edges[EDGE_S]];
             ctx.beginPath();
-            ctx.moveTo(this.x + temp, this.y + this.size);
-            ctx.lineTo(this.x + temp, this.y + temp);
+            ctx.moveTo(this.x + edgeOffset, this.y + this.size);
+            ctx.lineTo(this.x + edgeOffset, this.y + edgeOffset);
             ctx.stroke();
         }
-        if (this.edges[3]) {
-            ctx.strokeStyle = roadColor[this.edges[3]];
+        if (this.edges[EDGE_W]) {
+            ctx.strokeStyle = roadColor[this.edges[EDGE_W]];
             ctx.beginPath();
-            ctx.moveTo(this.x, this.y + temp);
-            ctx.lineTo(this.x + temp, this.y + temp);
+            ctx.moveTo(this.x, this.y + edgeOffset);
+            ctx.lineTo(this.x + edgeOffset, this.y + edgeOffset);
             ctx.stroke();
         }
     }
@@ -82,14 +90,43 @@ function drawTiles(ctx, tiles) {
 function initTiles(numberOfTiles) {
     let edges = generateEdges(config.uniqueEdges);
     let tiles = [];
-    let sideLength = Math.sqrt(numberOfTiles)
+    let sideLength = Math.sqrt(numberOfTiles);
+    let id = 0;
+    let neighbours = generateNeighbours(numberOfTiles, sideLength);
     for (let j = 0; j < sideLength; j++) {
         for (let i = 0; i < sideLength; i++) {
-            let tile = new Tile(i * config.tileSize, j * config.tileSize, 0, edges[i + j * sideLength], [], config.tileSize, "green");
+            let tile = generateTile(i, j, edges, sideLength, neighbours[id], id++);
             tiles.push(tile);
         }
     }
     return tiles;
+}
+
+function generateNeighbours(numberOfTiles, sideLength) {
+    let neighbours = [];
+    for (let id = 0; id < numberOfTiles; id++) {
+        let neighbour = [0, 0, 0, 0];
+        neighbour[EDGE_N] = (id - sideLength >= 0) ? id - sideLength : undefined;
+        neighbour[EDGE_E] = (id + 1 < sideLength * sideLength) ? id + 1 : undefined;
+        neighbour[EDGE_S] = (id + sideLength < sideLength * sideLength) ? id + sideLength : undefined;
+        neighbour[EDGE_W] = (id - 1 >= 0) ? id - 1 : undefined;
+        neighbours.push(neighbour);
+    }
+    return neighbours;
+}
+
+function generateTile(i, j, edges, sideLength, neighbours, id) {
+    return new Tile({
+        x: i * config.tileSize,
+        y: j * config.tileSize,
+        rot: 0,
+        edges: edges[i + j * sideLength],
+        pixels: [],
+        size: config.tileSize,
+        color: "green",
+        id: id,
+        neighbours: neighbours,
+    });
 }
 
 function generateEdges(uniqueEdges) {
@@ -104,4 +141,39 @@ function generateEdges(uniqueEdges) {
         }
     }
     return edges;
+}
+
+function generatePossibles(gTiles) {
+    gTiles.forEach(tile => {
+        gTiles.forEach(candidate => {
+            if (tile.edges[EDGE_N] == candidate.edges[EDGE_S]) {
+                tile.possible[EDGE_N].push(candidate.id);
+            }
+            if (tile.edges[EDGE_E] == candidate.edges[EDGE_W]) {
+                tile.possible[EDGE_E].push(candidate.id);
+            }
+            if (tile.edges[EDGE_S] == candidate.edges[EDGE_N]) {
+                tile.possible[EDGE_S].push(candidate.id);
+            }
+            if (tile.edges[EDGE_W] == candidate.edges[EDGE_E]) {
+                tile.possible[EDGE_W].push(candidate.id);
+            }
+        });
+    });
+}
+
+function getLowestEntropy() {
+
+}
+
+function wfc() {
+    let stack = [];
+    let lowestEntropy = getLowestEntropy();
+    stack.push(gTiles[lowestEntropy]);
+
+    while (stack.length > 0) {
+        let tile = stack.pop();
+
+    }
+
 }

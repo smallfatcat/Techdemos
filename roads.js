@@ -61,41 +61,44 @@ class BaseTile {
         this.color = parameters.color ? parameters.color : "green";
         this.possible = parameters.possible ? parameters.possible : [[], [], [], []];
         this.id = parameters.id ? parameters.id : 0;
+        // this.image = parameters.image ? parameters.image : "blank"
     }
 
     draw(ctx, x, y) {
-        ctx.lineWidth = 2;
-        ctx.fillStyle = this.color;
-        ctx.fillRect(x, y, this.size, this.size);
-        let edgeOffset = this.size / 2;
-        if (this.edges[EDGE_N]) {
-            ctx.strokeStyle = roadColor[this.edges[EDGE_N]];
-            ctx.beginPath();
-            ctx.moveTo(x + edgeOffset, y);
-            ctx.lineTo(x + edgeOffset, y + edgeOffset);
-            ctx.stroke();
-        }
-        if (this.edges[EDGE_E]) {
-            ctx.strokeStyle = roadColor[this.edges[EDGE_E]];
-            ctx.beginPath();
-            ctx.moveTo(x + this.size, y + edgeOffset);
-            ctx.lineTo(x + edgeOffset, y + edgeOffset);
-            ctx.stroke();
-        }
-        if (this.edges[EDGE_S]) {
-            ctx.strokeStyle = roadColor[this.edges[EDGE_S]];
-            ctx.beginPath();
-            ctx.moveTo(x + edgeOffset, y + this.size);
-            ctx.lineTo(x + edgeOffset, y + edgeOffset);
-            ctx.stroke();
-        }
-        if (this.edges[EDGE_W]) {
-            ctx.strokeStyle = roadColor[this.edges[EDGE_W]];
-            ctx.beginPath();
-            ctx.moveTo(x, y + edgeOffset);
-            ctx.lineTo(x + edgeOffset, y + edgeOffset);
-            ctx.stroke();
-        }
+        const image = document.getElementById("tile"+ (this.id+1));
+        ctx.drawImage(image, x, y, 20, 20)
+        // ctx.lineWidth = 2;
+        // ctx.fillStyle = this.color;
+        // ctx.fillRect(x, y, this.size, this.size);
+        // let edgeOffset = this.size / 2;
+        // if (this.edges[EDGE_N]) {
+        //     ctx.strokeStyle = roadColor[this.edges[EDGE_N]];
+        //     ctx.beginPath();
+        //     ctx.moveTo(x + edgeOffset, y);
+        //     ctx.lineTo(x + edgeOffset, y + edgeOffset);
+        //     ctx.stroke();
+        // }
+        // if (this.edges[EDGE_E]) {
+        //     ctx.strokeStyle = roadColor[this.edges[EDGE_E]];
+        //     ctx.beginPath();
+        //     ctx.moveTo(x + this.size, y + edgeOffset);
+        //     ctx.lineTo(x + edgeOffset, y + edgeOffset);
+        //     ctx.stroke();
+        // }
+        // if (this.edges[EDGE_S]) {
+        //     ctx.strokeStyle = roadColor[this.edges[EDGE_S]];
+        //     ctx.beginPath();
+        //     ctx.moveTo(x + edgeOffset, y + this.size);
+        //     ctx.lineTo(x + edgeOffset, y + edgeOffset);
+        //     ctx.stroke();
+        // }
+        // if (this.edges[EDGE_W]) {
+        //     ctx.strokeStyle = roadColor[this.edges[EDGE_W]];
+        //     ctx.beginPath();
+        //     ctx.moveTo(x, y + edgeOffset);
+        //     ctx.lineTo(x + edgeOffset, y + edgeOffset);
+        //     ctx.stroke();
+        // }
     }
 
     generatePossibles(tiles) {
@@ -135,15 +138,14 @@ window.onload = (event) => {
 
 
 function animate(t) {
-    // console.log(t);
-    let notFinished = true;
+    let finished = false;
     for (i = 0; i < loopCount; i++) {
-        notFinished = wfc();
-        if(!notFinished){
+        finished = !wfc();
+        if(finished){
             break;
         }
     }
-    if (notFinished) {
+    if (!finished) {
         requestAnimationFrame(animate);
     }
     else {
@@ -165,7 +167,6 @@ function drawBaseTiles(ctx, tiles) {
 }
 
 function drawGridTiles(ctx, gridTiles, baseTiles) {
-    let sideLength = Math.sqrt(config.gridSize);
     for (let tile of gridTiles) {
         let x = tile.x * config.tileSize;
         let y = tile.y * config.tileSize;
@@ -225,24 +226,19 @@ function generateNeighbours(gridSize, gridWidth) {
 function testInit(){
     let tiles = [];
     let edges = [
+        [1,0,0,1],
+        [1,1,0,0],
+        [0,0,1,1],
         [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,1,1,0],
-        [0,0,1,3],
-        [3,0,0,3],
-        [3,1,0,0],
-        [1,0,3,0],
-        [0,3,0,1],
+        [1,1,1,1],
         [1,0,1,0],
-        [0,1,0,1],
-        [3,0,3,0],
-        [0,3,0,3],
-        [1,0,0,3],
-        [3,1,0,1],
-        // [0,3,0,1],
-    ]
+        [0,1,1,0],
+        [0,1,1,1],
+        [1,1,1,0],
+        [1,0,1,1],
+        [0,1,1,1],
+        [1,1,0,1],
+    ];
     for( let id = 0; id < edges.length; id++){
         tiles.push(generateBaseTile(edges, id));
     }

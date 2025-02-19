@@ -9,7 +9,7 @@ let gridTiles = [];
 let config = {};
 config.width = 200;
 config.height = 200;
-config.uniqueEdges = 3;
+config.uniqueEdges = 2;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
 config.gridWidth = 100;
@@ -117,12 +117,12 @@ window.onload = (event) => {
     // drawGridTiles(gridctx, gridTiles, baseTiles);
 }
 
-let loopCount = 100;
+let loopCount = 10;
 
 function animate(t) {
     // console.log(t);
     let notFinished = true;
-    for(i = 0; i < loopCount; i++){
+    for (i = 0; i < loopCount; i++) {
         notFinished = wfc();
     }
     if (notFinished) {
@@ -147,26 +147,23 @@ function drawBaseTiles(ctx, tiles) {
 }
 
 function drawGridTiles(ctx, gridTiles, baseTiles) {
-    let i = 0;
+    // let i = 0;
     let sideLength = Math.sqrt(config.gridSize);
     for (let tile of gridTiles) {
         let x = tile.x * config.tileSize;
         let y = tile.y * config.tileSize;
         baseTiles[tile.getbaseID()].draw(ctx, x, y);
-        i++;
+        // console.log(tile.getbaseID(), x, y);
+        // i++;
     }
 }
 
 function initBaseTiles(numberOfTiles) {
     let edges = generateEdges(config.uniqueEdges);
     let tiles = [];
-    let sideLength = Math.sqrt(numberOfTiles);
-    let id = 0;
-    for (let j = 0; j < sideLength; j++) {
-        for (let i = 0; i < sideLength; i++) {
-            let tile = generateBaseTile(edges, id++);
-            tiles.push(tile);
-        }
+    for (let id = 0; id < edges.length; id++) {
+        let tile = generateBaseTile(edges, id);
+        tiles.push(tile);
     }
     tiles = generatePossibles(tiles);
     return tiles;
@@ -178,7 +175,7 @@ function initGridTiles() {
     let id = 0;
     for (let j = 0; j < config.gridWidth; j++) {
         for (let i = 0; i < config.gridWidth; i++) {
-            let candidates = generateCandidates(config.numberOfTiles);
+            let candidates = generateCandidates(baseTiles.length);
             let tile = generateGridTile(i, j, neighbours[id], candidates, id++);
             grid.push(tile);
         }
@@ -232,7 +229,9 @@ function generateEdges(uniqueEdges) {
         for (let s = 0; s < uniqueEdges; s++) {
             for (let e = 0; e < uniqueEdges; e++) {
                 for (let n = 0; n < uniqueEdges; n++) {
-                    edges.push([n, e, s, w]);
+                    if ((n + e + s + w) == 2 || (n + e + s + w) == 0) {
+                        edges.push([n, e, s, w]);
+                    }
                 }
             }
         }
@@ -333,7 +332,7 @@ function generatePossibleForAllCandidates(candidates, direction) {
         let possibles = baseTiles[candidate].possible[direction];
 
         // possiblesSet.add(possibles);
-        possibles.forEach((possible)=>{
+        possibles.forEach((possible) => {
             possiblesSet.add(possible)
         })
     });

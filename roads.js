@@ -326,8 +326,6 @@ function getLowestEntropy() {
     return lowestTiles.length > 0 ? lowestTiles[r] : -1;
 }
 
-const getRandomItem = set => [...set][Math.floor(Math.random() * set.size)];
-
 function collapse(tile) {
     // console.log("collapse")
     let r = Math.floor(Math.random()*tile.candidates.length)

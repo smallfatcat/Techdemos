@@ -13,6 +13,7 @@ config.height = 200;
 config.uniqueEdges = 2;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
+// config.numberOfTiles = 13;
 config.gridWidth = 100;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
@@ -65,7 +66,7 @@ class BaseTile {
     }
 
     draw(ctx, x, y) {
-        const image = document.getElementById("tile"+ (this.id+1));
+        const image = document.getElementById("tile"+ (this.id));
         ctx.drawImage(image, x, y, 20, 20)
         // ctx.lineWidth = 2;
         // ctx.fillStyle = this.color;
@@ -236,8 +237,9 @@ function testInit(){
         [0,1,1,1],
         [1,1,1,0],
         [1,0,1,1],
-        [0,1,1,1],
         [1,1,0,1],
+        [0,1,1,1],
+        [0,1,0,1],
     ];
     for( let id = 0; id < edges.length; id++){
         tiles.push(generateBaseTile(edges, id));

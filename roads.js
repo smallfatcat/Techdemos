@@ -1,4 +1,5 @@
 let baseTiles = [];
+let gridTiles = [];
 
 let config = {};
 config.width = 1000;
@@ -6,6 +7,8 @@ config.height = 1000;
 config.uniqueEdges = 3;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
+config.gridSize = 100;
+config.gridWidth = Math.sqrt(config.gridSize);
 
 
 const EDGE_N = 0;
@@ -86,7 +89,8 @@ window.onload = (event) => {
     tileCanvas.width = config.width;
     tileCanvas.height = config.height;
 
-    baseTiles = initTiles(config.numberOfTiles);
+    baseTiles = initBaseTiles(config.numberOfTiles);
+    gridTiles = initGridTiles(config.gridSize)
     drawTiles(tilectx, baseTiles);
 }
 
@@ -101,7 +105,7 @@ function drawTiles(ctx, tiles) {
     }
 }
 
-function initTiles(numberOfTiles) {
+function initBaseTiles(numberOfTiles) {
     let edges = generateEdges(config.uniqueEdges);
     let tiles = [];
     let sideLength = Math.sqrt(numberOfTiles);
@@ -110,7 +114,7 @@ function initTiles(numberOfTiles) {
     // let candidates = generateCandidates(numberOfTiles);
     for (let j = 0; j < sideLength; j++) {
         for (let i = 0; i < sideLength; i++) {
-            let tile = generateTile(edges, id++);
+            let tile = generateBaseTile(edges, id++);
             tiles.push(tile);
         }
     }
@@ -118,39 +122,57 @@ function initTiles(numberOfTiles) {
     return tiles;
 }
 
-function generateCandidates(numberOfTiles) {
+function initGridTiles() {
+    let grid = [];
+    let neighbours = generateNeighbours(config.gridSize, config.gridWidth);
+    let candidates = generateCandidates(config.numberOfTiles);
+    let id = 0;
+    for (let j = 0; j < config.gridWidth; j++) {
+        for (let i = 0; i < config.gridWidth; i++) {
+            let tile = generateGridTile(i, j, neighbours[id], candidates, id++);
+            grid.push(tile);
+        }
+    }
+    return grid;
+}
+
+function generateCandidates(numberOfCandidates) {
     let candidates = [];
-    for (let i = 0; i < numberOfTiles; i++) {
+    for (let i = 0; i < numberOfCandidates; i++) {
         candidates.push(i);
     }
     return candidates;
 }
 
-function generateNeighbours(numberOfTiles, sideLength) {
+function generateNeighbours(gridSize, gridWidth) {
     let neighbours = [];
-    for (let id = 0; id < numberOfTiles; id++) {
+    for (let id = 0; id < gridSize; id++) {
         let neighbour = [0, 0, 0, 0];
-        neighbour[EDGE_N] = (id - sideLength >= 0) ? id - sideLength : undefined;
-        neighbour[EDGE_E] = (id + 1 < sideLength * sideLength) ? id + 1 : undefined;
-        neighbour[EDGE_S] = (id + sideLength < sideLength * sideLength) ? id + sideLength : undefined;
+        neighbour[EDGE_N] = (id - gridWidth >= 0) ? id - gridWidth : undefined;
+        neighbour[EDGE_E] = (id + 1 < gridWidth * gridWidth) ? id + 1 : undefined;
+        neighbour[EDGE_S] = (id + gridWidth < gridWidth * gridWidth) ? id + gridWidth : undefined;
         neighbour[EDGE_W] = (id - 1 >= 0) ? id - 1 : undefined;
         neighbours.push(neighbour);
     }
     return neighbours;
 }
 
-function generateTile(edges, id) {
+function generateBaseTile(edges, id) {
     return new BaseTile({
-        // x: i * config.tileSize,
-        // y: j * config.tileSize,
-        // rot: 0,
         edges: edges[id],
-        // pixels: [],
         size: config.tileSize,
         color: "green",
         id: id,
-        // neighbours: neighbours,
-        // candidates: candidates,
+    });
+}
+
+function generateGridTile(x, y, neighbours, candidates, id) {
+    return new GridTile({
+        x: x,
+        y: y,
+        id: id,
+        neighbours: neighbours,
+        candidates: candidates,
     });
 }
 

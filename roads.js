@@ -35,13 +35,13 @@ class GridTile {
     constructor(parameters) {
         this.x = parameters.x ? parameters.x : 0;
         this.y = parameters.y ? parameters.y : 0;
-        this.candidates = parameters.candidates ? parameters.candidates : new Set();
+        this.candidates = parameters.candidates ? parameters.candidates : [];
         this.neighbours = parameters.neighbours ? parameters.neighbours : [];
         this.id = parameters.id ? parameters.id : 0;
     }
 
     getEntropy() {
-        return this.candidates.size;
+        return this.candidates.length;
     }
 
     getbaseID() {
@@ -202,9 +202,9 @@ function initGridTiles() {
 }
 
 function generateCandidates(numberOfCandidates) {
-    let candidates = new Set();
+    let candidates = [];
     for (let i = 0; i < numberOfCandidates; i++) {
-        candidates.add(i);
+        candidates.push(i);
     }
     return candidates;
 }
@@ -330,19 +330,19 @@ const getRandomItem = set => [...set][Math.floor(Math.random() * set.size)];
 
 function collapse(tile) {
     // console.log("collapse")
-    let candidate = getRandomItem(tile.candidates);
-    tile.candidates = new Set();
-    tile.candidates.add(candidate);
+    let r = Math.floor(Math.random()*tile.candidates.length)
+    let candidate = tile.candidates[r];
+    tile.candidates = [candidate];
 }
 
 function constrain(tile, possiblesSet) {
-    let res = new Set();
+    let res = [];
     tile.candidates.forEach((candidate) => {
         if (possiblesSet.has(candidate)) {
-            res.add(candidate);
+            res.push(candidate);
         }
     });
-    if (res.size != tile.candidates.size && res.size > 0) {
+    if (res.length != tile.candidates.length && res.length > 0) {
         tile.candidates = res;
         return true;
     }

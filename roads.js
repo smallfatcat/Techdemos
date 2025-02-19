@@ -28,9 +28,14 @@ class GridTile {
     constructor(parameters) {
         this.x = parameters.x ? parameters.x : 0;
         this.y = parameters.y ? parameters.y : 0;
-        this.candidates = parameters.candidates ? parameters.candidates : [];
+        // this.candidates = parameters.candidates ? parameters.candidates : [];
+        this.candidates = parameters.candidates ? parameters.candidates : new Set();
         this.neighbours = parameters.neighbours ? parameters.neighbours : [];
         this.id = parameters.id ? parameters.id : 0;
+    }
+    
+    getEntropy() {
+        return this.candidates.size;
     }
 }
 
@@ -77,10 +82,6 @@ class BaseTile {
             ctx.stroke();
         }
     }
-
-    getEntropy() {
-        return this.candidates.length;
-    }
 }
 
 window.onload = (event) => {
@@ -110,8 +111,6 @@ function initBaseTiles(numberOfTiles) {
     let tiles = [];
     let sideLength = Math.sqrt(numberOfTiles);
     let id = 0;
-    // let neighbours = generateNeighbours(numberOfTiles, sideLength);
-    // let candidates = generateCandidates(numberOfTiles);
     for (let j = 0; j < sideLength; j++) {
         for (let i = 0; i < sideLength; i++) {
             let tile = generateBaseTile(edges, id++);
@@ -137,9 +136,9 @@ function initGridTiles() {
 }
 
 function generateCandidates(numberOfCandidates) {
-    let candidates = [];
+    let candidates = new Set();
     for (let i = 0; i < numberOfCandidates; i++) {
-        candidates.push(i);
+        candidates.add(i);
     }
     return candidates;
 }
@@ -213,7 +212,7 @@ function generatePossibles(tiles) {
 function getLowestEntropy() {
     let lowestTiles = [];
     let lowest = Infinity;
-    baseTiles.forEach(tile => {
+    gridTiles.forEach(tile => {
         let entropy = tile.getEntropy();
         if (entropy > 1) {
             if (entropy < lowest) {
@@ -229,24 +228,26 @@ function getLowestEntropy() {
     return lowestTiles.length > 0 ? lowestTiles[r] : -1;
 }
 
+const getRandomItem = set => [...set][Math.floor(Math.random()*set.size)]
+
 function collapse(tile) {
-    let r = Math.floor(Math.random() * tile.candidates.length);
-    let candidate = tile.candidates[r];
-    tile.candidates = [candidate]
+    let candidate = getRandomItem(tile.candidates);
+    tile.candidates = new Set();
+    tile.candidates.add(candidate);
 }
 
-function constrain(tile, possible) {
-    let res = [];
+function constrain(tile, possiblesSet) {
+    let res = new Set();
     tile.candidates.forEach((candidate) => {
-        if (possible.includes(candidate)) {
-            res.push(candidate);
+        if (possiblesSet.has(candidate)) {
+            res.add(candidate);
         }
     });
-    if (res.length == tile.candidates.length || res.length == 0) {
-        return false;
+    if (res.size != tile.candidates.size && res.size > 0) {
+        tile.candidates = res;
+        return true;
     }
-    tile.candidates = res;
-    return true;
+    return false;
 }
 
 function wfc() {
@@ -255,21 +256,37 @@ function wfc() {
     if (lowestEntropy == -1) {
         return false;
     }
-    collapse(baseTiles[lowestEntropy]);
-    stack.push(baseTiles[lowestEntropy]);
+    collapse(gridTiles[lowestEntropy]);
+    stack.push(gridTiles[lowestEntropy]);
 
     while (stack.length > 0) {
         let tile = stack.pop();
-        let neighbourID = tile.neighbours[EDGE_N];
-        if (neighbourID != undefined) {
-            let neighbour = baseTiles[neighbourID];
-            let reduced = constrain(neighbour, tile.possible[EDGE_N]);
-            if (reduced) {
-                stack.push(neighbour);
+        for(let d = 0; d < 4; d++){
+            let possiblesSet = generatePossibleForAllCandidates(tile.candidates, d);
+            let neighbourID = tile.neighbours[d];
+            if (neighbourID != undefined) {
+                let neighbour = gridTiles[neighbourID];
+                if(neighbour.candidates.size > 1){
+                    let reduced = constrain(neighbour, possiblesSet);
+                    if (reduced) {
+                        stack.push(neighbour);
+                    }
+                }
             }
         }
     }
     return true;
+}
+
+function generatePossibleForAllCandidates(candidates, direction){
+    let possiblesSet = new Set();
+    candidates.forEach((candidate)=>{
+        let possible = baseTiles[candidate].possible[direction];
+        possible.forEach((possible)=>{
+            possiblesSet.add(possible)
+        })
+    });
+    return possiblesSet;
 }
 
 function animate(t) {

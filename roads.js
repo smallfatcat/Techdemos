@@ -1,3 +1,4 @@
+let loopCount = 500;
 let tilectx = undefined;
 let gridctx = undefined;
 let tileCanvas = undefined;
@@ -12,7 +13,7 @@ config.height = 200;
 config.uniqueEdges = 2;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
-config.gridWidth = 100;
+config.gridWidth = 200;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
 
@@ -34,7 +35,6 @@ class GridTile {
     constructor(parameters) {
         this.x = parameters.x ? parameters.x : 0;
         this.y = parameters.y ? parameters.y : 0;
-        // this.candidates = parameters.candidates ? parameters.candidates : [];
         this.candidates = parameters.candidates ? parameters.candidates : new Set();
         this.neighbours = parameters.neighbours ? parameters.neighbours : [];
         this.id = parameters.id ? parameters.id : 0;
@@ -97,6 +97,23 @@ class BaseTile {
             ctx.stroke();
         }
     }
+
+    generatePossibles(tiles) {
+        tiles.forEach(candidate => {
+            if (this.edges[EDGE_N] == candidate.edges[EDGE_S]) {
+                this.possible[EDGE_N].push(candidate.id);
+            }
+            if (this.edges[EDGE_E] == candidate.edges[EDGE_W]) {
+                this.possible[EDGE_E].push(candidate.id);
+            }
+            if (this.edges[EDGE_S] == candidate.edges[EDGE_N]) {
+                this.possible[EDGE_S].push(candidate.id);
+            }
+            if (this.edges[EDGE_W] == candidate.edges[EDGE_E]) {
+                this.possible[EDGE_W].push(candidate.id);
+            }
+        });
+    }
 }
 
 window.onload = (event) => {
@@ -107,17 +124,14 @@ window.onload = (event) => {
 
     gridCanvas = document.getElementById("gridCanvas");
     gridctx = gridCanvas.getContext("2d");
-    gridCanvas.width = 2000;
-    gridCanvas.height = 2000;
+    gridCanvas.width = config.gridWidth * config.tileSize;
+    gridCanvas.height = config.gridWidth * config.tileSize;
 
     baseTiles = initBaseTiles(config.numberOfTiles);
     gridTiles = initGridTiles(config.gridSize);
     animate();
-    // drawBaseTiles(tilectx, baseTiles);
-    // drawGridTiles(gridctx, gridTiles, baseTiles);
 }
 
-let loopCount = 10;
 
 function animate(t) {
     // console.log(t);
@@ -147,14 +161,11 @@ function drawBaseTiles(ctx, tiles) {
 }
 
 function drawGridTiles(ctx, gridTiles, baseTiles) {
-    // let i = 0;
     let sideLength = Math.sqrt(config.gridSize);
     for (let tile of gridTiles) {
         let x = tile.x * config.tileSize;
         let y = tile.y * config.tileSize;
         baseTiles[tile.getbaseID()].draw(ctx, x, y);
-        // console.log(tile.getbaseID(), x, y);
-        // i++;
     }
 }
 
@@ -165,7 +176,10 @@ function initBaseTiles(numberOfTiles) {
         let tile = generateBaseTile(edges, id);
         tiles.push(tile);
     }
-    tiles = generatePossibles(tiles);
+    // tiles = generatePossibles(tiles);
+    for(let tile of tiles){
+        tile.generatePossibles(tiles);
+    }
     return tiles;
 }
 
@@ -278,9 +292,10 @@ function getLowestEntropy() {
     return lowestTiles.length > 0 ? lowestTiles[r] : -1;
 }
 
-const getRandomItem = set => [...set][Math.floor(Math.random() * set.size)]
+const getRandomItem = set => [...set][Math.floor(Math.random() * set.size)];
 
 function collapse(tile) {
+    // console.log("collapse")
     let candidate = getRandomItem(tile.candidates);
     tile.candidates = new Set();
     tile.candidates.add(candidate);
@@ -330,8 +345,6 @@ function generatePossibleForAllCandidates(candidates, direction) {
     let possiblesSet = new Set();
     candidates.forEach((candidate) => {
         let possibles = baseTiles[candidate].possible[direction];
-
-        // possiblesSet.add(possibles);
         possibles.forEach((possible) => {
             possiblesSet.add(possible)
         })

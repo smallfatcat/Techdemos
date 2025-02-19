@@ -1,9 +1,9 @@
-let gTiles = [];
+let baseTiles = [];
 
 let config = {};
 config.width = 1000;
 config.height = 1000;
-config.uniqueEdges = 2;
+config.uniqueEdges = 3;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
 
@@ -21,53 +21,62 @@ const roadColor = [
     "red",
 ];
 
-class Tile {
+class GridTile {
     constructor(parameters) {
         this.x = parameters.x ? parameters.x : 0;
         this.y = parameters.y ? parameters.y : 0;
-        this.rot = parameters.rot ? parameters.rot : 0;
+        this.candidates = parameters.candidates ? parameters.candidates : [];
+        this.neighbours = parameters.neighbours ? parameters.neighbours : [];
+        this.id = parameters.id ? parameters.id : 0;
+    }
+}
+
+class BaseTile {
+    constructor(parameters) {
         this.edges = parameters.edges ? parameters.edges : [];
-        this.pixels = parameters.pixels ? parameters.pixels : [];
         this.size = parameters.size ? parameters.size : 20;
         this.color = parameters.color ? parameters.color : "green";
         this.possible = parameters.possible ? parameters.possible : [[], [], [], []];
         this.id = parameters.id ? parameters.id : 0;
-        this.neighbours = parameters.neighbours ? parameters.neighbours : [];
     }
 
-    draw(ctx) {
+    draw(ctx, x, y) {
         ctx.lineWidth = 2;
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.fillRect(x, y, this.size, this.size);
         let edgeOffset = this.size / 2;
         if (this.edges[EDGE_N]) {
             ctx.strokeStyle = roadColor[this.edges[EDGE_N]];
             ctx.beginPath();
-            ctx.moveTo(this.x + edgeOffset, this.y);
-            ctx.lineTo(this.x + edgeOffset, this.y + edgeOffset);
+            ctx.moveTo(x + edgeOffset, y);
+            ctx.lineTo(x + edgeOffset, y + edgeOffset);
             ctx.stroke();
         }
         if (this.edges[EDGE_E]) {
             ctx.strokeStyle = roadColor[this.edges[EDGE_E]];
             ctx.beginPath();
-            ctx.moveTo(this.x + this.size, this.y + edgeOffset);
-            ctx.lineTo(this.x + edgeOffset, this.y + edgeOffset);
+            ctx.moveTo(x + this.size, y + edgeOffset);
+            ctx.lineTo(x + edgeOffset, y + edgeOffset);
             ctx.stroke();
         }
         if (this.edges[EDGE_S]) {
             ctx.strokeStyle = roadColor[this.edges[EDGE_S]];
             ctx.beginPath();
-            ctx.moveTo(this.x + edgeOffset, this.y + this.size);
-            ctx.lineTo(this.x + edgeOffset, this.y + edgeOffset);
+            ctx.moveTo(x + edgeOffset, y + this.size);
+            ctx.lineTo(x + edgeOffset, y + edgeOffset);
             ctx.stroke();
         }
         if (this.edges[EDGE_W]) {
             ctx.strokeStyle = roadColor[this.edges[EDGE_W]];
             ctx.beginPath();
-            ctx.moveTo(this.x, this.y + edgeOffset);
-            ctx.lineTo(this.x + edgeOffset, this.y + edgeOffset);
+            ctx.moveTo(x, y + edgeOffset);
+            ctx.lineTo(x + edgeOffset, y + edgeOffset);
             ctx.stroke();
         }
+    }
+
+    getEntropy() {
+        return this.candidates.length;
     }
 }
 
@@ -77,13 +86,18 @@ window.onload = (event) => {
     tileCanvas.width = config.width;
     tileCanvas.height = config.height;
 
-    gTiles = initTiles(config.numberOfTiles);
-    drawTiles(tilectx, gTiles);
+    baseTiles = initTiles(config.numberOfTiles);
+    drawTiles(tilectx, baseTiles);
 }
 
 function drawTiles(ctx, tiles) {
+    let i = 0;
+    let sideLength = Math.sqrt(config.numberOfTiles);
     for (let tile of tiles) {
-        tile.draw(ctx);
+        let x = (i % sideLength) * config.tileSize;
+        let y = Math.floor(i / sideLength) * config.tileSize;
+        tile.draw(ctx, x, y);
+        i++;
     }
 }
 
@@ -92,14 +106,24 @@ function initTiles(numberOfTiles) {
     let tiles = [];
     let sideLength = Math.sqrt(numberOfTiles);
     let id = 0;
-    let neighbours = generateNeighbours(numberOfTiles, sideLength);
+    // let neighbours = generateNeighbours(numberOfTiles, sideLength);
+    // let candidates = generateCandidates(numberOfTiles);
     for (let j = 0; j < sideLength; j++) {
         for (let i = 0; i < sideLength; i++) {
-            let tile = generateTile(i, j, edges, sideLength, neighbours[id], id++);
+            let tile = generateTile(edges, id++);
             tiles.push(tile);
         }
     }
+    tiles = generatePossibles(tiles);
     return tiles;
+}
+
+function generateCandidates(numberOfTiles) {
+    let candidates = [];
+    for (let i = 0; i < numberOfTiles; i++) {
+        candidates.push(i);
+    }
+    return candidates;
 }
 
 function generateNeighbours(numberOfTiles, sideLength) {
@@ -115,17 +139,18 @@ function generateNeighbours(numberOfTiles, sideLength) {
     return neighbours;
 }
 
-function generateTile(i, j, edges, sideLength, neighbours, id) {
-    return new Tile({
-        x: i * config.tileSize,
-        y: j * config.tileSize,
-        rot: 0,
-        edges: edges[i + j * sideLength],
-        pixels: [],
+function generateTile(edges, id) {
+    return new BaseTile({
+        // x: i * config.tileSize,
+        // y: j * config.tileSize,
+        // rot: 0,
+        edges: edges[id],
+        // pixels: [],
         size: config.tileSize,
         color: "green",
         id: id,
-        neighbours: neighbours,
+        // neighbours: neighbours,
+        // candidates: candidates,
     });
 }
 
@@ -143,9 +168,9 @@ function generateEdges(uniqueEdges) {
     return edges;
 }
 
-function generatePossibles(gTiles) {
-    gTiles.forEach(tile => {
-        gTiles.forEach(candidate => {
+function generatePossibles(tiles) {
+    tiles.forEach(tile => {
+        tiles.forEach(candidate => {
             if (tile.edges[EDGE_N] == candidate.edges[EDGE_S]) {
                 tile.possible[EDGE_N].push(candidate.id);
             }
@@ -160,20 +185,77 @@ function generatePossibles(gTiles) {
             }
         });
     });
+    return tiles;
 }
 
 function getLowestEntropy() {
+    let lowestTiles = [];
+    let lowest = Infinity;
+    baseTiles.forEach(tile => {
+        let entropy = tile.getEntropy();
+        if (entropy > 1) {
+            if (entropy < lowest) {
+                lowest = entropy;
+                lowestTiles = [];
+            }
+            if (entropy == lowest) {
+                lowestTiles.push(tile.id);
+            }
+        }
+    });
+    let r = Math.floor(Math.random() * lowestTiles.length);
+    return lowestTiles.length > 0 ? lowestTiles[r] : -1;
+}
 
+function collapse(tile) {
+    let r = Math.floor(Math.random() * tile.candidates.length);
+    let candidate = tile.candidates[r];
+    tile.candidates = [candidate]
+}
+
+function constrain(tile, possible) {
+    let res = [];
+    tile.candidates.forEach((candidate) => {
+        if (possible.includes(candidate)) {
+            res.push(candidate);
+        }
+    });
+    if (res.length == tile.candidates.length || res.length == 0) {
+        return false;
+    }
+    tile.candidates = res;
+    return true;
 }
 
 function wfc() {
     let stack = [];
     let lowestEntropy = getLowestEntropy();
-    stack.push(gTiles[lowestEntropy]);
+    if (lowestEntropy == -1) {
+        return false;
+    }
+    collapse(baseTiles[lowestEntropy]);
+    stack.push(baseTiles[lowestEntropy]);
 
     while (stack.length > 0) {
         let tile = stack.pop();
-
+        let neighbourID = tile.neighbours[EDGE_N];
+        if (neighbourID != undefined) {
+            let neighbour = baseTiles[neighbourID];
+            let reduced = constrain(neighbour, tile.possible[EDGE_N]);
+            if (reduced) {
+                stack.push(neighbour);
+            }
+        }
     }
+    return true;
+}
 
+function animate(t) {
+    console.log(t);
+    if (wfc()) {
+        requestAnimationFrame(animate);
+    }
+    else {
+        console.log(t, "finished")
+    }
 }

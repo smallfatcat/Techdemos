@@ -14,7 +14,7 @@ config.uniqueEdges = 2;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
 // config.numberOfTiles = 13;
-config.gridWidth = 100;
+config.gridWidth = 25;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
 
@@ -227,10 +227,10 @@ function generateNeighbours(gridSize, gridWidth) {
 function testInit(){
     let tiles = [];
     let edges = [
-        [1,0,0,1],
+        [0,0,0,0],
         [1,1,0,0],
         [0,0,1,1],
-        [0,0,0,0],
+        [1,0,0,1],
         [1,1,1,1],
         [1,0,1,0],
         [0,1,1,0],
@@ -240,6 +240,11 @@ function testInit(){
         [1,1,0,1],
         [0,1,1,1],
         [0,1,0,1],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
     ];
     for( let id = 0; id < edges.length; id++){
         tiles.push(generateBaseTile(edges, id));
@@ -321,6 +326,7 @@ function getLowestEntropy() {
         }
     });
     let r = Math.floor(Math.random() * lowestTiles.length);
+    // console.log(lowestTiles[r], lowestTiles.length, lowest);
     return lowestTiles.length > 0 ? lowestTiles[r] : -1;
 }
 

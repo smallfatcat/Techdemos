@@ -13,7 +13,7 @@ config.height = 200;
 config.uniqueEdges = 2;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
-config.gridWidth = 200;
+config.gridWidth = 100;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
 
@@ -24,10 +24,10 @@ const EDGE_S = 2;
 const EDGE_W = 3;
 
 const roadColor = [
-    "green",
+    "blue",
     "white",
     "red",
-    "black",
+    "white",
     "grey",
 ];
 
@@ -127,7 +127,8 @@ window.onload = (event) => {
     gridCanvas.width = config.gridWidth * config.tileSize;
     gridCanvas.height = config.gridWidth * config.tileSize;
 
-    baseTiles = initBaseTiles(config.numberOfTiles);
+    // baseTiles = initBaseTiles(config.numberOfTiles);
+    baseTiles = testInit();
     gridTiles = initGridTiles(config.gridSize);
     animate();
 }
@@ -138,6 +139,9 @@ function animate(t) {
     let notFinished = true;
     for (i = 0; i < loopCount; i++) {
         notFinished = wfc();
+        if(!notFinished){
+            break;
+        }
     }
     if (notFinished) {
         requestAnimationFrame(animate);
@@ -216,6 +220,36 @@ function generateNeighbours(gridSize, gridWidth) {
         neighbours.push(neighbour);
     }
     return neighbours;
+}
+
+function testInit(){
+    let tiles = [];
+    let edges = [
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,0,0,0],
+        [0,1,1,0],
+        [0,0,1,3],
+        [3,0,0,3],
+        [3,1,0,0],
+        [1,0,3,0],
+        [0,3,0,1],
+        [1,0,1,0],
+        [0,1,0,1],
+        [3,0,3,0],
+        [0,3,0,3],
+        [1,0,0,3],
+        [3,1,0,1],
+        // [0,3,0,1],
+    ]
+    for( let id = 0; id < edges.length; id++){
+        tiles.push(generateBaseTile(edges, id));
+    }
+    for(let tile of tiles){
+        tile.generatePossibles(tiles);
+    }
+    return tiles;
 }
 
 function generateBaseTile(edges, id) {

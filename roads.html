@@ -42,7 +42,7 @@
         <!-- <canvas id="savedCanvas"></canvas> -->
         <!-- <canvas id="paletteCanvas"></canvas> -->
     </div>
-    <div><button id="step" onclick="initButton()">Restart</button></div>
+    <div><button id="step" onmousedown="initButton()">Restart</button><button id="pause" onmousedown="pauseButton()">Pause</button></div>
     
     <div><label for="speed">Speed</label><input type="range" id="speed" name="speed" value="0" min="0" max="665" onchange = "changeValue(this.value)" /><span id="speedDisplay">Speed</span></div>
 </body>

@@ -3,6 +3,7 @@ let tilectx = undefined;
 let gridctx = undefined;
 let tileCanvas = undefined;
 let gridCanvas = undefined;
+let paused = false;
 
 let baseTiles = [];
 let gridTiles = [];
@@ -146,13 +147,22 @@ function initButton() {
 function changeValue(newVal) {
     document.getElementById("speedDisplay").innerText = Math.floor(2 ** (newVal / 100));
 }
+function pauseButton(newVal) {
+    paused = !paused;
+    if(paused){
+        document.getElementById("pause").textContent = "Play";
+    }
+    else{
+        document.getElementById("pause").textContent = "Pause";
+    }
+}
 
 
 function animate(t) {
     let finished = false;
     loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
-    document.getElementById("speedDisplay").innerText = loopCount;
-    for (i = 0; i < loopCount; i++) {
+    // document.getElementById("speedDisplay").innerText = loopCount;
+    for (i = 0; i < loopCount && !paused; i++) {
         finished = !wfc();
         if (finished) {
             break;

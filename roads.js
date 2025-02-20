@@ -14,7 +14,7 @@ config.uniqueEdges = 2;
 config.tileSize = 20;
 config.numberOfTiles = config.uniqueEdges ** 4;
 // config.numberOfTiles = 13;
-config.gridWidth = 25;
+config.gridWidth = 50;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
 
@@ -66,7 +66,7 @@ class BaseTile {
     }
 
     draw(ctx, x, y) {
-        const image = document.getElementById("tile"+ (this.id));
+        const image = document.getElementById("tile" + (this.id));
         ctx.drawImage(image, x, y, 20, 20)
         // ctx.lineWidth = 2;
         // ctx.fillStyle = this.color;
@@ -135,14 +135,26 @@ window.onload = (event) => {
     baseTiles = testInit();
     gridTiles = initGridTiles(config.gridSize);
     animate();
+
+}
+
+function initButton() {
+    gridTiles = initGridTiles(config.gridSize);
+    animate();
+}
+
+function changeValue(newVal) {
+    document.getElementById("speedDisplay").innerText = Math.floor(2 ** (newVal / 100));
 }
 
 
 function animate(t) {
     let finished = false;
+    loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
+    document.getElementById("speedDisplay").innerText = loopCount;
     for (i = 0; i < loopCount; i++) {
         finished = !wfc();
-        if(finished){
+        if (finished) {
             break;
         }
     }
@@ -183,7 +195,7 @@ function initBaseTiles(numberOfTiles) {
         tiles.push(tile);
     }
     // tiles = generatePossibles(tiles);
-    for(let tile of tiles){
+    for (let tile of tiles) {
         tile.generatePossibles(tiles);
     }
     return tiles;
@@ -224,32 +236,35 @@ function generateNeighbours(gridSize, gridWidth) {
     return neighbours;
 }
 
-function testInit(){
+function testInit() {
     let tiles = [];
     let edges = [
-        [0,0,0,0],
-        [1,1,0,0],
-        [0,0,1,1],
-        [1,0,0,1],
-        [1,1,1,1],
-        [1,0,1,0],
-        [0,1,1,0],
-        [0,1,1,1],
-        [1,1,1,0],
-        [1,0,1,1],
-        [1,1,0,1],
-        [0,1,1,1],
-        [0,1,0,1],
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0],
-        [0,0,0,0],
+        [0, 0, 0, 0], // 0
+        [1, 1, 0, 0], // 1
+        [0, 0, 1, 1], // 2
+        [1, 0, 0, 1], // 3
+        [1, 1, 1, 1], // 4
+        [1, 0, 1, 0], // 5
+        [0, 1, 1, 0], // 6
+        [0, 1, 1, 1], // 7
+        [1, 1, 1, 0], // 8
+        [1, 0, 1, 1], // 9
+        [1, 1, 0, 1], // 10
+        [0, 1, 0, 1], // 11
+        [0, 0, 0, 0], // 12
+        [0, 0, 0, 0], // 13
+        [0, 0, 0, 0], // 14
+        [0, 0, 0, 0], // 15
+        [0, 0, 0, 0], // 16
+        // [0,2,0,0], // 17
+        // [0,0,0,2], // 18
+        // [2,0,0,0], // 19
+        // [0,0,2,0], // 20
     ];
-    for( let id = 0; id < edges.length; id++){
+    for (let id = 0; id < edges.length; id++) {
         tiles.push(generateBaseTile(edges, id));
     }
-    for(let tile of tiles){
+    for (let tile of tiles) {
         tile.generatePossibles(tiles);
     }
     return tiles;
@@ -332,7 +347,7 @@ function getLowestEntropy() {
 
 function collapse(tile) {
     // console.log("collapse")
-    let r = Math.floor(Math.random()*tile.candidates.length)
+    let r = Math.floor(Math.random() * tile.candidates.length)
     let candidate = tile.candidates[r];
     tile.candidates = [candidate];
 }

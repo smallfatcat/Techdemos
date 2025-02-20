@@ -13,38 +13,38 @@
 </head>
 
 <body>
-    <img id="tile0" src="./images/a0.png" hidden="true">
-    <img id="tile1" src="./images/a1.png" hidden="true">
-    <img id="tile2" src="./images/a2.png" hidden="true">
-    <img id="tile3" src="./images/a3.png" hidden="true">
-    <img id="tile4" src="./images/a4.png" hidden="true">
-    <img id="tile5" src="./images/a5.png" hidden="true">
-    <img id="tile6" src="./images/a6.png" hidden="true">
-    <img id="tile7" src="./images/a7.png" hidden="true">
-    <img id="tile8" src="./images/a8.png" hidden="true">
-    <img id="tile9" src="./images/a9.png" hidden="true">
-    <img id="tile10" src="./images/a10.png" hidden="true">
-    <img id="tile11" src="./images/a11.png" hidden="true">
-    <img id="tile12" src="./images/a12.png" hidden="true">
-    <img id="tile13" src="./images/a13.png" hidden="true">
-    <img id="tile14" src="./images/a14.png" hidden="true">
-    <img id="tile15" src="./images/a15.png" hidden="true">
-    <img id="tile16" src="./images/a16.png" hidden="true">
-    <!-- <img id="tile17" src="./images/a17.png" hidden="true">
-    <img id="tile18" src="./images/a18.png" hidden="true">
-    <img id="tile19" src="./images/a19.png" hidden="true">
-    <img id="tile20" src="./images/a20.png" hidden="true">
-    <img id="tile21" src="./images/a21.png" hidden="true"> -->
+    <div><button id="step" onmousedown="initButton()">Restart</button><button id="pause" onmousedown="pauseButton()">Pause</button></div>
+    <div><label for="speed">Speed</label><input type="range" id="speed" name="speed" value="0" min="0" max="665" onchange = "changeValue(this.value)" /><span id="speedDisplay">Speed</span></div>
+    <!-- <img id="tile0" src="./images/road_anim0.png" hidden="true"> -->
+    <img id="tile1" src="./images/road_anim1.png" hidden="true">
+    <img id="tile2" src="./images/road_anim2.png" hidden="true">
+    <img id="tile3" src="./images/road_anim3.png" hidden="true">
+    <img id="tile4" src="./images/road_anim4.png" hidden="true">
+    <img id="tile5" src="./images/road_anim5.png" hidden="true">
+    <img id="tile6" src="./images/road_anim6.png" hidden="true">
+    <img id="tile7" src="./images/road_anim7.png" hidden="true">
+    <img id="tile8" src="./images/road_anim8.png" hidden="true">
+    <img id="tile9" src="./images/road_anim9.png" hidden="true">
+    <img id="tile10" src="./images/road_anim10.png" hidden="true">
+    <img id="tile11" src="./images/road_anim11.png" hidden="true">
+    <img id="tile12" src="./images/road_anim12.png" hidden="true">
+    <!-- <img id="tile13" src="./images/road_anim13.png" hidden="true">
+    <img id="tile14" src="./images/road_anim14.png" hidden="true">
+    <img id="tile15" src="./images/road_anim15.png" hidden="true">
+    <img id="tile16" src="./images/road_anim16.png" hidden="true"> -->
+    <!-- <img id="tile17" src="./images/road_anim17.png" hidden="true">
+    <img id="tile18" src="./images/road_anim18.png" hidden="true">
+    <img id="tile19" src="./images/road_anim19.png" hidden="true">
+    <img id="tile20" src="./images/road_anim20.png" hidden="true">
+    <img id="tile21" src="./images/road_anim21.png" hidden="true"> -->
     <div id="grid-container">
-        <canvas id="tileCanvas"></canvas>
         <canvas id="gridCanvas"></canvas>
+        <canvas id="tileCanvas"></canvas>
         <!-- <canvas id="tilePreviewCanvas"></canvas> -->
         <!-- <canvas id="savedCanvas"></canvas> -->
         <!-- <canvas id="paletteCanvas"></canvas> -->
     </div>
-    <div><button id="step" onmousedown="initButton()">Restart</button><button id="pause" onmousedown="pauseButton()">Pause</button></div>
     
-    <div><label for="speed">Speed</label><input type="range" id="speed" name="speed" value="0" min="0" max="665" onchange = "changeValue(this.value)" /><span id="speedDisplay">Speed</span></div>
 </body>
 
 </html>

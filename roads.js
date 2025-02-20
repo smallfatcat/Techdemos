@@ -67,7 +67,7 @@ class BaseTile {
     }
 
     draw(ctx, x, y) {
-        const image = document.getElementById("tile" + (this.id));
+        const image = document.getElementById("tile" + (this.id + 1));
         ctx.drawImage(image, x, y, 20, 20)
         // ctx.lineWidth = 2;
         // ctx.fillStyle = this.color;
@@ -261,11 +261,11 @@ function testInit() {
         [1, 0, 1, 1], // 9
         [1, 1, 0, 1], // 10
         [0, 1, 0, 1], // 11
-        [0, 0, 0, 0], // 12
-        [0, 0, 0, 0], // 13
-        [0, 0, 0, 0], // 14
-        [0, 0, 0, 0], // 15
-        [0, 0, 0, 0], // 16
+        // [0, 0, 0, 0], // 12
+        // [0, 0, 0, 0], // 13
+        // [0, 0, 0, 0], // 14
+        // [0, 0, 0, 0], // 15
+        // [0, 0, 0, 0], // 16
         // [0,2,0,0], // 17
         // [0,0,0,2], // 18
         // [2,0,0,0], // 19

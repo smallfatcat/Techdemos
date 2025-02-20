@@ -1,3 +1,4 @@
+let robots = [];
 let loopCount = 500;
 let tilectx = undefined;
 let gridctx = undefined;
@@ -43,7 +44,8 @@ class Robot {
         this.nextDistance = 0.0;
         this.offsetX = 0.0;
         this.offsetY = 0.0;
-        this.speed = 0.0125;
+        this.speed = 0.1;
+        this.color = parameters.color ? parameters.color : "white";
     }
 
     getNextPosition(grid) {
@@ -62,6 +64,9 @@ class Robot {
         }
         let r = Math.floor(Math.random() * directions.length);
         let newDirection = directions[r];
+        if (directions.length == 0) {
+            return;
+        }
         while (grid[i].neighbours[newDirection] == undefined) {
             r = (r + 1) % directions.length;
             newDirection = directions[r];
@@ -88,13 +93,12 @@ class Robot {
 
     draw(ctx, x, y) {
         ctx.lineWidth = 2;
-        ctx.fillStyle = "yellow";
+        ctx.fillStyle = this.color;
         ctx.fillRect(x, y, 20, 20);
-        console.log(x, y)
+        // console.log(x, y)
     }
 }
 
-let robot = new Robot(25, 25);
 
 class GridTile {
     constructor(parameters) {
@@ -132,38 +136,6 @@ class BaseTile {
     draw(ctx, x, y) {
         const image = document.getElementById("tile" + (this.id + 1));
         ctx.drawImage(image, x, y, config.tileSize, config.tileSize)
-        // ctx.lineWidth = 2;
-        // ctx.fillStyle = this.color;
-        // ctx.fillRect(x, y, this.size, this.size);
-        // let edgeOffset = this.size / 2;
-        // if (this.edges[EDGE_N]) {
-        //     ctx.strokeStyle = roadColor[this.edges[EDGE_N]];
-        //     ctx.beginPath();
-        //     ctx.moveTo(x + edgeOffset, y);
-        //     ctx.lineTo(x + edgeOffset, y + edgeOffset);
-        //     ctx.stroke();
-        // }
-        // if (this.edges[EDGE_E]) {
-        //     ctx.strokeStyle = roadColor[this.edges[EDGE_E]];
-        //     ctx.beginPath();
-        //     ctx.moveTo(x + this.size, y + edgeOffset);
-        //     ctx.lineTo(x + edgeOffset, y + edgeOffset);
-        //     ctx.stroke();
-        // }
-        // if (this.edges[EDGE_S]) {
-        //     ctx.strokeStyle = roadColor[this.edges[EDGE_S]];
-        //     ctx.beginPath();
-        //     ctx.moveTo(x + edgeOffset, y + this.size);
-        //     ctx.lineTo(x + edgeOffset, y + edgeOffset);
-        //     ctx.stroke();
-        // }
-        // if (this.edges[EDGE_W]) {
-        //     ctx.strokeStyle = roadColor[this.edges[EDGE_W]];
-        //     ctx.beginPath();
-        //     ctx.moveTo(x, y + edgeOffset);
-        //     ctx.lineTo(x + edgeOffset, y + edgeOffset);
-        //     ctx.stroke();
-        // }
     }
 
     generatePossibles(tiles) {
@@ -204,7 +176,60 @@ window.onload = (event) => {
 
 function initButton() {
     gridTiles = initGridTiles(config.gridSize);
+    initRobot();
     animate();
+}
+
+function initRobot() {
+    drawRobot = false;
+    robots = [];
+    // let robot = new Robot({ x: 25, y: 25 , color: "yellow"});
+    // robots.push(robot);
+    // robot = new Robot({ x: 25, y: 25 , color: "green"});
+    // robots.push(robot);
+    // robot = new Robot({ x: 25, y: 25 , color: "blue"});
+    // robots.push(robot);
+    // robot = new Robot({ x: 25, y: 25 , color: "red"});
+    // robots.push(robot);
+    for (let i = 0; i < 100; i++) {
+        let robot = new Robot({ x: 25, y: 25, color: "red" });
+        robots.push(robot);
+    }
+}
+
+function testInit() {
+    let tiles = [];
+    let edges = [
+        [0, 0, 0, 0], // 0
+        [1, 1, 0, 0], // 1
+        [0, 0, 1, 1], // 2
+        [1, 0, 0, 1], // 3
+        [1, 1, 1, 1], // 4
+        [1, 0, 1, 0], // 5
+        [0, 1, 1, 0], // 6
+        [0, 1, 1, 1], // 7
+        [1, 1, 1, 0], // 8
+        [1, 0, 1, 1], // 9
+        [1, 1, 0, 1], // 10
+        [0, 1, 0, 1], // 11
+        // [0, 0, 0, 0], // 12
+        // [0, 0, 0, 0], // 13
+        // [0, 0, 0, 0], // 14
+        // [0, 0, 0, 0], // 15
+        // [0, 0, 0, 0], // 16
+        // [0,2,0,0], // 17
+        // [0,0,0,2], // 18
+        // [2,0,0,0], // 19
+        // [0,0,2,0], // 20
+    ];
+    for (let id = 0; id < edges.length; id++) {
+        tiles.push(generateBaseTile(edges, id));
+    }
+    for (let tile of tiles) {
+        tile.generatePossibles(tiles);
+    }
+    initRobot();
+    return tiles;
 }
 
 function changeValue(newVal) {
@@ -248,8 +273,18 @@ function animateRobot() {
         // robot.getNextPosition(gridTiles);
         // console.log(robot.x, robot.y)
         drawGridTiles(gridctx, gridTiles, baseTiles);
-        robot.move(gridTiles);
-        robot.draw(gridctx, robot.offsetX * config.tileSize + (config.tileSize / 2), robot.offsetY * config.tileSize + (config.tileSize / 2));
+        for (let robot of robots) {
+            robot.move(gridTiles);
+            let x = robot.offsetX * config.tileSize + (config.tileSize / 2);
+            let y = robot.offsetY * config.tileSize + (config.tileSize / 2);
+            if(x > config.gridWidth * config.tileSize){
+                x -= config.gridWidth * config.tileSize;
+            }
+            if(x < 0){
+                x += config.gridWidth * config.tileSize;
+            }
+            robot.draw(gridctx, x, y);
+        }
         requestAnimationFrame(animateRobot);
     }
 }
@@ -322,40 +357,6 @@ function generateNeighbours(gridSize, gridWidth) {
     return neighbours;
 }
 
-function testInit() {
-    let drawRobot = false;
-    let tiles = [];
-    let edges = [
-        [0, 0, 0, 0], // 0
-        [1, 1, 0, 0], // 1
-        [0, 0, 1, 1], // 2
-        [1, 0, 0, 1], // 3
-        [1, 1, 1, 1], // 4
-        [1, 0, 1, 0], // 5
-        [0, 1, 1, 0], // 6
-        [0, 1, 1, 1], // 7
-        [1, 1, 1, 0], // 8
-        [1, 0, 1, 1], // 9
-        [1, 1, 0, 1], // 10
-        [0, 1, 0, 1], // 11
-        // [0, 0, 0, 0], // 12
-        // [0, 0, 0, 0], // 13
-        // [0, 0, 0, 0], // 14
-        // [0, 0, 0, 0], // 15
-        // [0, 0, 0, 0], // 16
-        // [0,2,0,0], // 17
-        // [0,0,0,2], // 18
-        // [2,0,0,0], // 19
-        // [0,0,2,0], // 20
-    ];
-    for (let id = 0; id < edges.length; id++) {
-        tiles.push(generateBaseTile(edges, id));
-    }
-    for (let tile of tiles) {
-        tile.generatePossibles(tiles);
-    }
-    return tiles;
-}
 
 function generateBaseTile(edges, id) {
     return new BaseTile({

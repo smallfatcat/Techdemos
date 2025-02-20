@@ -7,12 +7,13 @@ let paused = false;
 
 let baseTiles = [];
 let gridTiles = [];
+let drawRobot = false;
 
 let config = {};
 config.width = 200;
 config.height = 200;
 config.uniqueEdges = 2;
-config.tileSize = 20;
+config.tileSize = 64;
 config.numberOfTiles = config.uniqueEdges ** 4;
 // config.numberOfTiles = 13;
 config.gridWidth = 50;
@@ -32,6 +33,68 @@ const roadColor = [
     "white",
     "grey",
 ];
+
+class Robot {
+    constructor(parameters) {
+        this.x = parameters.x ? parameters.x : 0;
+        this.y = parameters.y ? parameters.y : 0;
+        this.nextX = parameters.x ? parameters.x : 0;
+        this.nextY = parameters.y ? parameters.y : 0;
+        this.nextDistance = 0.0;
+        this.offsetX = 0.0;
+        this.offsetY = 0.0;
+        this.speed = 0.0125;
+    }
+
+    getNextPosition(grid) {
+        let x = this.x;
+        let y = this.y;
+
+        let width = Math.sqrt(grid.length);
+        let i = x + y * width;
+        let candidate = grid[i].candidates[0];
+        let edges = baseTiles[candidate].edges;
+        let directions = [];
+        for (let id = 0; id < 4; id++) {
+            if (edges[id] > 0) {
+                directions.push(id);
+            }
+        }
+        let r = Math.floor(Math.random() * directions.length);
+        let newDirection = directions[r];
+        while (grid[i].neighbours[newDirection] == undefined) {
+            r = (r + 1) % directions.length;
+            newDirection = directions[r];
+        }
+        let nextID = grid[i].neighbours[newDirection];
+        // console.log(grid[nextID].x, grid[nextID].y);
+        this.nextX = grid[nextID].x;
+        this.nextY = grid[nextID].y;
+    }
+
+    move(grid) {
+        this.nextDistance += this.speed;
+        this.offsetX = this.x + ((this.nextX - this.x) * this.nextDistance);
+        this.offsetY = this.y + ((this.nextY - this.y) * this.nextDistance);
+        if (this.nextDistance > 1) {
+            this.x = this.nextX;
+            this.y = this.nextY;
+            this.offsetX = this.nextX;
+            this.offsetY = this.nextY;
+            this.nextDistance = 0.0;
+            this.getNextPosition(grid);
+        }
+    }
+
+    draw(ctx, x, y) {
+        ctx.lineWidth = 2;
+        ctx.fillStyle = "yellow";
+        ctx.fillRect(x, y, 20, 20);
+        console.log(x, y)
+    }
+}
+
+let robot = new Robot(25, 25);
 
 class GridTile {
     constructor(parameters) {
@@ -68,7 +131,7 @@ class BaseTile {
 
     draw(ctx, x, y) {
         const image = document.getElementById("tile" + (this.id + 1));
-        ctx.drawImage(image, x, y, 20, 20)
+        ctx.drawImage(image, x, y, config.tileSize, config.tileSize)
         // ctx.lineWidth = 2;
         // ctx.fillStyle = this.color;
         // ctx.fillRect(x, y, this.size, this.size);
@@ -149,10 +212,10 @@ function changeValue(newVal) {
 }
 function pauseButton(newVal) {
     paused = !paused;
-    if(paused){
+    if (paused) {
         document.getElementById("pause").textContent = "Play";
     }
-    else{
+    else {
         document.getElementById("pause").textContent = "Pause";
     }
 }
@@ -172,10 +235,23 @@ function animate(t) {
         requestAnimationFrame(animate);
     }
     else {
-        console.log(t, "finished")
+        console.log(t, "finished");
+        drawRobot = true;
+        animateRobot();
     }
     drawBaseTiles(tilectx, baseTiles);
     drawGridTiles(gridctx, gridTiles, baseTiles);
+}
+
+function animateRobot() {
+    if (drawRobot) {
+        // robot.getNextPosition(gridTiles);
+        // console.log(robot.x, robot.y)
+        drawGridTiles(gridctx, gridTiles, baseTiles);
+        robot.move(gridTiles);
+        robot.draw(gridctx, robot.offsetX * config.tileSize + (config.tileSize / 2), robot.offsetY * config.tileSize + (config.tileSize / 2));
+        requestAnimationFrame(animateRobot);
+    }
 }
 
 function drawBaseTiles(ctx, tiles) {
@@ -247,6 +323,7 @@ function generateNeighbours(gridSize, gridWidth) {
 }
 
 function testInit() {
+    let drawRobot = false;
     let tiles = [];
     let edges = [
         [0, 0, 0, 0], // 0
@@ -412,3 +489,24 @@ function generatePossibleForAllCandidates(candidates, direction) {
     });
     return possiblesSet;
 }
+
+// function getNextPosition(tile, grid) {
+//     let x = tile.x;
+//     let y = tile.y;
+
+//     let width = Math.sqrt(grid.length);
+//     let i = x + y * width;
+//     let candidate = grid[i].candidates[0];
+//     let edges = baseTiles[candidate].edges;
+//     let directions = [];
+//     for (let id = 0; id < 4; id++) {
+//         if (edges[id] > 0) {
+//             directions.push(id);
+//         }
+//     }
+//     let r = Math.floor(Math.random() * directions.length);
+//     let newDirection = directions[r];
+//     let nextID = grid[i].neighbours[newDirection];
+//     console.log(grid[nextID].x, grid[nextID].y);
+//     return grid[nextID];
+// }

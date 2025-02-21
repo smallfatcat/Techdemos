@@ -2,8 +2,11 @@ let robots = [];
 let loopCount = 500;
 let tilectx = undefined;
 let gridctx = undefined;
+let bufferctx = undefined;
 let tileCanvas = undefined;
 let gridCanvas = undefined;
+let bufferCanvas = undefined;
+
 let paused = false;
 
 let baseTiles = [];
@@ -163,6 +166,11 @@ window.onload = (event) => {
     tilectx = tileCanvas.getContext("2d");
     tileCanvas.width = config.width;
     tileCanvas.height = config.height;
+    
+    bufferCanvas = document.createElement("canvas");
+    bufferctx = bufferCanvas.getContext("2d");
+    bufferCanvas.width = config.gridWidth * config.tileSize;
+    bufferCanvas.height = config.gridWidth * config.tileSize;
 
     gridCanvas = document.getElementById("gridCanvas");
     gridctx = gridCanvas.getContext("2d");
@@ -173,7 +181,6 @@ window.onload = (event) => {
     baseTiles = testInit();
     gridTiles = initGridTiles(config.gridSize);
     animate();
-
 }
 
 function initButton() {
@@ -279,14 +286,16 @@ function animate(t) {
         animateRobot();
     }
     drawBaseTiles(tilectx, baseTiles);
-    drawGridTiles(gridctx, gridTiles, baseTiles);
+    drawGridTiles(bufferctx, gridTiles, baseTiles);
+    gridctx.drawImage(bufferCanvas, 0, 0);
 }
 
 function animateRobot() {
     if (drawRobot) {
         // robot.getNextPosition(gridTiles);
         // console.log(robot.x, robot.y)
-        drawGridTiles(gridctx, gridTiles, baseTiles);
+        gridctx.drawImage(bufferCanvas, 0, 0);
+        // drawGridTiles(gridctx, gridTiles, baseTiles);
         for (let robot of robots) {
             robot.move(gridTiles);
             let x = robot.offsetX * config.tileSize + (config.tileSize / 2);

@@ -14,10 +14,10 @@ let config = {};
 config.width = 200;
 config.height = 200;
 config.uniqueEdges = 2;
-config.tileSize = 32;
+config.tileSize = 64;
 config.numberOfTiles = config.uniqueEdges ** 4;
 // config.numberOfTiles = 13;
-config.gridWidth = 50;
+config.gridWidth = 25;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
 
@@ -95,7 +95,7 @@ class Robot {
         ctx.lineWidth = 2;
         ctx.fillStyle = this.color;
         ctx.globalAlpha = 0.1;
-        ctx.fillRect(x, y, config.tileSize/4, config.tileSize/4);
+        ctx.fillRect(x, y, config.tileSize/4 -10, config.tileSize/4 -10);
         ctx.globalAlpha = 1.0;
         // console.log(x, y)
     }
@@ -186,7 +186,7 @@ function initRobot() {
     drawRobot = false;
     robots = [];
     for (let i = 0; i < 3; i++) {
-        let robot = new Robot({ x: 25, y: 25, color: roadColor[i] });
+        let robot = new Robot({ x: Math.floor(config.gridWidth / 2), y: Math.floor(config.gridWidth / 2), color: roadColor[i] });
         robots.push(robot);
     }
 }
@@ -194,18 +194,19 @@ function initRobot() {
 function testInit() {
     let tiles = [];
     let edges = [
-        [0, 0, 0, 0], // 0
-        [1, 1, 0, 0], // 1
-        [0, 0, 1, 1], // 2
-        [1, 0, 0, 1], // 3
-        [1, 1, 1, 1], // 4
+        [0, 0, 0, 0], // 1
+        [1, 1, 0, 0], // 2
+        [0, 1, 1, 0], // 3
+        [0, 0, 1, 1], // 4
         [1, 0, 1, 0], // 5
-        [0, 1, 1, 0], // 6
-        [0, 1, 1, 1], // 7
-        [1, 1, 1, 0], // 8
-        [1, 0, 1, 1], // 9
-        [1, 1, 0, 1], // 10
-        [0, 1, 0, 1], // 11
+        [0, 0, 0, 0], // 6
+        [1, 1, 1, 0], // 7
+        [1, 0, 1, 1], // 8
+        [1, 1, 0, 1], // 9
+        [0, 1, 0, 1], // 10
+        [0, 1, 1, 1], // 11
+        [1, 0, 0, 1], // 11
+        [1, 1, 1, 1], // 12
         // [0, 0, 0, 0], // 12
         // [0, 0, 0, 0], // 13
         // [0, 0, 0, 0], // 14

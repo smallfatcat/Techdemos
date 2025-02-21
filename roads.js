@@ -14,12 +14,12 @@ let gridTiles = [];
 let drawRobot = false;
 
 let config = {};
-config.width = 400;
-config.height = 400;
-config.uniqueEdges = 2;
-config.tileSize = 128;
-// config.numberOfTiles = config.uniqueEdges ** 4;
 config.numberOfTiles = 36;
+config.tileSize = 128;
+config.width = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
+config.height = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
+config.uniqueEdges = 2;
+// config.numberOfTiles = config.uniqueEdges ** 4;
 config.gridWidth = 25;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);

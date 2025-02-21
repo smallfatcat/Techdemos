@@ -14,7 +14,7 @@ let config = {};
 config.width = 200;
 config.height = 200;
 config.uniqueEdges = 2;
-config.tileSize = 64;
+config.tileSize = 32;
 config.numberOfTiles = config.uniqueEdges ** 4;
 // config.numberOfTiles = 13;
 config.gridWidth = 50;
@@ -28,11 +28,11 @@ const EDGE_S = 2;
 const EDGE_W = 3;
 
 const roadColor = [
-    "blue",
-    "white",
     "red",
-    "white",
-    "grey",
+    "green",
+    "blue",
+    // "white",
+    // "grey",
 ];
 
 class Robot {
@@ -94,7 +94,9 @@ class Robot {
     draw(ctx, x, y) {
         ctx.lineWidth = 2;
         ctx.fillStyle = this.color;
-        ctx.fillRect(x, y, 20, 20);
+        ctx.globalAlpha = 0.1;
+        ctx.fillRect(x, y, config.tileSize/4, config.tileSize/4);
+        ctx.globalAlpha = 1.0;
         // console.log(x, y)
     }
 }
@@ -183,16 +185,8 @@ function initButton() {
 function initRobot() {
     drawRobot = false;
     robots = [];
-    // let robot = new Robot({ x: 25, y: 25 , color: "yellow"});
-    // robots.push(robot);
-    // robot = new Robot({ x: 25, y: 25 , color: "green"});
-    // robots.push(robot);
-    // robot = new Robot({ x: 25, y: 25 , color: "blue"});
-    // robots.push(robot);
-    // robot = new Robot({ x: 25, y: 25 , color: "red"});
-    // robots.push(robot);
-    for (let i = 0; i < 100; i++) {
-        let robot = new Robot({ x: 25, y: 25, color: "red" });
+    for (let i = 0; i < 3; i++) {
+        let robot = new Robot({ x: 25, y: 25, color: roadColor[i] });
         robots.push(robot);
     }
 }
@@ -272,7 +266,7 @@ function animateRobot() {
     if (drawRobot) {
         // robot.getNextPosition(gridTiles);
         // console.log(robot.x, robot.y)
-        drawGridTiles(gridctx, gridTiles, baseTiles);
+        // drawGridTiles(gridctx, gridTiles, baseTiles);
         for (let robot of robots) {
             robot.move(gridTiles);
             let x = robot.offsetX * config.tileSize + (config.tileSize / 2);

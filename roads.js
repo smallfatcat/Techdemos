@@ -14,7 +14,7 @@ let config = {};
 config.width = 400;
 config.height = 400;
 config.uniqueEdges = 2;
-config.tileSize = 64;
+config.tileSize = 128;
 // config.numberOfTiles = config.uniqueEdges ** 4;
 config.numberOfTiles = 36;
 config.gridWidth = 25;
@@ -44,7 +44,7 @@ class Robot {
         this.nextDistance = 0.0;
         this.offsetX = 0.0;
         this.offsetY = 0.0;
-        this.speed = 0.1;
+        this.speed = 0.01;
         this.color = parameters.color ? parameters.color : "white";
     }
 
@@ -286,7 +286,7 @@ function animateRobot() {
     if (drawRobot) {
         // robot.getNextPosition(gridTiles);
         // console.log(robot.x, robot.y)
-        // drawGridTiles(gridctx, gridTiles, baseTiles);
+        drawGridTiles(gridctx, gridTiles, baseTiles);
         for (let robot of robots) {
             robot.move(gridTiles);
             let x = robot.offsetX * config.tileSize + (config.tileSize / 2);
@@ -305,7 +305,7 @@ function animateRobot() {
 
 function drawBaseTiles(ctx, tiles) {
     let i = 0;
-    let sideLength = Math.sqrt(config.numberOfTiles);
+    let sideLength = Math.ceil(Math.sqrt(config.numberOfTiles));
     for (let tile of tiles) {
         let x = (i % sideLength) * config.tileSize;
         let y = Math.floor(i / sideLength) * config.tileSize;

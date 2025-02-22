@@ -9,6 +9,7 @@ class Robot {
         this.offsetY = 0.0;
         this.speed = 0.01;
         this.color = parameters.color ? parameters.color : "white";
+        this.currentDirection = 0;
     }
 
     getNextPosition(grid, baseTiles) {
@@ -27,13 +28,15 @@ class Robot {
         }
         let r = Math.floor(Math.random() * directions.length);
         let newDirection = directions[r];
+        console.log(this.currentDirection, directions.length);
         if (directions.length == 0) {
             return;
         }
-        while (grid[i].neighbours[newDirection] == undefined) {
+        while ((grid[i].neighbours[newDirection] == undefined) || ((((newDirection + 2) % 4) == this.currentDirection) && directions.length > 1)) {
             r = (r + 1) % directions.length;
             newDirection = directions[r];
         }
+        this.currentDirection = newDirection;
         let nextID = grid[i].neighbours[newDirection];
         this.nextX = grid[nextID].x;
         this.nextY = grid[nextID].y;
@@ -57,7 +60,7 @@ class Robot {
         ctx.lineWidth = 2;
         ctx.fillStyle = this.color;
         // ctx.globalAlpha = 0.1;
-        ctx.fillRect(x, y, (config.tileSize / 4 - 10) / zoom, (config.tileSize / 4 - 10 )/ zoom);
+        ctx.fillRect(x, y, (config.tileSize / 4 - 10) / zoom, (config.tileSize / 4 - 10) / zoom);
         ctx.globalAlpha = 1.0;
     }
 }
@@ -76,7 +79,7 @@ class GridTile {
     }
 
     getbaseID() {
-        if(this.candidates.length == 1){
+        if (this.candidates.length == 1) {
             return this.candidates[0];
         }
         return 0;

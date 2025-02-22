@@ -15,12 +15,12 @@ let drawRobot = false;
 
 let config = {};
 config.numberOfTiles = 36;
-config.tileSize = 128;
+config.tileSize = 32;
 config.width = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
 config.height = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
-config.uniqueEdges = 2;
+config.uniqueEdges = 5;
 // config.numberOfTiles = config.uniqueEdges ** 4;
-config.gridWidth = 25;
+config.gridWidth = 10;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
 
@@ -119,12 +119,12 @@ class GridTile {
     }
 
     getbaseID() {
-        let baseID;
-        for (let candidate of this.candidates) {
-            baseID = candidate;
-            break;
-        }
-        return baseID;
+        // let baseID;
+        // for (let candidate of this.candidates) {
+        //     baseID = candidate;
+        //     break;
+        // }
+        return this.candidates[0];
     }
 }
 
@@ -180,11 +180,13 @@ window.onload = (event) => {
     // baseTiles = initBaseTiles(config.numberOfTiles);
     baseTiles = testInit();
     gridTiles = initGridTiles(config.gridSize);
+    createBorder();
     animate();
 }
 
 function initButton() {
     gridTiles = initGridTiles(config.gridSize);
+    createBorder();
     initRobot();
     animate();
 }
@@ -193,9 +195,13 @@ function initRobot() {
     drawRobot = false;
     robots = [];
     for (let i = 0; i < 3; i++) {
-        let robot = new Robot({ x: Math.floor(config.gridWidth / 2), y: Math.floor(config.gridWidth / 2), color: roadColor[i] });
-        robots.push(robot);
+        spawnRobot(Math.floor(config.gridWidth / 2), Math.floor(config.gridWidth / 2), roadColor[i]);
     }
+}
+
+function spawnRobot(x, y, color) {
+    let robot = new Robot({ x: x, y: y, color: color });
+    robots.push(robot);
 }
 
 function testInit() {
@@ -268,6 +274,7 @@ function pauseButton(newVal) {
 
 
 function animate(t) {
+    console.log(gridTiles[50].candidates);
     let finished = false;
     loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
     // document.getElementById("speedDisplay").innerText = loopCount;
@@ -291,6 +298,7 @@ function animate(t) {
 }
 
 function animateRobot() {
+    console.log(gridTiles[50].candidates);
     if (drawRobot) {
         // robot.getNextPosition(gridTiles);
         // console.log(robot.x, robot.y)
@@ -486,6 +494,26 @@ function wfc() {
     collapse(gridTiles[lowestEntropy]);
     stack.push(gridTiles[lowestEntropy]);
 
+    wfcLoop(stack);
+
+    // while (stack.length > 0) {
+    //     let tile = stack.pop();
+    //     for (let d = 0; d < 4; d++) {
+    //         let possiblesSet = generatePossibleForAllCandidates(tile.candidates, d);
+    //         let neighbourID = tile.neighbours[d];
+    //         if (neighbourID != undefined) {
+    //             let neighbour = gridTiles[neighbourID];
+    //             let reduced = constrain(neighbour, possiblesSet);
+    //             if (reduced) {
+    //                 stack.push(neighbour);
+    //             }
+    //         }
+    //     }
+    // }
+    return true;
+}
+
+function wfcLoop(stack){
     while (stack.length > 0) {
         let tile = stack.pop();
         for (let d = 0; d < 4; d++) {
@@ -500,7 +528,32 @@ function wfc() {
             }
         }
     }
-    return true;
+}
+
+function createBorder() {
+    let stack = [];
+    // top row
+    // for(let y = config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
+    //     gridTiles[y].candidates = [28];
+    //     stack.push(gridTiles[y]);
+    // }
+    // for(let y = config.gridWidth - 1 + config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
+    //     gridTiles[y].candidates = [28];
+    //     stack.push(gridTiles[y]);
+    // }
+    // for(let x = 0; x < config.gridWidth; x++){
+    //     gridTiles[x].candidates = [28];
+    //     stack.push(gridTiles[x]);
+    // }
+    // for(let x =  config.gridSize - config.gridWidth; x < config.gridSize; x++){
+    //     gridTiles[x].candidates = [28];
+    //     stack.push(gridTiles[x]);
+    // }
+    let m =  Math.floor(config.gridSize / 2);
+    gridTiles[m].candidates = [28];
+    stack.push(gridTiles[m]);
+
+    wfcLoop(stack);
 }
 
 function generatePossibleForAllCandidates(candidates, direction) {

@@ -28,7 +28,6 @@ class Robot {
         }
         let r = Math.floor(Math.random() * directions.length);
         let newDirection = directions[r];
-        console.log(this.currentDirection, directions.length);
         if (directions.length == 0) {
             return;
         }

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roads Collapse Demo</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quantico">
+    <link rel="stylesheet" href="tetris.css">
+    <!-- <script src="data.js"></script> -->
+    <!-- <script src="render.js"></script> -->
+    <script src="classes.js"></script>
+    <script src="roads.js"></script>
+</head>
+
+<body>
+    <div><button id="step" onmousedown="initButton()">Restart</button><button id="pause" onmousedown="pauseButton()">Pause</button></div>
+    <div><label for="speed">Speed</label><input type="range" id="speed" name="speed" value="665" min="0" max="665" onchange = "changeValue(this.value)" /><span id="speedDisplay">Speed</span></div>
+    <!-- <img id="tile0" src="./images/road_anim0.png" hidden="true"> -->
+    <img id="tile1" src="./Images/city_c1.png" hidden="true">
+    <img id="tile2" src="./Images/city_c2.png" hidden="true">
+    <img id="tile3" src="./Images/city_c3.png" hidden="true">
+    <img id="tile4" src="./Images/city_c4.png" hidden="true">
+    <img id="tile5" src="./Images/city_c5.png" hidden="true">
+    <img id="tile6" src="./Images/city_c6.png" hidden="true">
+    <img id="tile7" src="./Images/city_c7.png" hidden="true">
+    <img id="tile8" src="./Images/city_c8.png" hidden="true">
+    <img id="tile9" src="./Images/city_c9.png" hidden="true">
+    <img id="tile10" src="./Images/city_c10.png" hidden="true">
+    <img id="tile11" src="./Images/city_c11.png" hidden="true">
+    <img id="tile12" src="./Images/city_c12.png" hidden="true">
+    <img id="tile13" src="./Images/city_c13.png" hidden="true">
+    <img id="tile14" src="./Images/city_c14.png" hidden="true">
+    <img id="tile15" src="./Images/city_c15.png" hidden="true">
+    <img id="tile16" src="./Images/city_c16.png" hidden="true">
+    <img id="tile17" src="./Images/city_c17.png" hidden="true">
+    <img id="tile18" src="./Images/city_c18.png" hidden="true">
+    <img id="tile19" src="./Images/city_c19.png" hidden="true">
+    <img id="tile20" src="./Images/city_c20.png" hidden="true">
+    <img id="tile21" src="./Images/city_c21.png" hidden="true">
+    <img id="tile22" src="./Images/city_c22.png" hidden="true">
+    <img id="tile23" src="./Images/city_c23.png" hidden="true">
+    <img id="tile24" src="./Images/city_c24.png" hidden="true">
+    <img id="tile25" src="./Images/city_c25.png" hidden="true">
+    <img id="tile26" src="./Images/city_c26.png" hidden="true">
+    <img id="tile27" src="./Images/city_c27.png" hidden="true">
+    <img id="tile28" src="./Images/city_c28.png" hidden="true">
+    <img id="tile29" src="./Images/city_c29.png" hidden="true">
+    <img id="tile30" src="./Images/city_c30.png" hidden="true">
+    <img id="tile31" src="./Images/city_c31.png" hidden="true">
+    <img id="tile32" src="./Images/city_c32.png" hidden="true">
+    <img id="tile33" src="./Images/city_c33.png" hidden="true">
+    <img id="tile34" src="./Images/city_c34.png" hidden="true">
+    <img id="tile35" src="./Images/city_c35.png" hidden="true">
+    <img id="tile36" src="./Images/city_c36.png" hidden="true">
+    <img id="tile37" src="./Images/city_c37.png" hidden="true">
+    <img id="tile38" src="./Images/city_c38.png" hidden="true">
+    <img id="tile39" src="./Images/city_c39.png" hidden="true">
+    <img id="tile40" src="./Images/city_c40.png" hidden="true">
+    <img id="tile41" src="./Images/city_c41.png" hidden="true">
+    <img id="tile42" src="./Images/city_c42.png" hidden="true">
+    <img id="tile43" src="./Images/city_c43.png" hidden="true">
+    <img id="tile44" src="./Images/city_c44.png" hidden="true">
+    <img id="tile45" src="./Images/city_c45.png" hidden="true">
+    <img id="tile46" src="./Images/city_c46.png" hidden="true">
+    <img id="tile47" src="./Images/city_c47.png" hidden="true">
+    <img id="tile48" src="./Images/city_c48.png" hidden="true">
+    <img id="tile49" src="./Images/city_c49.png" hidden="true">
+    <img id="tile50" src="./Images/city_c50.png" hidden="true">
+    <!-- <img id="tile13" src="./images/road_anim13.png" hidden="true">
+    <img id="tile14" src="./images/road_anim14.png" hidden="true">
+    <img id="tile15" src="./images/road_anim15.png" hidden="true">
+    <img id="tile16" src="./images/road_anim16.png" hidden="true"> -->
+    <!-- <img id="tile17" src="./images/road_anim17.png" hidden="true">
+    <img id="tile18" src="./images/road_anim18.png" hidden="true">
+    <img id="tile19" src="./images/road_anim19.png" hidden="true">
+    <img id="tile20" src="./images/road_anim20.png" hidden="true">
+    <img id="tile21" src="./images/road_anim21.png" hidden="true"> -->
+    <div id="grid-container">
+        <canvas id="gridCanvas"></canvas>
+        <canvas id="tileCanvas"></canvas>
+        <!-- <canvas id="tilePreviewCanvas"></canvas> -->
+        <!-- <canvas id="savedCanvas"></canvas> -->
+        <!-- <canvas id="paletteCanvas"></canvas> -->
+    </div>
+    
+</body>
+
+</html>

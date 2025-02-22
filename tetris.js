@@ -154,7 +154,6 @@ function calcLevel(lines, level) {
 
 function calcSpeed(level) {
     return gravityAtLevel[level];
-    // return Math.floor(((0.8 - ((level - 1) * 0.007)) ** (level - 1)) * 1000);
 }
 
 function spawnBlock() {

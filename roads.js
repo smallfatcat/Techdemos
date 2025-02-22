@@ -7,6 +7,11 @@ let tileCanvas = undefined;
 let gridCanvas = undefined;
 let bufferCanvas = undefined;
 
+let sx = 0;
+let sy = 0;
+let scrollSpeed = 2;
+let zoom = 1.0;
+
 let paused = false;
 
 let baseTiles = [];
@@ -14,7 +19,7 @@ let gridTiles = [];
 let drawRobot = false;
 
 let config = {};
-config.numberOfTiles = 36;
+config.numberOfTiles = 50;
 config.tileSize = 64;
 config.width = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
 config.height = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
@@ -35,12 +40,19 @@ const roadColor = [
     "blue",
 ];
 
+let key_up = false;
+let key_down = false;
+let key_left = false;
+let key_right = false;
+let key_zoom_in = false;
+let key_zoom_out = false;
+
 window.onload = (event) => {
     tileCanvas = document.getElementById("tileCanvas");
     tilectx = tileCanvas.getContext("2d");
     tileCanvas.width = config.width;
     tileCanvas.height = config.height;
-    
+
     bufferCanvas = document.createElement("canvas");
     bufferctx = bufferCanvas.getContext("2d");
     bufferCanvas.width = config.gridWidth * config.tileSize;
@@ -50,6 +62,50 @@ window.onload = (event) => {
     gridctx = gridCanvas.getContext("2d");
     gridCanvas.width = config.gridWidth * config.tileSize;
     gridCanvas.height = config.gridWidth * config.tileSize;
+
+    document.addEventListener('keydown', function (event) {
+        const keyString = event.key.toLowerCase();
+        if (keyString == 'a') {
+            key_left = true;
+        }
+        if (keyString == 'd') {
+            key_right = true;
+        }
+        if (keyString == 'w') {
+            key_up = true;
+        }
+        if (keyString == 's') {
+            key_down = true;
+        }
+        if (keyString == 'q') {
+            key_zoom_in = true;
+        }
+        if (keyString == 'e') {
+            key_zoom_out = true;
+        }
+    });
+
+    document.addEventListener('keyup', function (event) {
+        const keyString = event.key.toLowerCase();
+        if (keyString == 'a') {
+            key_left = false;
+        }
+        if (keyString == 'd') {
+            key_right = false;
+        }
+        if (keyString == 'w') {
+            key_up = false;
+        }
+        if (keyString == 's') {
+            key_down = false;
+        }
+        if (keyString == 'q') {
+            key_zoom_in = false;
+        }
+        if (keyString == 'e') {
+            key_zoom_out = false;
+        }
+    });
 
     // baseTiles = initBaseTiles(config.numberOfTiles);
     baseTiles = initStart();
@@ -155,6 +211,27 @@ function pauseButton(newVal) {
     }
 }
 
+function scroll() {
+    if (key_up) {
+        sy -= scrollSpeed;
+    }
+    if (key_down) {
+        sy += scrollSpeed;
+    }
+    if (key_left) {
+        sx -= scrollSpeed;
+    }
+    if (key_right) {
+        sx += scrollSpeed;
+    }
+    if (key_zoom_in) {
+        zoom -= 0.001;
+    }
+    if (key_zoom_out) {
+        zoom += 0.001;
+    }
+}
+
 function animate(t) {
     let finished = false;
     loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
@@ -178,17 +255,21 @@ function animate(t) {
 }
 
 function animateRobot() {
+    scroll();
     if (drawRobot) {
-        gridctx.drawImage(bufferCanvas, 0, 0);
+        // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+        let canvasX = config.gridWidth * config.tileSize;
+        let portalX = canvasX * zoom;
+        gridctx.drawImage(bufferCanvas, sx, sy, portalX, portalX, 0, 0, canvasX, canvasX);
         // drawGridTiles(gridctx, gridTiles, baseTiles);
         for (let robot of robots) {
             robot.move(gridTiles, baseTiles);
             let x = robot.offsetX * config.tileSize + (config.tileSize / 2);
             let y = robot.offsetY * config.tileSize + (config.tileSize / 2);
-            if(x > config.gridWidth * config.tileSize){
+            if (x > config.gridWidth * config.tileSize) {
                 x -= config.gridWidth * config.tileSize;
             }
-            if(x < 0){
+            if (x < 0) {
                 x += config.gridWidth * config.tileSize;
             }
             robot.draw(gridctx, x, y);
@@ -373,7 +454,7 @@ function wfc() {
     return true;
 }
 
-function wfcLoop(stack){
+function wfcLoop(stack) {
     while (stack.length > 0) {
         let tile = stack.pop();
         for (let d = 0; d < 4; d++) {
@@ -392,23 +473,23 @@ function wfcLoop(stack){
 
 function createBorder() {
     let stack = [];
-    for(let y = config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
+    for (let y = config.gridWidth; y < config.gridSize - config.gridWidth; y += config.gridWidth) {
         gridTiles[y].candidates = [28];
         stack.push(gridTiles[y]);
     }
-    for(let y = config.gridWidth - 1 + config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
+    for (let y = config.gridWidth - 1 + config.gridWidth; y < config.gridSize - config.gridWidth; y += config.gridWidth) {
         gridTiles[y].candidates = [28];
         stack.push(gridTiles[y]);
     }
-    for(let x = 0; x < config.gridWidth; x++){
+    for (let x = 0; x < config.gridWidth; x++) {
         gridTiles[x].candidates = [28];
         stack.push(gridTiles[x]);
     }
-    for(let x =  config.gridSize - config.gridWidth; x < config.gridSize; x++){
+    for (let x = config.gridSize - config.gridWidth; x < config.gridSize; x++) {
         gridTiles[x].candidates = [28];
         stack.push(gridTiles[x]);
     }
-    let m =  Math.floor(config.gridSize / 2);
+    let m = Math.floor(config.gridSize / 2);
     gridTiles[m].candidates = [12];
     stack.push(gridTiles[m]);
 

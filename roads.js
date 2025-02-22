@@ -127,8 +127,8 @@ function initButton() {
 function initRobot() {
     drawRobot = false;
     robots = [];
-    for (let i = 0; i < 3; i++) {
-        spawnRobot(Math.floor(config.gridWidth / 2), Math.floor(config.gridWidth / 2), roadColor[i]);
+    for (let i = 0; i < 100; i++) {
+        spawnRobot(Math.floor(config.gridWidth / 2), Math.floor(config.gridWidth / 2), roadColor[i%3]);
     }
 }
 

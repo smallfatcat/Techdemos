@@ -19,10 +19,8 @@ config.tileSize = 32;
 config.width = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
 config.height = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
 config.uniqueEdges = 5;
-// config.numberOfTiles = config.uniqueEdges ** 4;
 config.gridWidth = 50;
 config.gridSize = config.gridWidth * config.gridWidth;
-// config.gridWidth = Math.sqrt(config.gridSize);
 
 
 const EDGE_N = 0;
@@ -34,8 +32,6 @@ const roadColor = [
     "red",
     "green",
     "blue",
-    // "white",
-    // "grey",
 ];
 
 class Robot {
@@ -75,7 +71,6 @@ class Robot {
             newDirection = directions[r];
         }
         let nextID = grid[i].neighbours[newDirection];
-        // console.log(grid[nextID].x, grid[nextID].y);
         this.nextX = grid[nextID].x;
         this.nextY = grid[nextID].y;
     }
@@ -100,7 +95,6 @@ class Robot {
         // ctx.globalAlpha = 0.1;
         ctx.fillRect(x, y, config.tileSize/4 -10, config.tileSize/4 -10);
         ctx.globalAlpha = 1.0;
-        // console.log(x, y)
     }
 }
 
@@ -119,11 +113,6 @@ class GridTile {
     }
 
     getbaseID() {
-        // let baseID;
-        // for (let candidate of this.candidates) {
-        //     baseID = candidate;
-        //     break;
-        // }
         return this.candidates[0];
     }
 }
@@ -135,7 +124,6 @@ class BaseTile {
         this.color = parameters.color ? parameters.color : "green";
         this.possible = parameters.possible ? parameters.possible : [[], [], [], []];
         this.id = parameters.id ? parameters.id : 0;
-        // this.image = parameters.image ? parameters.image : "blank"
     }
 
     draw(ctx, x, y) {
@@ -239,15 +227,6 @@ function testInit() {
         [1, 0, 0, 0], // 30
         [0, 1, 0, 0], // 31
         [0, 0, 1, 0], // 32
-        // [0, 0, 0, 0], // 12
-        // [0, 0, 0, 0], // 13
-        // [0, 0, 0, 0], // 14
-        // [0, 0, 0, 0], // 15
-        // [0, 0, 0, 0], // 16
-        // [0,2,0,0], // 17
-        // [0,0,0,2], // 18
-        // [2,0,0,0], // 19
-        // [0,0,2,0], // 20
     ];
     for (let id = 0; id < edges.length; id++) {
         tiles.push(generateBaseTile(edges, id));
@@ -274,10 +253,8 @@ function pauseButton(newVal) {
 
 
 function animate(t) {
-    // console.log(gridTiles[50].candidates);
     let finished = false;
     loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
-    // document.getElementById("speedDisplay").innerText = loopCount;
     for (i = 0; i < loopCount && !paused; i++) {
         finished = !wfc();
         if (finished) {
@@ -298,10 +275,7 @@ function animate(t) {
 }
 
 function animateRobot() {
-    // console.log(gridTiles[50].candidates);
     if (drawRobot) {
-        // robot.getNextPosition(gridTiles);
-        // console.log(robot.x, robot.y)
         gridctx.drawImage(bufferCanvas, 0, 0);
         // drawGridTiles(gridctx, gridTiles, baseTiles);
         for (let robot of robots) {
@@ -346,7 +320,6 @@ function initBaseTiles(numberOfTiles) {
         let tile = generateBaseTile(edges, id);
         tiles.push(tile);
     }
-    // tiles = generatePossibles(tiles);
     for (let tile of tiles) {
         tile.generatePossibles(tiles);
     }
@@ -460,12 +433,10 @@ function getLowestEntropy() {
         }
     });
     let r = Math.floor(Math.random() * lowestTiles.length);
-    // console.log(lowestTiles[r], lowestTiles.length, lowest);
     return lowestTiles.length > 0 ? lowestTiles[r] : -1;
 }
 
 function collapse(tile) {
-    // console.log("collapse")
     let r = Math.floor(Math.random() * tile.candidates.length)
     let candidate = tile.candidates[r];
     tile.candidates = [candidate];
@@ -496,20 +467,6 @@ function wfc() {
 
     wfcLoop(stack);
 
-    // while (stack.length > 0) {
-    //     let tile = stack.pop();
-    //     for (let d = 0; d < 4; d++) {
-    //         let possiblesSet = generatePossibleForAllCandidates(tile.candidates, d);
-    //         let neighbourID = tile.neighbours[d];
-    //         if (neighbourID != undefined) {
-    //             let neighbour = gridTiles[neighbourID];
-    //             let reduced = constrain(neighbour, possiblesSet);
-    //             if (reduced) {
-    //                 stack.push(neighbour);
-    //             }
-    //         }
-    //     }
-    // }
     return true;
 }
 
@@ -532,7 +489,6 @@ function wfcLoop(stack){
 
 function createBorder() {
     let stack = [];
-    // top row
     for(let y = config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
         gridTiles[y].candidates = [28];
         stack.push(gridTiles[y]);
@@ -567,23 +523,3 @@ function generatePossibleForAllCandidates(candidates, direction) {
     return possiblesSet;
 }
 
-// function getNextPosition(tile, grid) {
-//     let x = tile.x;
-//     let y = tile.y;
-
-//     let width = Math.sqrt(grid.length);
-//     let i = x + y * width;
-//     let candidate = grid[i].candidates[0];
-//     let edges = baseTiles[candidate].edges;
-//     let directions = [];
-//     for (let id = 0; id < 4; id++) {
-//         if (edges[id] > 0) {
-//             directions.push(id);
-//         }
-//     }
-//     let r = Math.floor(Math.random() * directions.length);
-//     let newDirection = directions[r];
-//     let nextID = grid[i].neighbours[newDirection];
-//     console.log(grid[nextID].x, grid[nextID].y);
-//     return grid[nextID];
-// }

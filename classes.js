@@ -76,7 +76,10 @@ class GridTile {
     }
 
     getbaseID() {
-        return this.candidates[0];
+        if(this.candidates.length == 1){
+            return this.candidates[0];
+        }
+        return 0;
     }
 }
 

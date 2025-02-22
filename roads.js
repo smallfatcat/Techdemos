@@ -20,7 +20,7 @@ config.width = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
 config.height = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
 config.uniqueEdges = 5;
 // config.numberOfTiles = config.uniqueEdges ** 4;
-config.gridWidth = 10;
+config.gridWidth = 50;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
 
@@ -274,7 +274,7 @@ function pauseButton(newVal) {
 
 
 function animate(t) {
-    console.log(gridTiles[50].candidates);
+    // console.log(gridTiles[50].candidates);
     let finished = false;
     loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
     // document.getElementById("speedDisplay").innerText = loopCount;
@@ -298,7 +298,7 @@ function animate(t) {
 }
 
 function animateRobot() {
-    console.log(gridTiles[50].candidates);
+    // console.log(gridTiles[50].candidates);
     if (drawRobot) {
         // robot.getNextPosition(gridTiles);
         // console.log(robot.x, robot.y)
@@ -533,23 +533,23 @@ function wfcLoop(stack){
 function createBorder() {
     let stack = [];
     // top row
-    // for(let y = config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
-    //     gridTiles[y].candidates = [28];
-    //     stack.push(gridTiles[y]);
-    // }
-    // for(let y = config.gridWidth - 1 + config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
-    //     gridTiles[y].candidates = [28];
-    //     stack.push(gridTiles[y]);
-    // }
-    // for(let x = 0; x < config.gridWidth; x++){
-    //     gridTiles[x].candidates = [28];
-    //     stack.push(gridTiles[x]);
-    // }
-    // for(let x =  config.gridSize - config.gridWidth; x < config.gridSize; x++){
-    //     gridTiles[x].candidates = [28];
-    //     stack.push(gridTiles[x]);
-    // }
-    let m =  Math.floor(config.gridSize / 2);
+    for(let y = config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
+        gridTiles[y].candidates = [28];
+        stack.push(gridTiles[y]);
+    }
+    for(let y = config.gridWidth - 1 + config.gridWidth; y < config.gridSize - config.gridWidth; y+=config.gridWidth){
+        gridTiles[y].candidates = [28];
+        stack.push(gridTiles[y]);
+    }
+    for(let x = 0; x < config.gridWidth; x++){
+        gridTiles[x].candidates = [28];
+        stack.push(gridTiles[x]);
+    }
+    for(let x =  config.gridSize - config.gridWidth; x < config.gridSize; x++){
+        gridTiles[x].candidates = [28];
+        stack.push(gridTiles[x]);
+    }
+    let m =  Math.floor(config.gridSize / 2) - Math.floor(config.gridWidth / 2);
     gridTiles[m].candidates = [28];
     stack.push(gridTiles[m]);
 

@@ -262,8 +262,8 @@ function animateRobot() {
     if (drawRobot) {
         let canvasX = config.gridWidth * config.tileSize;
         let portalX = canvasX * zoom;
-        let sx = ox - (portalX/2);
-        let sy = oy - (portalX/2);
+        let sx = ox - (portalX / 2);
+        let sy = oy - (portalX / 2);
         gridctx.drawImage(bufferCanvas, sx, sy, portalX, portalX, 0, 0, canvasX, canvasX);
         for (let robot of robots) {
             robot.move(gridTiles, baseTiles);
@@ -275,10 +275,14 @@ function animateRobot() {
             if (x < 0) {
                 x += config.gridWidth * config.tileSize;
             }
-            robot.draw(gridctx, x, y);
+            robot.draw(gridctx, convertScreenCoords(x, ox), convertScreenCoords(y, oy));
         }
         requestAnimationFrame(animateRobot);
     }
+}
+
+function convertScreenCoords(x, ox){
+    return (x - ox) / zoom + (config.gridWidth * config.tileSize) / 2;
 }
 
 function drawBaseTiles(ctx, tiles) {

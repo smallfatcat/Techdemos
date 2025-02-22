@@ -57,7 +57,7 @@ class Robot {
         ctx.lineWidth = 2;
         ctx.fillStyle = this.color;
         // ctx.globalAlpha = 0.1;
-        ctx.fillRect(x, y, config.tileSize/4 -10, config.tileSize/4 -10);
+        ctx.fillRect(x, y, (config.tileSize / 4 - 10) / zoom, (config.tileSize / 4 - 10 )/ zoom);
         ctx.globalAlpha = 1.0;
     }
 }

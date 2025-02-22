@@ -7,10 +7,6 @@ let tileCanvas = undefined;
 let gridCanvas = undefined;
 let bufferCanvas = undefined;
 
-let sx = 0;
-let sy = 0;
-let scrollSpeed = 2;
-let zoom = 1.0;
 
 let paused = false;
 
@@ -28,6 +24,13 @@ config.uniqueEdges = 5;
 config.gridWidth = 25;
 config.gridSize = config.gridWidth * config.gridWidth;
 // config.gridWidth = Math.sqrt(config.gridSize);
+
+let sx = 0;
+let sy = 0;
+let ox = config.gridWidth * config.tileSize / 2;
+let oy = config.gridWidth * config.tileSize / 2;
+let scrollSpeed = 2;
+let zoom = 1.0;
 
 const EDGE_N = 0;
 const EDGE_E = 1;
@@ -213,16 +216,16 @@ function pauseButton(newVal) {
 
 function scroll() {
     if (key_up) {
-        sy -= scrollSpeed;
+        oy -= scrollSpeed;
     }
     if (key_down) {
-        sy += scrollSpeed;
+        oy += scrollSpeed;
     }
     if (key_left) {
-        sx -= scrollSpeed;
+        ox -= scrollSpeed;
     }
     if (key_right) {
-        sx += scrollSpeed;
+        ox += scrollSpeed;
     }
     if (key_zoom_in) {
         zoom -= 0.001;
@@ -257,11 +260,11 @@ function animate(t) {
 function animateRobot() {
     scroll();
     if (drawRobot) {
-        // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
         let canvasX = config.gridWidth * config.tileSize;
         let portalX = canvasX * zoom;
+        let sx = ox - (portalX/2);
+        let sy = oy - (portalX/2);
         gridctx.drawImage(bufferCanvas, sx, sy, portalX, portalX, 0, 0, canvasX, canvasX);
-        // drawGridTiles(gridctx, gridTiles, baseTiles);
         for (let robot of robots) {
             robot.move(gridTiles, baseTiles);
             let x = robot.offsetX * config.tileSize + (config.tileSize / 2);

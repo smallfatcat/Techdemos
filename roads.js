@@ -355,7 +355,6 @@ function generateNeighbours(gridSize, gridWidth) {
     return neighbours;
 }
 
-
 function generateBaseTile(edges, id) {
     return new BaseTile({
         edges: edges[id],

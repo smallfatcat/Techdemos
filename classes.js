@@ -22,7 +22,7 @@ class Robot {
         let edges = baseTiles[candidate].edges;
         let directions = [];
         for (let id = 0; id < 4; id++) {
-            if (edges[id] > 0) {
+            if (edges[id] == 1 || edges[id] == 5) {
                 directions.push(id);
             }
         }

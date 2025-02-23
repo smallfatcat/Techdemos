@@ -10,11 +10,11 @@ class idleState {
     }
     
     enter() {
-        console.log("entered Idle State")
+        // console.log("entered Idle State")
     }
     
     exit() {
-        console.log("exited Idle State")
+        // console.log("exited Idle State")
     }
     
     move(grid, baseTiles, other) {
@@ -63,11 +63,11 @@ class movingState {
     }
 
     enter() {
-        console.log("entered Moving State")
+        // console.log("entered Moving State")
     }
 
     exit() {
-        console.log("exited Moving State")
+        // console.log("exited Moving State")
     }
 
     update() {

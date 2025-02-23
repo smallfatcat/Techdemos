@@ -133,7 +133,7 @@ function initRobot() {
 }
 
 function spawnRobot(x, y, color) {
-    let robot = new Robot({ x: x, y: y, color: color });
+    let robot = new Bot({ x: x, y: y, color: color });
     robots.push(robot);
 }
 

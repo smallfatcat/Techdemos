@@ -190,6 +190,8 @@ function initStart() {
         [6, 0, 0, 0], // 48
         [0, 6, 0, 0], // 49
         [0, 0, 6, 0], // 50
+        [1, 6, 1, 6], // 51
+        [6, 1, 6, 1], // 52
     ];
     for (let id = 0; id < edges.length; id++) {
         tiles.push(generateBaseTile(edges, id));
@@ -204,6 +206,7 @@ function initStart() {
 function changeValue(newVal) {
     document.getElementById("speedDisplay").innerText = Math.floor(2 ** (newVal / 100));
 }
+
 function pauseButton(newVal) {
     paused = !paused;
     if (paused) {

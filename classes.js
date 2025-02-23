@@ -1,30 +1,31 @@
 class idleState {
     constructor() {
-        this.moving = false;
+        this.idleStart = 0;
+        this.delay = 1000;
+        this.noDelay = false;
     }
     
-    update() {
-        if (this.moving) {
-            return new movingState();
-        }
-    }
-    
-    enter() {
+    enter(grid, baseTiles, other) {
+        this.idleStart = Date.now();
+        this.delay = Math.floor(Math.random() * 1000)
         // console.log("entered Idle State")
-    }
-    
-    exit() {
-        // console.log("exited Idle State")
-    }
-    
-    move(grid, baseTiles, other) {
         other.x = other.nextX;
         other.y = other.nextY;
         other.offsetX = other.nextX;
         other.offsetY = other.nextY;
         other.nextDistance = 0.0;
         this.getNextPosition(grid, baseTiles, other);
-        return new movingState();
+    }
+    
+    exit(grid, baseTiles, other) {
+        // console.log("exited Idle State")
+    }
+    
+    move(grid, baseTiles, other) {
+        let timeSinceIdleStarted = Date.now() - this.idleStart;
+        if(timeSinceIdleStarted > this.delay || this.noDelay){
+            return new movingState();
+        }
     }
 
     getNextPosition(grid, baseTiles, other) {
@@ -50,6 +51,9 @@ class idleState {
             r = (r + 1) % directions.length;
             newDirection = directions[r];
         }
+        if(other.currentDirection == newDirection || directions.length == 2){
+            this.noDelay = true;
+        }
         other.currentDirection = newDirection;
         let nextID = grid[i].neighbours[newDirection];
         other.nextX = grid[nextID].x;
@@ -59,21 +63,15 @@ class idleState {
 
 class movingState {
     constructor() {
-        this.moving = true;
+
     }
 
-    enter() {
+    enter(grid, baseTiles, other) {
         // console.log("entered Moving State")
     }
 
-    exit() {
+    exit(grid, baseTiles, other) {
         // console.log("exited Moving State")
-    }
-
-    update() {
-        if (!this.moving) {
-            return new idleState();
-        }
     }
 
     move(grid, baseTiles, other) {
@@ -101,23 +99,16 @@ class Bot {
         this.currentDirection = 0;
     }
 
-    changeState(newState) {
-        this.activeState.exit();
+    changeState(newState,grid, baseTiles) {
+        this.activeState.exit(grid, baseTiles, this);
         this.activeState = newState;
-        this.activeState.enter();
-    }
-
-    update() {
-        this.newState = this.activeState.update();
-        if (this.newState) {
-            this.changeState(this.newState);
-        }
+        this.activeState.enter(grid, baseTiles, this);
     }
 
     move(grid, baseTiles) {
         this.newState = this.activeState.move(grid, baseTiles, this);
         if (this.newState) {
-            this.changeState(this.newState);
+            this.changeState(this.newState,grid, baseTiles);
         }
     }
 

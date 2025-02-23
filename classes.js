@@ -4,7 +4,7 @@ class idleState {
         this.delay = 1000;
         this.noDelay = false;
     }
-    
+
     enter(grid, baseTiles, other) {
         this.idleStart = Date.now();
         this.delay = Math.floor(Math.random() * 1000)
@@ -16,14 +16,23 @@ class idleState {
         other.nextDistance = 0.0;
         this.getNextPosition(grid, baseTiles, other);
     }
-    
+
     exit(grid, baseTiles, other) {
         // console.log("exited Idle State")
     }
-    
+
     move(grid, baseTiles, other) {
         let timeSinceIdleStarted = Date.now() - this.idleStart;
-        if(timeSinceIdleStarted > this.delay || this.noDelay){
+        if (timeSinceIdleStarted > this.delay || this.noDelay) {
+            if (grid[other.nextID].candidates[0] == 50 || grid[other.nextID].candidates[0] == 51) {
+                other.speed = 0.005;
+            }
+            else if (other.nextType == 5) {
+                other.speed = 0.02;
+            }
+            else {
+                other.speed = 0.01;
+            }
             return new movingState();
         }
     }
@@ -31,7 +40,7 @@ class idleState {
     getNextPosition(grid, baseTiles, other) {
         let x = other.x;
         let y = other.y;
-    
+
         let width = Math.sqrt(grid.length);
         let i = x + y * width;
         let candidate = grid[i].candidates[0];
@@ -51,13 +60,14 @@ class idleState {
             r = (r + 1) % directions.length;
             newDirection = directions[r];
         }
-        if(other.currentDirection == newDirection || directions.length == 2){
+        if (other.currentDirection == newDirection || directions.length == 2) {
             this.noDelay = true;
         }
         other.currentDirection = newDirection;
-        let nextID = grid[i].neighbours[newDirection];
-        other.nextX = grid[nextID].x;
-        other.nextY = grid[nextID].y;
+        other.nextID = grid[i].neighbours[newDirection];
+        other.nextType = edges[newDirection];
+        other.nextX = grid[other.nextID].x;
+        other.nextY = grid[other.nextID].y;
     }
 }
 
@@ -97,9 +107,11 @@ class Bot {
         this.speed = 0.01;
         this.color = parameters.color ? parameters.color : "white";
         this.currentDirection = 0;
+        this.nextID = 0;
+        this.nextType = 0;
     }
 
-    changeState(newState,grid, baseTiles) {
+    changeState(newState, grid, baseTiles) {
         this.activeState.exit(grid, baseTiles, this);
         this.activeState = newState;
         this.activeState.enter(grid, baseTiles, this);
@@ -108,7 +120,7 @@ class Bot {
     move(grid, baseTiles) {
         this.newState = this.activeState.move(grid, baseTiles, this);
         if (this.newState) {
-            this.changeState(this.newState,grid, baseTiles);
+            this.changeState(this.newState, grid, baseTiles);
         }
     }
 

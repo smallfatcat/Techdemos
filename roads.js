@@ -139,62 +139,8 @@ function spawnRobot(x, y, color) {
 
 function initStart() {
     let tiles = [];
-    let edges = [
-        [0, 0, 0, 0], // 1
-        [1, 1, 0, 0], // 2
-        [0, 1, 1, 0], // 3
-        [0, 0, 1, 1], // 4
-        [1, 0, 1, 0], // 5
-        [0, 0, 0, 0], // 6
-        [1, 1, 0, 1], // 7
-        [1, 0, 1, 1], // 8
-        [1, 1, 1, 0], // 9
-        [0, 1, 0, 1], // 10
-        [0, 1, 1, 1], // 11
-        [1, 0, 0, 1], // 12
-        [1, 1, 1, 1], // 13
-        [0, 1, 0, 1], // 14
-        [1, 0, 1, 0], // 15
-        [0, 0, 0, 1], // 16
-        [2, 3, 2, 0], // 17
-        [2, 2, 0, 0], // 18
-        [3, 2, 0, 2], // 19
-        [4, 0, 0, 4], // 20
-        [0, 0, 4, 4], // 21
-        [0, 4, 2, 0], // 22
-        [4, 0, 4, 3], // 23
-        [0, 4, 3, 4], // 24
-        [4, 4, 3, 3], // 25
-        [2, 3, 3, 4], // 26
-        [3, 2, 4, 3], // 27
-        [3, 3, 2, 2], // 28
-        [3, 3, 3, 3], // 29
-        [1, 0, 0, 0], // 30
-        [0, 1, 0, 0], // 31
-        [0, 0, 1, 0], // 32
-        [1, 0, 1, 0], // 33
-        [0, 1, 0, 1], // 34
-        [0, 5, 0, 1], // 35
-        [0, 1, 0, 5], // 36
-        [1, 0, 5, 0], // 37
-        [5, 0, 1, 0], // 38
-        [0, 5, 0, 5], // 39
-        [5, 0, 5, 0], // 40
-        [0, 6, 0, 6], // 41
-        [0, 0, 6, 6], // 42
-        [6, 0, 0, 6], // 43
-        [6, 6, 0, 0], // 44
-        [0, 6, 6, 0], // 45
-        [6, 0, 6, 0], // 46
-        [0, 0, 0, 6], // 47
-        [6, 0, 0, 0], // 48
-        [0, 6, 0, 0], // 49
-        [0, 0, 6, 0], // 50
-        [1, 6, 1, 6], // 51
-        [6, 1, 6, 1], // 52
-    ];
-    for (let id = 0; id < edges.length; id++) {
-        tiles.push(generateBaseTile(edges, id));
+    for (let id = 0; id < tileData.length; id++) {
+        tiles.push(generateBaseTile(tileData, id));
     }
     for (let tile of tiles) {
         tile.generatePossibles(tiles);
@@ -319,7 +265,7 @@ function initBaseTiles(numberOfTiles) {
     let edges = generateEdges(config.uniqueEdges);
     let tiles = [];
     for (let id = 0; id < edges.length; id++) {
-        let tile = generateBaseTile(edges, id);
+        let tile = generateBaseTile(tileData, id);
         tiles.push(tile);
     }
     for (let tile of tiles) {
@@ -363,12 +309,13 @@ function generateNeighbours(gridSize, gridWidth) {
     return neighbours;
 }
 
-function generateBaseTile(edges, id) {
+function generateBaseTile(tileData, id) {
     return new BaseTile({
-        edges: edges[id],
+        edges: tileData[id].edges,
         size: config.tileSize,
         color: "green",
         id: id,
+        icon: tileData[id].icon,
     });
 }
 

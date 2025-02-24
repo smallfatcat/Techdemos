@@ -6,7 +6,7 @@ class idleState {
         this.currentDirection = 0;
     }
 
-    enter(grid, baseTiles, other) {
+    enter(grid, other) {
         this.idleStart = Date.now();
         this.delay = Math.floor(Math.random() * 1000)
         // console.log("entered Idle State")
@@ -15,10 +15,10 @@ class idleState {
         other.offsetX = other.nextX;
         other.offsetY = other.nextY;
         other.nextDistance = 0.0;
-        this.getNextPosition(grid, baseTiles, other);
+        this.getNextPosition(grid, other);
     }
 
-    exit(grid, baseTiles, other) {
+    exit(grid, other) {
         other.currentDirection = this.currentDirection;
         // console.log("exited Idle State")
     }
@@ -39,15 +39,14 @@ class idleState {
         }
     }
 
-    getNextPosition(grid, baseTiles, other) {
+    getNextPosition(grid, other) {
         let x = other.x;
         let y = other.y;
-        let currentDirection = 0;
 
         let width = Math.sqrt(grid.length);
-        let i = x + y * width;
-        let candidate = grid[i].candidates[0];
-        let edges = baseTiles[candidate].edges;
+        let gridIndex = x + y * width;
+        // let candidate = grid[gridIndex].candidates[0];
+        let edges = grid[gridIndex].edges;
         let directions = [];
         for (let id = 0; id < 4; id++) {
             if (edges[id] == 1 || edges[id] == 5) {
@@ -59,7 +58,7 @@ class idleState {
         if (directions.length == 0) {
             return;
         }
-        while ((grid[i].neighbours[newDirection] == undefined) || ((((newDirection + 2) % 4) == other.currentDirection) && directions.length > 1)) {
+        while ((grid[gridIndex].neighbours[newDirection] == undefined) || ((((newDirection + 2) % 4) == other.currentDirection) && directions.length > 1)) {
             r = (r + 1) % directions.length;
             newDirection = directions[r];
         }
@@ -67,7 +66,7 @@ class idleState {
             this.noDelay = true;
         }
         this.currentDirection = newDirection;
-        other.nextID = grid[i].neighbours[newDirection];
+        other.nextID = grid[gridIndex].neighbours[newDirection];
         other.nextType = edges[newDirection];
         other.nextX = grid[other.nextID].x;
         other.nextY = grid[other.nextID].y;
@@ -79,11 +78,11 @@ class movingState {
 
     }
 
-    enter(grid, baseTiles, other) {
+    enter(grid, other) {
         // console.log("entered Moving State")
     }
 
-    exit(grid, baseTiles, other) {
+    exit(grid, other) {
         // console.log("exited Moving State")
     }
 
@@ -115,9 +114,9 @@ class Bot {
     }
 
     changeState(newState, grid, baseTiles) {
-        this.activeState.exit(grid, baseTiles, this);
+        this.activeState.exit(grid, this);
         this.activeState = newState;
-        this.activeState.enter(grid, baseTiles, this);
+        this.activeState.enter(grid, this);
     }
 
     move(grid, baseTiles) {
@@ -135,28 +134,28 @@ class Bot {
         let laneOffsetY = 0;
         let width = 5;
         let height = 11;
-        if(this.currentDirection == 0){
+        if (this.currentDirection == 0) {
             laneOffsetX = -8;
             laneOffsetY = 0;
         }
-        if(this.currentDirection == 1){
+        if (this.currentDirection == 1) {
             laneOffsetX = 0;
             laneOffsetY = -7;
             width = 11;
             height = 5;
         }
-        if(this.currentDirection == 2){
+        if (this.currentDirection == 2) {
             laneOffsetX = 2;
             laneOffsetY = 0;
         }
-        if(this.currentDirection == 3){
+        if (this.currentDirection == 3) {
             laneOffsetX = 0;
             laneOffsetY = 2;
             width = 11;
             height = 5;
         }
         // ctx.fillRect(x, y, (config.tileSize / 4 + laneOffsetX) / zoom, (config.tileSize / 4 + laneOffsetY) / zoom);
-        let temp = "car_" + this.color +""+ this.currentDirection;
+        let temp = "car_" + this.color + "" + this.currentDirection;
         const image = document.getElementById(temp);
         ctx.drawImage(image, x + (laneOffsetX / zoom), y + (laneOffsetY / zoom), (width) / zoom, (height) / zoom);
         // ctx.fillRect(x + (laneOffsetX / zoom), y + (laneOffsetY / zoom), (config.tileSize / 4 - 10) / zoom, (config.tileSize / 4 - 10) / zoom);
@@ -236,6 +235,8 @@ class GridTile {
         this.y = parameters.y ? parameters.y : 0;
         this.candidates = parameters.candidates ? parameters.candidates : [];
         this.neighbours = parameters.neighbours ? parameters.neighbours : [];
+        this.neighbourTypes = parameters.neighbourTypes ? parameters.neighbourTypes : [];
+        this.edges = parameters.edges ? parameters.edges : [];
         this.id = parameters.id ? parameters.id : 0;
     }
 
@@ -248,6 +249,19 @@ class GridTile {
             return this.candidates[0];
         }
         return 0;
+    }
+    setNeighbourTypes(grid) {
+        for (let d = 0; d < 4; d++) {
+            let neighbourType = undefined;
+            let neighbourID = this.neighbours[d];
+            if (neighbourID != undefined) {
+                neighbourType = grid[neighbourID].getbaseID();
+            }
+            this.neighbourTypes.push(neighbourType);
+        }
+    }
+    setEdges(baseTiles) {
+        this.edges = baseTiles[this.getbaseID()].edges.slice();
     }
 }
 

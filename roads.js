@@ -128,7 +128,7 @@ function initRobot() {
     drawRobot = false;
     robots = [];
     for (let i = 0; i < 100; i++) {
-        spawnRobot(Math.floor(config.gridWidth / 2), Math.floor(config.gridWidth / 2), roadColor[i%3]);
+        spawnRobot(Math.floor(config.gridWidth / 2), Math.floor(config.gridWidth / 2), roadColor[i % 3]);
     }
 }
 
@@ -252,12 +252,20 @@ function animate(t) {
     }
     else {
         console.log(t, "finished");
+        generateNeighbourTypes(gridTiles);
         drawRobot = true;
         animateRobot();
     }
     drawBaseTiles(tilectx, baseTiles);
     drawGridTiles(bufferctx, gridTiles, baseTiles);
     gridctx.drawImage(bufferCanvas, 0, 0);
+}
+
+function generateNeighbourTypes(grid) {
+    for (let gridTile of grid) {
+        gridTile.setNeighbourTypes(grid);
+        gridTile.setEdges(baseTiles);
+    }
 }
 
 function animateRobot() {
@@ -284,7 +292,7 @@ function animateRobot() {
     }
 }
 
-function convertScreenCoords(x, ox){
+function convertScreenCoords(x, ox) {
     return (x - ox) / zoom + (config.gridWidth * config.tileSize) / 2;
 }
 
@@ -483,19 +491,19 @@ function wfcLoop(stack) {
 function createBorder() {
     let stack = [];
     for (let y = config.gridWidth; y < config.gridSize - config.gridWidth; y += config.gridWidth) {
-        gridTiles[y].candidates = [28];
+        gridTiles[y].candidates = [0];
         stack.push(gridTiles[y]);
     }
     for (let y = config.gridWidth - 1 + config.gridWidth; y < config.gridSize - config.gridWidth; y += config.gridWidth) {
-        gridTiles[y].candidates = [28];
+        gridTiles[y].candidates = [0];
         stack.push(gridTiles[y]);
     }
     for (let x = 0; x < config.gridWidth; x++) {
-        gridTiles[x].candidates = [28];
+        gridTiles[x].candidates = [0];
         stack.push(gridTiles[x]);
     }
     for (let x = config.gridSize - config.gridWidth; x < config.gridSize; x++) {
-        gridTiles[x].candidates = [28];
+        gridTiles[x].candidates = [0];
         stack.push(gridTiles[x]);
     }
     let m = Math.floor(config.gridSize / 2);

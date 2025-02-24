@@ -3,6 +3,7 @@ class idleState {
         this.idleStart = 0;
         this.delay = 1000;
         this.noDelay = false;
+        this.currentDirection = 0;
     }
 
     enter(grid, baseTiles, other) {
@@ -132,6 +133,8 @@ class Bot {
         // ctx.globalAlpha = 0.1;
         let laneOffsetX = 0;
         let laneOffsetY = 0;
+        let width = 5;
+        let height = 11;
         if(this.currentDirection == 0){
             laneOffsetX = -8;
             laneOffsetY = 0;
@@ -139,6 +142,8 @@ class Bot {
         if(this.currentDirection == 1){
             laneOffsetX = 0;
             laneOffsetY = -7;
+            width = 11;
+            height = 5;
         }
         if(this.currentDirection == 2){
             laneOffsetX = 2;
@@ -147,9 +152,14 @@ class Bot {
         if(this.currentDirection == 3){
             laneOffsetX = 0;
             laneOffsetY = 2;
+            width = 11;
+            height = 5;
         }
         // ctx.fillRect(x, y, (config.tileSize / 4 + laneOffsetX) / zoom, (config.tileSize / 4 + laneOffsetY) / zoom);
-        ctx.fillRect(x + (laneOffsetX / zoom), y + (laneOffsetY / zoom), (config.tileSize / 4 - 10) / zoom, (config.tileSize / 4 - 10) / zoom);
+        let temp = "car_" + this.color +""+ this.currentDirection;
+        const image = document.getElementById(temp);
+        ctx.drawImage(image, x + (laneOffsetX / zoom), y + (laneOffsetY / zoom), (width) / zoom, (height) / zoom);
+        // ctx.fillRect(x + (laneOffsetX / zoom), y + (laneOffsetY / zoom), (config.tileSize / 4 - 10) / zoom, (config.tileSize / 4 - 10) / zoom);
         ctx.globalAlpha = 1.0;
     }
 }

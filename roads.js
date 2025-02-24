@@ -38,9 +38,9 @@ const EDGE_S = 2;
 const EDGE_W = 3;
 
 const roadColor = [
-    "red",
-    "green",
     "blue",
+    "red",
+    "purple",
 ];
 
 let key_up = false;

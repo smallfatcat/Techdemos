@@ -87,7 +87,7 @@ window.onload = (event) => {
             key_zoom_out = true;
         }
     });
-
+    
     document.addEventListener('keyup', function (event) {
         const keyString = event.key.toLowerCase();
         if (keyString == 'a') {
@@ -110,18 +110,43 @@ window.onload = (event) => {
         }
     });
 
-    // baseTiles = initBaseTiles(config.numberOfTiles);
     baseTiles = initBaseTiles();
     gridTiles = initGridTiles(config.gridSize);
     createBorder();
-    animate();
+    animateGenerationPhase();
+}
+
+function initBaseTiles() {
+    let tiles = [];
+    for (let id = 0; id < tileData.length; id++) {
+        tiles.push(generateBaseTile(tileData, id));
+    }
+    for (let tile of tiles) {
+        tile.generatePossibles(tiles);
+    }
+    initRobot();
+    return tiles;
+}
+
+function initGridTiles() {
+    let grid = [];
+    let neighbours = generateNeighbours(config.gridSize, config.gridWidth);
+    let id = 0;
+    for (let j = 0; j < config.gridWidth; j++) {
+        for (let i = 0; i < config.gridWidth; i++) {
+            let candidates = generateCandidates(baseTiles.length);
+            let tile = generateGridTile(i, j, neighbours[id], candidates, id++);
+            grid.push(tile);
+        }
+    }
+    return grid;
 }
 
 function initButton() {
     gridTiles = initGridTiles(config.gridSize);
     createBorder();
     initRobot();
-    animate();
+    animateGenerationPhase();
 }
 
 function initRobot() {
@@ -135,18 +160,6 @@ function initRobot() {
 function spawnRobot(x, y, color) {
     let robot = new Bot({ x: x, y: y, color: color });
     robots.push(robot);
-}
-
-function initBaseTiles() {
-    let tiles = [];
-    for (let id = 0; id < tileData.length; id++) {
-        tiles.push(generateBaseTile(tileData, id));
-    }
-    for (let tile of tiles) {
-        tile.generatePossibles(tiles);
-    }
-    initRobot();
-    return tiles;
 }
 
 function changeValue(newVal) {
@@ -184,7 +197,7 @@ function scroll() {
     }
 }
 
-function animate(t) {
+function animateGenerationPhase(t) {
     let finished = false;
     loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
     for (i = 0; i < loopCount && !paused; i++) {
@@ -194,7 +207,7 @@ function animate(t) {
         }
     }
     if (!finished) {
-        requestAnimationFrame(animate);
+        requestAnimationFrame(animateGenerationPhase);
     }
     else {
         console.log(t, "finished");
@@ -259,33 +272,6 @@ function drawGridTiles(ctx, gridTiles, baseTiles) {
         let y = tile.y * config.tileSize;
         baseTiles[tile.getbaseID()].draw(ctx, x, y);
     }
-}
-
-// function initBaseTiles(numberOfTiles) {
-//     let edges = generateEdges(config.uniqueEdges);
-//     let tiles = [];
-//     for (let id = 0; id < edges.length; id++) {
-//         let tile = generateBaseTile(tileData, id);
-//         tiles.push(tile);
-//     }
-//     for (let tile of tiles) {
-//         tile.generatePossibles(tiles);
-//     }
-//     return tiles;
-// }
-
-function initGridTiles() {
-    let grid = [];
-    let neighbours = generateNeighbours(config.gridSize, config.gridWidth);
-    let id = 0;
-    for (let j = 0; j < config.gridWidth; j++) {
-        for (let i = 0; i < config.gridWidth; i++) {
-            let candidates = generateCandidates(baseTiles.length);
-            let tile = generateGridTile(i, j, neighbours[id], candidates, id++);
-            grid.push(tile);
-        }
-    }
-    return grid;
 }
 
 function generateCandidates(numberOfCandidates) {

@@ -277,7 +277,7 @@ function animateRobot() {
         let sy = oy - (portalX / 2);
         gridctx.drawImage(bufferCanvas, sx, sy, portalX, portalX, 0, 0, canvasX, canvasX);
         for (let robot of robots) {
-            robot.move(gridTiles, baseTiles);
+            robot.move(gridTiles);
             let x = robot.offsetX * config.tileSize + (config.tileSize / 2);
             let y = robot.offsetY * config.tileSize + (config.tileSize / 2);
             if (x > config.gridWidth * config.tileSize) {

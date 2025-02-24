@@ -6,70 +6,81 @@ class idleState {
         this.currentDirection = 0;
     }
 
-    enter(grid, other) {
+    enter(grid, bot) {
         this.idleStart = Date.now();
-        this.delay = Math.floor(Math.random() * 1000)
+        this.delay = Math.floor(Math.random() * 1000);
         // console.log("entered Idle State")
-        other.x = other.nextX;
-        other.y = other.nextY;
-        other.offsetX = other.nextX;
-        other.offsetY = other.nextY;
-        other.nextDistance = 0.0;
-        this.getNextPosition(grid, other);
+        bot.x = bot.nextX;
+        bot.y = bot.nextY;
+        bot.offsetX = bot.nextX;
+        bot.offsetY = bot.nextY;
+        bot.nextDistance = 0.0;
+        this.setNextPosition(grid, bot);
     }
 
-    exit(grid, other) {
-        other.currentDirection = this.currentDirection;
+    exit(grid, bot) {
+        bot.currentDirection = this.currentDirection;
         // console.log("exited Idle State")
     }
 
-    move(grid, baseTiles, other) {
+    move(grid, bot) {
         let timeSinceIdleStarted = Date.now() - this.idleStart;
         if (timeSinceIdleStarted > this.delay || this.noDelay) {
-            if (grid[other.nextID].candidates[0] == 50 || grid[other.nextID].candidates[0] == 51) {
-                other.speed = 0.005;
+            let nextTileType = grid[bot.nextID].getbaseID();
+            // Check if bridge
+            if (nextTileType == 50 || nextTileType == 51) {
+                bot.speed = 0.005;
             }
-            else if (other.nextType == 5) {
-                other.speed = 0.02;
+            // Check if dual carriageway
+            else if (bot.nextEdgeType == 5) {
+                bot.speed = 0.02;
             }
+            // Default speed
             else {
-                other.speed = 0.01;
+                bot.speed = 0.01;
             }
             return new movingState();
         }
     }
 
-    getNextPosition(grid, other) {
-        let x = other.x;
-        let y = other.y;
+    setNextPosition(grid, bot) {
+        let x = bot.x;
+        let y = bot.y;
 
         let width = Math.sqrt(grid.length);
         let gridIndex = x + y * width;
-        // let candidate = grid[gridIndex].candidates[0];
-        let edges = grid[gridIndex].edges;
-        let directions = [];
-        for (let id = 0; id < 4; id++) {
-            if (edges[id] == 1 || edges[id] == 5) {
-                directions.push(id);
+        let currentTile = grid[gridIndex];
+        let edges = currentTile.edges;
+
+        let roadEdges = [];
+        for (let d = 0; d < 4; d++) {
+            // check if edges are roads
+            if (edges[d] == 1 || edges[d] == 5) {
+                roadEdges.push(d);
             }
         }
-        let r = Math.floor(Math.random() * directions.length);
-        let newDirection = directions[r];
-        if (directions.length == 0) {
+
+        if (roadEdges.length == 0) {
             return;
         }
-        while ((grid[gridIndex].neighbours[newDirection] == undefined) || ((((newDirection + 2) % 4) == other.currentDirection) && directions.length > 1)) {
-            r = (r + 1) % directions.length;
-            newDirection = directions[r];
+
+        let r = Math.floor(Math.random() * roadEdges.length);
+        let newDirection = roadEdges[r];
+
+        while ((currentTile.neighbours[newDirection] == undefined) || ((((newDirection + 2) % 4) == bot.currentDirection) && roadEdges.length > 1)) {
+            r = (r + 1) % roadEdges.length;
+            newDirection = roadEdges[r];
         }
-        if (other.currentDirection == newDirection || directions.length == 2) {
+
+        if (bot.currentDirection == newDirection || roadEdges.length == 2) {
             this.noDelay = true;
         }
+
         this.currentDirection = newDirection;
-        other.nextID = grid[gridIndex].neighbours[newDirection];
-        other.nextType = edges[newDirection];
-        other.nextX = grid[other.nextID].x;
-        other.nextY = grid[other.nextID].y;
+        bot.nextID = currentTile.neighbours[newDirection];
+        bot.nextEdgeType = edges[newDirection];
+        bot.nextX = grid[bot.nextID].x;
+        bot.nextY = grid[bot.nextID].y;
     }
 }
 
@@ -78,19 +89,19 @@ class movingState {
 
     }
 
-    enter(grid, other) {
+    enter(grid, bot) {
         // console.log("entered Moving State")
     }
 
-    exit(grid, other) {
+    exit(grid, bot) {
         // console.log("exited Moving State")
     }
 
-    move(grid, baseTiles, other) {
-        other.nextDistance += other.speed;
-        other.offsetX = other.x + ((other.nextX - other.x) * other.nextDistance);
-        other.offsetY = other.y + ((other.nextY - other.y) * other.nextDistance);
-        if (other.nextDistance > 1) {
+    move(grid, bot) {
+        bot.nextDistance += bot.speed;
+        bot.offsetX = bot.x + ((bot.nextX - bot.x) * bot.nextDistance);
+        bot.offsetY = bot.y + ((bot.nextY - bot.y) * bot.nextDistance);
+        if (bot.nextDistance > 1) {
             return new idleState();
         }
     }
@@ -110,19 +121,19 @@ class Bot {
         this.color = parameters.color ? parameters.color : "white";
         this.currentDirection = 0;
         this.nextID = 0;
-        this.nextType = 0;
+        this.nextEdgeType = 0;
     }
 
-    changeState(newState, grid, baseTiles) {
+    changeState(newState, grid) {
         this.activeState.exit(grid, this);
         this.activeState = newState;
         this.activeState.enter(grid, this);
     }
 
-    move(grid, baseTiles) {
-        this.newState = this.activeState.move(grid, baseTiles, this);
+    move(grid) {
+        this.newState = this.activeState.move(grid, this);
         if (this.newState) {
-            this.changeState(this.newState, grid, baseTiles);
+            this.changeState(this.newState, grid);
         }
     }
 
@@ -162,72 +173,6 @@ class Bot {
         ctx.globalAlpha = 1.0;
     }
 }
-
-// class Robot {
-//     constructor(parameters) {
-//         this.x = parameters.x ? parameters.x : 0;
-//         this.y = parameters.y ? parameters.y : 0;
-//         this.nextX = parameters.x ? parameters.x : 0;
-//         this.nextY = parameters.y ? parameters.y : 0;
-//         this.nextDistance = 0.0;
-//         this.offsetX = 0.0;
-//         this.offsetY = 0.0;
-//         this.speed = 0.01;
-//         this.color = parameters.color ? parameters.color : "white";
-//         this.currentDirection = 0;
-//     }
-
-//     getNextPosition(grid, baseTiles) {
-//         let x = this.x;
-//         let y = this.y;
-
-//         let width = Math.sqrt(grid.length);
-//         let i = x + y * width;
-//         let candidate = grid[i].candidates[0];
-//         let edges = baseTiles[candidate].edges;
-//         let directions = [];
-//         for (let id = 0; id < 4; id++) {
-//             if (edges[id] == 1 || edges[id] == 5) {
-//                 directions.push(id);
-//             }
-//         }
-//         let r = Math.floor(Math.random() * directions.length);
-//         let newDirection = directions[r];
-//         if (directions.length == 0) {
-//             return;
-//         }
-//         while ((grid[i].neighbours[newDirection] == undefined) || ((((newDirection + 2) % 4) == this.currentDirection) && directions.length > 1)) {
-//             r = (r + 1) % directions.length;
-//             newDirection = directions[r];
-//         }
-//         this.currentDirection = newDirection;
-//         let nextID = grid[i].neighbours[newDirection];
-//         this.nextX = grid[nextID].x;
-//         this.nextY = grid[nextID].y;
-//     }
-
-//     move(grid, baseTiles) {
-//         this.nextDistance += this.speed;
-//         this.offsetX = this.x + ((this.nextX - this.x) * this.nextDistance);
-//         this.offsetY = this.y + ((this.nextY - this.y) * this.nextDistance);
-//         if (this.nextDistance > 1) {
-//             this.x = this.nextX;
-//             this.y = this.nextY;
-//             this.offsetX = this.nextX;
-//             this.offsetY = this.nextY;
-//             this.nextDistance = 0.0;
-//             this.getNextPosition(grid, baseTiles);
-//         }
-//     }
-
-//     draw(ctx, x, y) {
-//         ctx.lineWidth = 2;
-//         ctx.fillStyle = this.color;
-//         // ctx.globalAlpha = 0.1;
-//         ctx.fillRect(x, y, (config.tileSize / 4 - 10) / zoom, (config.tileSize / 4 - 10) / zoom);
-//         ctx.globalAlpha = 1.0;
-//     }
-// }
 
 class GridTile {
     constructor(parameters) {

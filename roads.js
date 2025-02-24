@@ -87,7 +87,7 @@ window.onload = (event) => {
             key_zoom_out = true;
         }
     });
-    
+
     document.addEventListener('keyup', function (event) {
         const keyString = event.key.toLowerCase();
         if (keyString == 'a') {
@@ -302,6 +302,8 @@ function generateBaseTile(tileData, id) {
         color: "green",
         id: id,
         icon: tileData[id].icon,
+        probability: tileData[id].probability,
+        name: tileData[id].name,
     });
 }
 
@@ -313,42 +315,6 @@ function generateGridTile(x, y, neighbours, candidates, id) {
         neighbours: neighbours,
         candidates: candidates,
     });
-}
-
-function generateEdges(uniqueEdges) {
-    let edges = [];
-    for (let w = 0; w < uniqueEdges; w++) {
-        for (let s = 0; s < uniqueEdges; s++) {
-            for (let e = 0; e < uniqueEdges; e++) {
-                for (let n = 0; n < uniqueEdges; n++) {
-                    if ((n + e + s + w) == 2 || (n + e + s + w) == 0) {
-                        edges.push([n, e, s, w]);
-                    }
-                }
-            }
-        }
-    }
-    return edges;
-}
-
-function generatePossibles(tiles) {
-    tiles.forEach(tile => {
-        tiles.forEach(candidate => {
-            if (tile.edges[EDGE_N] == candidate.edges[EDGE_S]) {
-                tile.possible[EDGE_N].push(candidate.id);
-            }
-            if (tile.edges[EDGE_E] == candidate.edges[EDGE_W]) {
-                tile.possible[EDGE_E].push(candidate.id);
-            }
-            if (tile.edges[EDGE_S] == candidate.edges[EDGE_N]) {
-                tile.possible[EDGE_S].push(candidate.id);
-            }
-            if (tile.edges[EDGE_W] == candidate.edges[EDGE_E]) {
-                tile.possible[EDGE_W].push(candidate.id);
-            }
-        });
-    });
-    return tiles;
 }
 
 function getLowestEntropy() {
@@ -370,33 +336,14 @@ function getLowestEntropy() {
     return lowestTiles.length > 0 ? lowestTiles[r] : -1;
 }
 
-function collapse(tile) {
-    let r = Math.floor(Math.random() * tile.candidates.length)
-    let candidate = tile.candidates[r];
-    tile.candidates = [candidate];
-}
-
-function constrain(tile, possiblesSet) {
-    let res = [];
-    tile.candidates.forEach((candidate) => {
-        if (possiblesSet.has(candidate)) {
-            res.push(candidate);
-        }
-    });
-    if (res.length != tile.candidates.length && res.length > 0) {
-        tile.candidates = res;
-        return true;
-    }
-    return false;
-}
-
 function wfc() {
     let stack = [];
     let lowestEntropy = getLowestEntropy();
     if (lowestEntropy == -1) {
         return false;
     }
-    collapse(gGridTiles[lowestEntropy]);
+    let lowestEntropyTile = gGridTiles[lowestEntropy];
+    lowestEntropyTile.collapse();
     stack.push(gGridTiles[lowestEntropy]);
 
     wfcLoop(stack);
@@ -412,7 +359,7 @@ function wfcLoop(stack) {
             let neighbourID = tile.neighbours[d];
             if (neighbourID != undefined) {
                 let neighbour = gGridTiles[neighbourID];
-                let reduced = constrain(neighbour, possiblesSet);
+                let reduced = neighbour.constrain(possiblesSet);
                 if (reduced) {
                     stack.push(neighbour);
                 }

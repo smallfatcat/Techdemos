@@ -208,6 +208,26 @@ class GridTile {
     setEdges(baseTiles) {
         this.edges = baseTiles[this.getbaseID()].edges.slice();
     }
+
+    constrain(possiblesSet) {
+        let res = [];
+        this.candidates.forEach((candidate) => {
+            if (possiblesSet.has(candidate)) {
+                res.push(candidate);
+            }
+        });
+        if (res.length != this.candidates.length && res.length > 0) {
+            this.candidates = res;
+            return true;
+        }
+        return false;
+    }
+
+    collapse() {
+        let r = Math.floor(Math.random() * this.candidates.length)
+        let candidate = this.candidates[r];
+        this.candidates = [candidate];
+    }
 }
 
 class BaseTile {
@@ -218,6 +238,8 @@ class BaseTile {
         this.possible = parameters.possible ? parameters.possible : [[], [], [], []];
         this.id = parameters.id ? parameters.id : 0;
         this.icon = parameters.icon ? parameters.icon : "";
+        this.probability = parameters.probability ? parameters.probability : "";
+        this.name = parameters.name ? parameters.name : "";
     }
 
     draw(ctx, x, y) {
@@ -242,66 +264,3 @@ class BaseTile {
         });
     }
 }
-
-// const LAND___ = 0;
-// const ROAD___ = 1;
-// const COAST_E = 2;
-// const COAST_N = 2;
-// const WATER__ = 3;
-// const COAST_W = 4;
-// const COAST_S = 4;
-
-// const tileData = [
-//     { edges: [0, 0, 0, 0], icon: "tile1"}, // 1
-//     { edges: [1, 1, 0, 0], icon: "tile2"}, // 2
-//     { edges: [0, 1, 1, 0], icon: "tile3"}, // 3
-//     { edges: [0, 0, 1, 1], icon: "tile4"}, // 4
-//     { edges: [1, 0, 1, 0], icon: "tile5"}, // 5
-//     { edges: [0, 0, 0, 0], icon: "tile6"}, // 6
-//     { edges: [1, 1, 0, 1], icon: "tile7"}, // 7
-//     { edges: [1, 0, 1, 1], icon: "tile8"}, // 8
-//     { edges: [1, 1, 1, 0], icon: "tile9"}, // 9
-//     { edges: [0, 1, 0, 1], icon: "tile10"}, // 10
-//     { edges: [0, 1, 1, 1], icon: "tile11"}, // 11
-//     { edges: [1, 0, 0, 1], icon: "tile12"}, // 12
-//     { edges: [1, 1, 1, 1], icon: "tile13"}, // 13
-//     { edges: [0, 1, 0, 1], icon: "tile14"}, // 14
-//     { edges: [1, 0, 1, 0], icon: "tile15"}, // 15
-//     // { edges: [0, 0, 0, 1], icon: "tile16"}, // 16
-//     { edges: [2, 3, 2, 0], icon: "tile17"}, // 17
-//     { edges: [2, 2, 0, 0], icon: "tile18"}, // 18
-//     { edges: [3, 2, 0, 2], icon: "tile19"}, // 19
-//     { edges: [4, 0, 0, 4], icon: "tile20"}, // 20
-//     { edges: [0, 0, 4, 4], icon: "tile21"}, // 21
-//     { edges: [0, 4, 2, 0], icon: "tile22"}, // 22
-//     { edges: [4, 0, 4, 3], icon: "tile23"}, // 23
-//     { edges: [0, 4, 3, 4], icon: "tile24"}, // 24
-//     { edges: [4, 4, 3, 3], icon: "tile25"}, // 25
-//     { edges: [2, 3, 3, 4], icon: "tile26"}, // 26
-//     { edges: [3, 2, 4, 3], icon: "tile27"}, // 27
-//     { edges: [3, 3, 2, 2], icon: "tile28"}, // 28
-//     { edges: [3, 3, 3, 3], icon: "tile29"}, // 29
-//     // { edges: [1, 0, 0, 0], icon: "tile30"}, // 30
-//     // { edges: [0, 1, 0, 0], icon: "tile31"}, // 31
-//     // { edges: [0, 0, 1, 0], icon: "tile32"}, // 32
-//     { edges: [1, 0, 1, 0], icon: "tile33"}, // 33
-//     { edges: [0, 1, 0, 1], icon: "tile34"}, // 34
-//     { edges: [0, 5, 0, 1], icon: "tile35"}, // 35
-//     { edges: [0, 1, 0, 5], icon: "tile36"}, // 36
-//     { edges: [1, 0, 5, 0], icon: "tile37"}, // 37
-//     { edges: [5, 0, 1, 0], icon: "tile38"}, // 38
-//     { edges: [0, 5, 0, 5], icon: "tile39"}, // 39
-//     { edges: [5, 0, 5, 0], icon: "tile40"}, // 40
-//     { edges: [0, 6, 0, 6], icon: "tile41"}, // 41
-//     { edges: [0, 0, 6, 6], icon: "tile42"}, // 42
-//     { edges: [6, 0, 0, 6], icon: "tile43"}, // 43
-//     { edges: [6, 6, 0, 0], icon: "tile44"}, // 44
-//     { edges: [0, 6, 6, 0], icon: "tile45"}, // 45
-//     { edges: [6, 0, 6, 0], icon: "tile46"}, // 46
-//     { edges: [0, 0, 0, 6], icon: "tile47"}, // 47
-//     { edges: [6, 0, 0, 0], icon: "tile48"}, // 48
-//     { edges: [0, 6, 0, 0], icon: "tile49"}, // 49
-//     { edges: [0, 0, 6, 0], icon: "tile50"}, // 50
-//     { edges: [1, 6, 1, 6], icon: "tile51"}, // 51
-//     { edges: [6, 1, 6, 1], icon: "tile52"}, // 52
-// ];

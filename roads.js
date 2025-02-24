@@ -261,18 +261,18 @@ function drawGridTiles(ctx, gridTiles, baseTiles) {
     }
 }
 
-function initBaseTiles(numberOfTiles) {
-    let edges = generateEdges(config.uniqueEdges);
-    let tiles = [];
-    for (let id = 0; id < edges.length; id++) {
-        let tile = generateBaseTile(tileData, id);
-        tiles.push(tile);
-    }
-    for (let tile of tiles) {
-        tile.generatePossibles(tiles);
-    }
-    return tiles;
-}
+// function initBaseTiles(numberOfTiles) {
+//     let edges = generateEdges(config.uniqueEdges);
+//     let tiles = [];
+//     for (let id = 0; id < edges.length; id++) {
+//         let tile = generateBaseTile(tileData, id);
+//         tiles.push(tile);
+//     }
+//     for (let tile of tiles) {
+//         tile.generatePossibles(tiles);
+//     }
+//     return tiles;
+// }
 
 function initGridTiles() {
     let grid = [];

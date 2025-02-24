@@ -111,7 +111,7 @@ window.onload = (event) => {
     });
 
     // baseTiles = initBaseTiles(config.numberOfTiles);
-    baseTiles = initStart();
+    baseTiles = initBaseTiles();
     gridTiles = initGridTiles(config.gridSize);
     createBorder();
     animate();
@@ -137,7 +137,7 @@ function spawnRobot(x, y, color) {
     robots.push(robot);
 }
 
-function initStart() {
+function initBaseTiles() {
     let tiles = [];
     for (let id = 0; id < tileData.length; id++) {
         tiles.push(generateBaseTile(tileData, id));

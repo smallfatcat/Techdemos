@@ -224,9 +224,29 @@ class GridTile {
     }
 
     collapse() {
-        let r = Math.floor(Math.random() * this.candidates.length)
-        let candidate = this.candidates[r];
-        this.candidates = [candidate];
+        let probabilities = [];
+        let totalProbability = 0;
+        for (let i = 0; i < this.candidates.length; i++) {
+            let candidate = this.candidates[i];
+            let probability = gBaseTiles[candidate].probability;
+            probabilities.push(probability);
+            totalProbability += probability;
+        }
+        console.assert(probabilities.length == this.candidates.length);
+
+        let r = Math.floor(Math.random() * totalProbability);
+        let baseValue = 0;
+        let collapsedIndex = 0;
+        for (let i = 0; i < probabilities.length; i++) {
+            let probability = probabilities[i];
+            if(r < probability + baseValue){
+                collapsedIndex = i;
+                break;
+            }
+            baseValue += probability;
+        }
+        let collapsedCandidate = this.candidates[collapsedIndex];
+        this.candidates = [collapsedCandidate];
     }
 }
 
@@ -243,6 +263,7 @@ class BaseTile {
     }
 
     draw(ctx, x, y) {
+        // TODO: move <img> element out of DOM into array
         const image = document.getElementById(this.icon);
         ctx.drawImage(image, x, y, config.tileSize, config.tileSize)
     }

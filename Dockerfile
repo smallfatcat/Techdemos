@@ -1,6 +1,6 @@
 # FROM nginx:latest
 # COPY . /usr/share/nginx/html/
-FROM python
+FROM python:alpine
 
 EXPOSE 6789
 

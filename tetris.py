@@ -46,7 +46,7 @@ async def server(websocket):
         # broadcast(USERS, users_event())
 
 async def main():
-    async with serve(server, "localhost", 6789):
+    async with serve(server, "0.0.0.0", 6789):
         await asyncio.get_running_loop().create_future()  # run forever
 
 if __name__ == "__main__":

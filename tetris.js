@@ -2,7 +2,7 @@ const websocket = new WebSocket("ws://localhost:6789/");
 const CLIENT_ID = Math.floor(Math.random() * 1000000);
 
 const logEnabled = false;
-const websocketEnabled = false;
+const websocketEnabled = true;
 
 let keys = {};
 let keyTimer = {};

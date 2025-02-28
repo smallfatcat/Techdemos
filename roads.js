@@ -1,14 +1,9 @@
-let robots = [];
-let loopCount = 500;
 let tilectx = undefined;
 let gridctx = undefined;
 let bufferctx = undefined;
 let tileCanvas = undefined;
 let gridCanvas = undefined;
 let bufferCanvas = undefined;
-
-let gBaseTiles = [];
-let gGridTiles = [];
 
 const gridWidth = 25;
 const numberOfTiles = 50;
@@ -35,6 +30,10 @@ const roadColor = [
 ];
 
 const gameState = {
+    robots: [],
+    gBaseTiles: [],
+    gGridTiles: [],
+    loopCount: 500,
     drawRobot: false,
     paused: false,
     viewWindowX: config.gridWidth * config.tileSize / 2,
@@ -109,8 +108,8 @@ window.onload = (event) => {
         }
     });
 
-    gBaseTiles = initBaseTiles();
-    gGridTiles = initGridTiles(config.gridSize);
+    gameState.gBaseTiles = initBaseTiles();
+    gameState.gGridTiles = initGridTiles(config.gridSize);
     createBorder();
     animateGenerationPhase();
 }
@@ -133,7 +132,7 @@ function initGridTiles() {
     let id = 0;
     for (let j = 0; j < config.gridWidth; j++) {
         for (let i = 0; i < config.gridWidth; i++) {
-            let candidates = generateCandidates(gBaseTiles.length);
+            let candidates = generateCandidates(gameState.gBaseTiles.length);
             let tile = generateGridTile(i, j, neighbours[id], candidates, id++);
             grid.push(tile);
         }
@@ -142,7 +141,7 @@ function initGridTiles() {
 }
 
 function initButton() {
-    gGridTiles = initGridTiles(config.gridSize);
+    gameState.gGridTiles = initGridTiles(config.gridSize);
     createBorder();
     initRobot();
     animateGenerationPhase();
@@ -150,7 +149,7 @@ function initButton() {
 
 function initRobot() {
     gameState.drawRobot = false;
-    robots = [];
+    gameState.robots = [];
     for (let i = 0; i < 100; i++) {
         spawnRobot(Math.floor(config.gridWidth / 2), Math.floor(config.gridWidth / 2), roadColor[i % 3]);
     }
@@ -158,7 +157,7 @@ function initRobot() {
 
 function spawnRobot(x, y, color) {
     let robot = new Bot({ x: x, y: y, color: color });
-    robots.push(robot);
+    gameState.robots.push(robot);
 }
 
 function changeValue(newVal) {
@@ -198,8 +197,8 @@ function scroll() {
 
 function animateGenerationPhase(t) {
     let finished = false;
-    loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
-    for (i = 0; i < loopCount && !gameState.paused; i++) {
+    gameState.loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
+    for (i = 0; i < gameState.loopCount && !gameState.paused; i++) {
         finished = !wfc();
         if (finished) {
             break;
@@ -210,19 +209,19 @@ function animateGenerationPhase(t) {
     }
     else {
         console.log(t, "finished");
-        generateNeighbourTypes(gGridTiles);
+        generateNeighbourTypes(gameState.gGridTiles);
         gameState.drawRobot = true;
         animateRobot();
     }
-    drawBaseTiles(tilectx, gBaseTiles);
-    drawGridTiles(bufferctx, gGridTiles, gBaseTiles);
+    drawBaseTiles(tilectx, gameState.gBaseTiles);
+    drawGridTiles(bufferctx, gameState.gGridTiles, gameState.gBaseTiles);
     gridctx.drawImage(bufferCanvas, 0, 0);
 }
 
 function generateNeighbourTypes(grid) {
     for (let gridTile of grid) {
         gridTile.setNeighbourTypes(grid);
-        gridTile.setEdges(gBaseTiles);
+        gridTile.setEdges(gameState.gBaseTiles);
     }
 }
 
@@ -234,8 +233,8 @@ function animateRobot() {
         let sx = gameState.viewWindowX - (portalX / 2);
         let sy = gameState.viewWindowY - (portalX / 2);
         gridctx.drawImage(bufferCanvas, sx, sy, portalX, portalX, 0, 0, canvasX, canvasX);
-        for (let robot of robots) {
-            robot.move(gGridTiles);
+        for (let robot of gameState.robots) {
+            robot.move(gameState.gGridTiles);
             let x = robot.offsetX * config.tileSize + (config.tileSize / 2);
             let y = robot.offsetY * config.tileSize + (config.tileSize / 2);
             if (x > config.gridWidth * config.tileSize) {
@@ -319,7 +318,7 @@ function generateGridTile(x, y, neighbours, candidates, id) {
 function getLowestEntropy() {
     let lowestTiles = [];
     let lowest = Infinity;
-    gGridTiles.forEach(tile => {
+    gameState.gGridTiles.forEach(tile => {
         let entropy = tile.getEntropy();
         if (entropy > 1) {
             if (entropy < lowest) {
@@ -341,9 +340,9 @@ function wfc() {
     if (lowestEntropy == -1) {
         return false;
     }
-    let lowestEntropyTile = gGridTiles[lowestEntropy];
+    let lowestEntropyTile = gameState.gGridTiles[lowestEntropy];
     lowestEntropyTile.collapse();
-    stack.push(gGridTiles[lowestEntropy]);
+    stack.push(gameState.gGridTiles[lowestEntropy]);
 
     wfcLoop(stack);
 
@@ -357,7 +356,7 @@ function wfcLoop(stack) {
             let possiblesSet = generatePossibleForAllCandidates(tile.candidates, d);
             let neighbourID = tile.neighbours[d];
             if (neighbourID != undefined) {
-                let neighbour = gGridTiles[neighbourID];
+                let neighbour = gameState.gGridTiles[neighbourID];
                 let reduced = neighbour.constrain(possiblesSet);
                 if (reduced) {
                     stack.push(neighbour);
@@ -370,24 +369,24 @@ function wfcLoop(stack) {
 function createBorder() {
     let stack = [];
     for (let y = config.gridWidth; y < config.gridSize - config.gridWidth; y += config.gridWidth) {
-        gGridTiles[y].candidates = [0];
-        stack.push(gGridTiles[y]);
+        gameState.gGridTiles[y].candidates = [0];
+        stack.push(gameState.gGridTiles[y]);
     }
     for (let y = config.gridWidth - 1 + config.gridWidth; y < config.gridSize - config.gridWidth; y += config.gridWidth) {
-        gGridTiles[y].candidates = [0];
-        stack.push(gGridTiles[y]);
+        gameState.gGridTiles[y].candidates = [0];
+        stack.push(gameState.gGridTiles[y]);
     }
     for (let x = 0; x < config.gridWidth; x++) {
-        gGridTiles[x].candidates = [0];
-        stack.push(gGridTiles[x]);
+        gameState.gGridTiles[x].candidates = [0];
+        stack.push(gameState.gGridTiles[x]);
     }
     for (let x = config.gridSize - config.gridWidth; x < config.gridSize; x++) {
-        gGridTiles[x].candidates = [0];
-        stack.push(gGridTiles[x]);
+        gameState.gGridTiles[x].candidates = [0];
+        stack.push(gameState.gGridTiles[x]);
     }
     let m = Math.floor(config.gridSize / 2);
-    gGridTiles[m].candidates = [12];
-    stack.push(gGridTiles[m]);
+    gameState.gGridTiles[m].candidates = [12];
+    stack.push(gameState.gGridTiles[m]);
 
     wfcLoop(stack);
 }
@@ -395,7 +394,7 @@ function createBorder() {
 function generatePossibleForAllCandidates(candidates, direction) {
     let possiblesSet = new Set();
     candidates.forEach((candidate) => {
-        let possibles = gBaseTiles[candidate].possible[direction];
+        let possibles = gameState.gBaseTiles[candidate].possible[direction];
         possibles.forEach((possible) => {
             possiblesSet.add(possible)
         })

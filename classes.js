@@ -228,7 +228,7 @@ class GridTile {
         let totalProbability = 0;
         for (let i = 0; i < this.candidates.length; i++) {
             let candidate = this.candidates[i];
-            let probability = gBaseTiles[candidate].probability;
+            let probability = gameState.gBaseTiles[candidate].probability;
             probabilities.push(probability);
             totalProbability += probability;
         }
@@ -239,7 +239,7 @@ class GridTile {
         let collapsedIndex = 0;
         for (let i = 0; i < probabilities.length; i++) {
             let probability = probabilities[i];
-            if(r < probability + baseValue){
+            if (r < probability + baseValue) {
                 collapsedIndex = i;
                 break;
             }

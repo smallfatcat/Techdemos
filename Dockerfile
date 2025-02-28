@@ -11,4 +11,5 @@ RUN pip install --no-cache-dir websockets
 
 COPY . .
 
-CMD [ "python", "./tetris.py" ]
+CMD [ "python", "./tetris.py"]
+# CMD python ./tetris.py > /data/log.txt

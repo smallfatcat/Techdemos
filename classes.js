@@ -166,9 +166,9 @@ class Bot {
             height = 5;
         }
         // ctx.fillRect(x, y, (config.tileSize / 4 + laneOffsetX) / zoom, (config.tileSize / 4 + laneOffsetY) / zoom);
-        let temp = "car_" + this.color + "" + this.currentDirection;
-        const image = document.getElementById(temp);
-        ctx.drawImage(image, x + (laneOffsetX / zoom), y + (laneOffsetY / zoom), (width) / zoom, (height) / zoom);
+        let tileID = "car_" + this.color + "" + this.currentDirection;
+        const image = document.getElementById(tileID);
+        ctx.drawImage(image, x + (laneOffsetX / gameState.zoom), y + (laneOffsetY / gameState.zoom), (width) / gameState.zoom, (height) / gameState.zoom);
         // ctx.fillRect(x + (laneOffsetX / zoom), y + (laneOffsetY / zoom), (config.tileSize / 4 - 10) / zoom, (config.tileSize / 4 - 10) / zoom);
         ctx.globalAlpha = 1.0;
     }

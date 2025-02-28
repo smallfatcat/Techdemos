@@ -7,30 +7,21 @@ let tileCanvas = undefined;
 let gridCanvas = undefined;
 let bufferCanvas = undefined;
 
-
-let paused = false;
-
 let gBaseTiles = [];
 let gGridTiles = [];
-let drawRobot = false;
 
-let config = {};
-config.numberOfTiles = 50;
-config.tileSize = 64;
-config.width = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
-config.height = Math.ceil(Math.sqrt(config.numberOfTiles)) * config.tileSize;
-config.uniqueEdges = 5;
-// config.numberOfTiles = config.uniqueEdges ** 4;
-config.gridWidth = 25;
-config.gridSize = config.gridWidth * config.gridWidth;
-// config.gridWidth = Math.sqrt(config.gridSize);
+const gridWidth = 25;
+const numberOfTiles = 50;
+const tileSize = 64;
 
-let sx = 0;
-let sy = 0;
-let ox = config.gridWidth * config.tileSize / 2;
-let oy = config.gridWidth * config.tileSize / 2;
-let scrollSpeed = 2;
-let zoom = 1.0;
+const config = {
+    numberOfTiles: numberOfTiles,
+    tileSize: tileSize,
+    width: Math.ceil(Math.sqrt(numberOfTiles)) * tileSize,
+    height: Math.ceil(Math.sqrt(numberOfTiles)) * tileSize,
+    gridWidth: gridWidth,
+    gridSize: gridWidth * gridWidth,
+}
 
 const EDGE_N = 0;
 const EDGE_E = 1;
@@ -43,12 +34,20 @@ const roadColor = [
     "purple",
 ];
 
-let key_up = false;
-let key_down = false;
-let key_left = false;
-let key_right = false;
-let key_zoom_in = false;
-let key_zoom_out = false;
+const gameState = {
+    drawRobot: false,
+    paused: false,
+    viewWindowX: config.gridWidth * config.tileSize / 2,
+    viewWindowY: config.gridWidth * config.tileSize / 2,
+    scrollSpeed: 2,
+    zoom: 1.0,
+    key_up: false,
+    key_down: false,
+    key_left: false,
+    key_right: false,
+    key_zoom_in: false,
+    key_zoom_out: false,
+}
 
 window.onload = (event) => {
     tileCanvas = document.getElementById("tileCanvas");
@@ -69,44 +68,44 @@ window.onload = (event) => {
     document.addEventListener('keydown', function (event) {
         const keyString = event.key.toLowerCase();
         if (keyString == 'a') {
-            key_left = true;
+            gameState.key_left = true;
         }
         if (keyString == 'd') {
-            key_right = true;
+            gameState.key_right = true;
         }
         if (keyString == 'w') {
-            key_up = true;
+            gameState.key_up = true;
         }
         if (keyString == 's') {
-            key_down = true;
+            gameState.key_down = true;
         }
         if (keyString == 'q') {
-            key_zoom_in = true;
+            gameState.key_zoom_in = true;
         }
         if (keyString == 'e') {
-            key_zoom_out = true;
+            gameState.key_zoom_out = true;
         }
     });
 
     document.addEventListener('keyup', function (event) {
         const keyString = event.key.toLowerCase();
         if (keyString == 'a') {
-            key_left = false;
+            gameState.key_left = false;
         }
         if (keyString == 'd') {
-            key_right = false;
+            gameState.key_right = false;
         }
         if (keyString == 'w') {
-            key_up = false;
+            gameState.key_up = false;
         }
         if (keyString == 's') {
-            key_down = false;
+            gameState.key_down = false;
         }
         if (keyString == 'q') {
-            key_zoom_in = false;
+            gameState.key_zoom_in = false;
         }
         if (keyString == 'e') {
-            key_zoom_out = false;
+            gameState.key_zoom_out = false;
         }
     });
 
@@ -150,7 +149,7 @@ function initButton() {
 }
 
 function initRobot() {
-    drawRobot = false;
+    gameState.drawRobot = false;
     robots = [];
     for (let i = 0; i < 100; i++) {
         spawnRobot(Math.floor(config.gridWidth / 2), Math.floor(config.gridWidth / 2), roadColor[i % 3]);
@@ -167,8 +166,8 @@ function changeValue(newVal) {
 }
 
 function pauseButton(newVal) {
-    paused = !paused;
-    if (paused) {
+    gameState.paused = !gameState.paused;
+    if (gameState.paused) {
         document.getElementById("pause").textContent = "Play";
     }
     else {
@@ -177,30 +176,30 @@ function pauseButton(newVal) {
 }
 
 function scroll() {
-    if (key_up) {
-        oy -= scrollSpeed;
+    if (gameState.key_up) {
+        gameState.viewWindowY -= gameState.scrollSpeed;
     }
-    if (key_down) {
-        oy += scrollSpeed;
+    if (gameState.key_down) {
+        gameState.viewWindowY += gameState.scrollSpeed;
     }
-    if (key_left) {
-        ox -= scrollSpeed;
+    if (gameState.key_left) {
+        gameState.viewWindowX -= gameState.scrollSpeed;
     }
-    if (key_right) {
-        ox += scrollSpeed;
+    if (gameState.key_right) {
+        gameState.viewWindowX += gameState.scrollSpeed;
     }
-    if (key_zoom_in) {
-        zoom -= 0.001;
+    if (gameState.key_zoom_in) {
+        gameState.zoom -= 0.001;
     }
-    if (key_zoom_out) {
-        zoom += 0.001;
+    if (gameState.key_zoom_out) {
+        gameState.zoom += 0.001;
     }
 }
 
 function animateGenerationPhase(t) {
     let finished = false;
     loopCount = Math.floor(2 ** (document.getElementById("speed").value / 100));
-    for (i = 0; i < loopCount && !paused; i++) {
+    for (i = 0; i < loopCount && !gameState.paused; i++) {
         finished = !wfc();
         if (finished) {
             break;
@@ -212,7 +211,7 @@ function animateGenerationPhase(t) {
     else {
         console.log(t, "finished");
         generateNeighbourTypes(gGridTiles);
-        drawRobot = true;
+        gameState.drawRobot = true;
         animateRobot();
     }
     drawBaseTiles(tilectx, gBaseTiles);
@@ -229,11 +228,11 @@ function generateNeighbourTypes(grid) {
 
 function animateRobot() {
     scroll();
-    if (drawRobot) {
+    if (gameState.drawRobot) {
         let canvasX = config.gridWidth * config.tileSize;
-        let portalX = canvasX * zoom;
-        let sx = ox - (portalX / 2);
-        let sy = oy - (portalX / 2);
+        let portalX = canvasX * gameState.zoom;
+        let sx = gameState.viewWindowX - (portalX / 2);
+        let sy = gameState.viewWindowY - (portalX / 2);
         gridctx.drawImage(bufferCanvas, sx, sy, portalX, portalX, 0, 0, canvasX, canvasX);
         for (let robot of robots) {
             robot.move(gGridTiles);
@@ -245,14 +244,14 @@ function animateRobot() {
             if (x < 0) {
                 x += config.gridWidth * config.tileSize;
             }
-            robot.draw(gridctx, convertScreenCoords(x, ox), convertScreenCoords(y, oy));
+            robot.draw(gridctx, convertScreenCoords(x, gameState.viewWindowX), convertScreenCoords(y, gameState.viewWindowY));
         }
         requestAnimationFrame(animateRobot);
     }
 }
 
 function convertScreenCoords(x, ox) {
-    return (x - ox) / zoom + (config.gridWidth * config.tileSize) / 2;
+    return (x - ox) / gameState.zoom + (config.gridWidth * config.tileSize) / 2;
 }
 
 function drawBaseTiles(ctx, tiles) {

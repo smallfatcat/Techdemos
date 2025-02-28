@@ -186,6 +186,7 @@ class GridTile {
     }
 
     getEntropy() {
+        // TODO: implement correct entropy calculation
         return this.candidates.length;
     }
 
@@ -195,6 +196,7 @@ class GridTile {
         }
         return 0;
     }
+
     setNeighbourTypes(grid) {
         for (let d = 0; d < 4; d++) {
             let neighbourType = undefined;
@@ -205,6 +207,7 @@ class GridTile {
             this.neighbourTypes.push(neighbourType);
         }
     }
+    
     setEdges(baseTiles) {
         this.edges = baseTiles[this.getbaseID()].edges.slice();
     }
